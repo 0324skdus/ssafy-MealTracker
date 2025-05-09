@@ -1,4 +1,4 @@
-# YAMYAM_KIMNAYEON_LEEJONGHYEON
+# Meal Tracker
 
 
 ## ✅ 핵심 기능 MVP (필수 기능)
