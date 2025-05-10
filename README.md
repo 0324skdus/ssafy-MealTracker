@@ -15,4 +15,4 @@
 | 8         | 게시판 - 추천 기능               | 좋아요 버튼. 추천 수 카운트                             |
 
 
-[](https://lab.ssafy.com/13th08a/06/mealtracker/-/blob/master/Mockup.png?ref_type=heads)
+![Mockup](/uploads/8c80fb2e00acb8034ab414446c84371c/Mockup.png)
