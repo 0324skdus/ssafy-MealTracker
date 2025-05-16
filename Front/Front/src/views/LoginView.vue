@@ -47,14 +47,29 @@
 
 <script setup>
 import { reactive } from 'vue'
+import { useRouter } from 'vue-router'
+import axios from 'axios'
+
+const router = useRouter()
 
 const form = reactive({
   userId: '',
   userPassword: ''
 })
 
-function login() {
-  console.log('로그인 시도:', form)
+async function login() {
+  try {
+    const response = await axios.post('http://localhost:8080/api/auth/login', {
+      userId: form.userId,
+      userPassword: form.userPassword
+    })
+    const token = response.data
+    localStorage.setItem('accessToken', token)
+    router.push('/home')
+  } catch (err) {
+    alert('로그인 실패: 아이디 또는 비밀번호 확인')
+    console.error(err)
+  }
 }
 </script>
 

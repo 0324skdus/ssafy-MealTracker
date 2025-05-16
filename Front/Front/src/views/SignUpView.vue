@@ -157,7 +157,8 @@ function adjustValue(type, delta) {
 }
 
 .logo {
-  width: 6rem;
+  width: 10rem;
+  max-width: 100%;
   height: auto;
   object-fit: contain;
 }
