@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.yamyam.dao.CommunityLikeDao">
+
+    <select id="exists" resultType="boolean">
+        SELECT EXISTS (
+        SELECT 1 FROM community_like
+        WHERE community_id = #{communityId} AND user_id = #{userId}
+        )
+    </select>
+
+    <insert id="insert">
+        INSERT INTO community_like (community_id, user_id)
+        VALUES (#{communityId}, #{userId})
+    </insert>
+
+</mapper>
+

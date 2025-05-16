@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.yamyam.dao.DailyScoreDao">
+
+    <insert id="insert" parameterType="com.ssafy.yamyam.dto.DailyScore">
+        INSERT INTO daily_score (
+        user_id, date, total_kcal, total_carbo, total_protein, total_fat,
+        total_saturatedfat, total_sugar, total_fiber, total_transfat, score
+        ) VALUES (
+        #{userId}, #{date}, #{totalKcal}, #{totalCarbo}, #{totalProtein}, #{totalFat},
+        #{totalSaturatedfat}, #{totalSugar}, #{totalFiber}, #{totalTransfat}, #{score}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.ssafy.yamyam.dto.DailyScore">
+        UPDATE daily_score SET
+        total_kcal = #{totalKcal},
+        total_carbo = #{totalCarbo},
+        total_protein = #{totalProtein},
+        total_fat = #{totalFat},
+        total_saturatedfat = #{totalSaturatedfat},
+        total_sugar = #{totalSugar},
+        total_fiber = #{totalFiber},
+        total_transfat = #{totalTransfat},
+        score = #{score}
+        WHERE user_id = #{userId} AND date = #{date}
+    </update>
+
+    <select id="selectByUserIdAndDate" parameterType="map" resultType="com.ssafy.yamyam.dto.DailyScore">
+        SELECT * FROM daily_score
+        WHERE user_id = #{userId} AND date = #{date}
+    </select>
+
+    <select id="selectByUserId" parameterType="string" resultType="com.ssafy.yamyam.dto.DailyScore">
+        SELECT * FROM daily_score
+        WHERE user_id = #{userId}
+        ORDER BY date DESC
+    </select>
+
+</mapper>

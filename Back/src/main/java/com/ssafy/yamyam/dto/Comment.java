@@ -1,0 +1,63 @@
+package com.ssafy.yamyam.dto;
+
+import java.time.LocalDateTime;
+
+public class Comment {
+
+    private int id;
+    private int communityId; // 외래키
+    private int userId;
+    private String content;
+    private LocalDateTime createdAt;
+
+    public Comment() {}
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getCommunityId() {
+        return communityId;
+    }
+
+    public void setCommunityId(int communityId) {
+        this.communityId = communityId;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Comment(int id, int communityId, int userId, String content, LocalDateTime createdAt) {
+        this.id = id;
+        this.communityId = communityId;
+        this.userId = userId;
+        this.content = content;
+        this.createdAt = createdAt;
+    }
+
+}

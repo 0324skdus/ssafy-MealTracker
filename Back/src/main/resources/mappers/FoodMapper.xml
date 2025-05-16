@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.yamyam.dao.FoodDao">
+
+    <!-- 전체 음식 조회 -->
+    <select id="selectAll" resultType="Food">
+        SELECT * FROM food
+    </select>
+
+    <!-- ID로 음식 단일 조회 -->
+    <select id="selectById" parameterType="int" resultType="Food">
+        SELECT * FROM food WHERE food_id = #{foodId}
+    </select>
+
+    <!-- 음식 추가 -->
+    <insert id="insert" parameterType="Food">
+        INSERT INTO food (food_name, kcal, carbo, protein, fat, saturatedfat, sugar, fiber, transfat)
+        VALUES (#{foodName}, #{kcal}, #{carbo}, #{protein}, #{fat}, #{saturatedFat}, #{sugar}, #{fiber}, #{transfat})
+    </insert>
+</mapper>
