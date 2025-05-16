@@ -8,12 +8,12 @@
       <!-- 1단계 -->
       <div v-if="step === 1" class="step-box">
         <div class="id-box">
-          <input placeholder="ID를 입력하세요" class="input-box id-input" />
+          <input v-model="userId" placeholder="ID를 입력하세요" class="input-box id-input" />
           <button class="check-button">중복확인</button>
         </div>
-        <input type="password" placeholder="비밀번호를 입력하세요" class="input-box" />
-        <input type="password" placeholder="비밀번호를 다시 입력해주세요" class="input-box" />
-        <input type="email" placeholder="email을 입력해주세요" class="input-box" />
+        <input v-model="password" type="password" placeholder="비밀번호를 입력하세요" class="input-box" />
+        <input v-model="passwordConfirm" type="password" placeholder="비밀번호를 다시 입력해주세요" class="input-box" />
+        <input v-model="email" type="email" placeholder="email을 입력해주세요" class="input-box" />
         <div class="button-center">
           <button @click="step = 2" class="submit-button">다음</button>
         </div>
@@ -25,8 +25,8 @@
           <div class="column-box">
             <label class="label">성별</label>
             <div class="radio-group">
-              <label class="radio-box"><input type="radio" name="gender" /> 남</label>
-              <label class="radio-box"><input type="radio" name="gender" /> 여</label>
+              <label class="radio-box"><input type="radio" name="gender" value="M" v-model="gender" /> 남</label>
+              <label class="radio-box"><input type="radio" name="gender" value="F" v-model="gender" /> 여</label>
             </div>
           </div>
           <div class="column-box">
@@ -73,14 +73,14 @@
 
         <div class="activity-box">
           <div class="label">평소 활동량이 얼마나 되나요?</div>
-          <label><input type="radio" name="activity" /> 오래 앉아서 일하고 운동을 거의 하지 않습니다</label>
-          <label><input type="radio" name="activity" /> 가끔 걷거나 가벼운 활동을 합니다</label>
-          <label><input type="radio" name="activity" /> 몸을 많이 쓰는 일을 하거나 운동을 규칙적으로 합니다</label>
+          <label><input type="radio" name="activity" value="low" v-model="activityLevel" /> 오래 앉아서 일하고 운동을 거의 하지 않습니다</label>
+          <label><input type="radio" name="activity" value="moderate" v-model="activityLevel" /> 가끔 걷거나 가벼운 활동을 합니다</label>
+          <label><input type="radio" name="activity" value="high" v-model="activityLevel" /> 몸을 많이 쓰는 일을 하거나 운동을 규칙적으로 합니다</label>
         </div>
 
         <div class="button-row">
           <button @click="step = 1" class="prev-button">이전</button>
-          <button class="submit-button">가입하기</button>
+          <button class="submit-button" @click="submitSignup">가입하기</button>
         </div>
       </div>
     </div>
@@ -89,11 +89,20 @@
 
 <script setup>
 import { ref } from 'vue'
+import axios from 'axios'
 
 const step = ref(1)
+
+const userId = ref('')
+const password = ref('')
+const passwordConfirm = ref('')
+const email = ref('')
+const gender = ref('')
 const age = ref('')
 const height = ref('')
 const weight = ref('')
+const activityLevel = ref('')
+
 const cursorTarget = ref('int')
 
 function handleCursor(event, type) {
@@ -126,6 +135,32 @@ function adjustValue(type, delta) {
   const newVal = `${intPart}.${decPart}`
   if (type === 'height') height.value = newVal
   if (type === 'weight') weight.value = newVal
+}
+
+async function submitSignup() {
+  if (password.value !== passwordConfirm.value) {
+    alert('비밀번호가 일치하지 않습니다.')
+    return
+  }
+
+  try {
+    await axios.post('http://localhost:8080/api/user', {
+      userId: userId.value,
+      password: password.value,
+      email: email.value,
+      gender: gender.value,
+      age: Number(age.value),
+      height: Number(height.value),
+      weight: Number(weight.value),
+      activityLevel: activityLevel.value,
+      name: '',
+      specialNote: ''
+    })
+    alert('회원가입 성공')
+  } catch (err) {
+    console.error(err)
+    alert('회원가입 실패')
+  }
 }
 </script>
 

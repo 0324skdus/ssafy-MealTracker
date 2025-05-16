@@ -28,8 +28,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/user").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/user").permitAll() // 회원가입 허용
+                        .requestMatchers(HttpMethod.GET, "/api/user/exists/**").permitAll() // ID 중복확인 허용
+                        .requestMatchers("/api/auth/**").permitAll() // 로그인 관련 허용
                         .requestMatchers("/api/community").permitAll()
                         .requestMatchers("/api/community/**").permitAll()
                         .anyRequest().authenticated()

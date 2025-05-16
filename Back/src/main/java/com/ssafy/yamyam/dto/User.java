@@ -8,8 +8,8 @@ public class User {
 	private String password;
 	private String name;
 	private String gender;
-	private float height;
-	private float weight;
+	private double height;
+	private double weight;
 	private int age;
 	private String specialNote; // 체중감량, 유지, 근육량 증가 등
 	private String activityLevel; // 활동 수준 추가 (예: low, moderate, high)
@@ -19,7 +19,7 @@ public class User {
 	}
 
 	public User(String userId, String email, String password, String name, String gender,
-				float height, float weight, int age, String specialNote, String activityLevel, LocalDateTime createdAt) {
+				double height, double weight, int age, String specialNote, String activityLevel, LocalDateTime createdAt) {
 		this.userId = userId;
 		this.email = email;
 		this.password = password;
@@ -73,7 +73,7 @@ public class User {
 		this.gender = gender;
 	}
 
-	public float getHeight() {
+	public double getHeight() {
 		return height;
 	}
 
@@ -81,7 +81,7 @@ public class User {
 		this.height = height;
 	}
 
-	public float getWeight() {
+	public double getWeight() {
 		return weight;
 	}
 
