@@ -13,4 +13,4 @@
 | 6         | 게시판 - 추천 기능               | 좋아요 버튼. 추천 수 카운트                             |
 
 
-![Mockup](/uploads/8c80fb2e00acb8034ab414446c84371c/Mockup.png)
+![mockup](/uploads/9f6760cba05606731de79d40e5f20024/mockup.png)
