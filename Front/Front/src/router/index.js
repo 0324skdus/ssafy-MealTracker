@@ -6,7 +6,7 @@ import MainView from '../views/MainView.vue'
 const routes = [
   { path: '/', component: LoginView },
   { path: '/signup', component: SignUpView },
-  { path: '/main', component: MainView }
+  { path: '/main', component: MainView }//메인페이지(캘린더) 링크
 ]
 
 const router = createRouter({
