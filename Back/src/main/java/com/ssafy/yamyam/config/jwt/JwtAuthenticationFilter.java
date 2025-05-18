@@ -1,3 +1,4 @@
+// JwtAuthenticationFilter.java
 package com.ssafy.yamyam.config.jwt;
 
 import com.ssafy.yamyam.dto.User;
@@ -33,6 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 인증 제외 경로
         if (uri.equals("/api/user") ||
+                uri.startsWith("/api/user/check-id") ||
                 uri.startsWith("/api/user/exists") ||
                 uri.startsWith("/api/auth")) {
             filterChain.doFilter(request, response);

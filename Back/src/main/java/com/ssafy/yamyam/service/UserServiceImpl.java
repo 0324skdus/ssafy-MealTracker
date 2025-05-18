@@ -88,4 +88,9 @@ public class UserServiceImpl implements UserService {
 
         return maintenanceCalories + adjustment;
     }
+
+    @Override
+    public boolean isUserIdExists(String userId) {
+        return userDao.countByUserId(userId) > 0;
+    }
 }

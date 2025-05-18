@@ -8,7 +8,7 @@
       <div v-if="step === 1" class="step-box">
         <div class="id-box">
           <input v-model="userId" placeholder="ID를 입력하세요" class="input-box id-input" />
-          <button class="check-button">중복확인</button>
+          <button class="check-button" @click="checkDuplicateId">중복확인</button>
         </div>
         <input v-model="name" placeholder="이름을 입력하세요" class="input-box" />
         <input v-model="password" type="password" placeholder="비밀번호를 입력하세요" class="input-box" />
@@ -143,6 +143,27 @@ function adjustValue(type, delta) {
   const newVal = `${intPart}.${decPart}`
   if (type === 'height') height.value = newVal
   if (type === 'weight') weight.value = newVal
+}
+
+async function checkDuplicateId() {
+  if (!userId.value) {
+    alert('아이디를 입력하세요.')
+    return
+  }
+
+  try {
+    const res = await axios.get('http://localhost:8080/api/user/check-id', {
+      params: { userId: userId.value }
+    })
+    if (res.data === '사용 가능한 아이디입니다.') {
+      alert('사용가능한 ID 입니다')
+    } else {
+      alert('이미 존재하는 ID 입니다')
+    }
+  } catch (err) {
+    console.error(err)
+    alert('중복 확인 중 오류가 발생했습니다.')
+  }
 }
 
 async function submitSignup() {

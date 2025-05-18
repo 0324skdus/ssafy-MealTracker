@@ -1,3 +1,4 @@
+// SecurityConfig.java
 package com.ssafy.yamyam.config;
 
 import com.ssafy.yamyam.config.jwt.JwtAuthenticationFilter;
@@ -30,12 +31,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                .cors() // CORS 허용 활성화
+                .cors()
                 .and()
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/user").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/user/check-id").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/user/exists/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/community").permitAll()

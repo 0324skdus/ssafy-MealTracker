@@ -112,4 +112,14 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패");
         }
     }*/
+
+    @GetMapping("/check-id")
+    public ResponseEntity<String> checkUserId(@RequestParam String userId) {
+        boolean exists = userService.isUserIdExists(userId);
+        if (exists) {
+            return ResponseEntity.ok("존재하는 아이디입니다.");
+        } else {
+            return ResponseEntity.ok("사용 가능한 아이디입니다.");
+        }
+    }
 }
