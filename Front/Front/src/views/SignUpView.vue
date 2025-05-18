@@ -5,12 +5,12 @@
         <img src="/logo.png" alt="logo" class="logo" />
       </div>
 
-      <!-- 1단계 -->
       <div v-if="step === 1" class="step-box">
         <div class="id-box">
           <input v-model="userId" placeholder="ID를 입력하세요" class="input-box id-input" />
           <button class="check-button">중복확인</button>
         </div>
+        <input v-model="name" placeholder="이름을 입력하세요" class="input-box" />
         <input v-model="password" type="password" placeholder="비밀번호를 입력하세요" class="input-box" />
         <input v-model="passwordConfirm" type="password" placeholder="비밀번호를 다시 입력해주세요" class="input-box" />
         <input v-model="email" type="email" placeholder="email을 입력해주세요" class="input-box" />
@@ -19,7 +19,6 @@
         </div>
       </div>
 
-      <!-- 2단계 -->
       <div v-else class="step-box">
         <div class="row-box">
           <div class="column-box">
@@ -73,9 +72,16 @@
 
         <div class="activity-box">
           <div class="label">평소 활동량이 얼마나 되나요?</div>
-          <label><input type="radio" name="activity" value="low" v-model="activityLevel" /> 오래 앉아서 일하고 운동을 거의 하지 않습니다</label>
-          <label><input type="radio" name="activity" value="moderate" v-model="activityLevel" /> 가끔 걷거나 가벼운 활동을 합니다</label>
-          <label><input type="radio" name="activity" value="high" v-model="activityLevel" /> 몸을 많이 쓰는 일을 하거나 운동을 규칙적으로 합니다</label>
+          <label><input type="radio" name="activity" value="L" v-model="activityLevel" /> 오래 앉아서 일하고 운동을 거의 하지 않습니다</label>
+          <label><input type="radio" name="activity" value="M" v-model="activityLevel" /> 가끔 걷거나 가벼운 활동을 합니다</label>
+          <label><input type="radio" name="activity" value="H" v-model="activityLevel" /> 몸을 많이 쓰는 일을 하거나 운동을 규칙적으로 합니다</label>
+        </div>
+
+        <div class="activity-box">
+          <div class="label">어떤 목표를 가지고 계신가요?</div>
+          <label><input type="radio" name="goal" value="체중감량" v-model="specialNote" /> 체중을 감량하고 싶습니다</label>
+          <label><input type="radio" name="goal" value="체중유지" v-model="specialNote" /> 현재 체중을 유지하고 싶습니다</label>
+          <label><input type="radio" name="goal" value="근육량 증가" v-model="specialNote" /> 근육량을 늘리고 싶습니다</label>
         </div>
 
         <div class="button-row">
@@ -94,6 +100,7 @@ import axios from 'axios'
 const step = ref(1)
 
 const userId = ref('')
+const name = ref('')
 const password = ref('')
 const passwordConfirm = ref('')
 const email = ref('')
@@ -102,6 +109,7 @@ const age = ref('')
 const height = ref('')
 const weight = ref('')
 const activityLevel = ref('')
+const specialNote = ref('')
 
 const cursorTarget = ref('int')
 
@@ -146,6 +154,7 @@ async function submitSignup() {
   try {
     await axios.post('http://localhost:8080/api/user', {
       userId: userId.value,
+      name: name.value,
       password: password.value,
       email: email.value,
       gender: gender.value,
@@ -153,8 +162,7 @@ async function submitSignup() {
       height: Number(height.value),
       weight: Number(weight.value),
       activityLevel: activityLevel.value,
-      name: '',
-      specialNote: ''
+      specialNote: specialNote.value
     })
     alert('회원가입 성공')
   } catch (err) {
