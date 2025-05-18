@@ -6,9 +6,9 @@
       </router-link>
     </div>
     <ul>
-      <li>마이페이지</li>
-      <li>게시판</li>
-      <li>회원정보 수정</li>
+      <li><router-link to="#">마이페이지</router-link></li>
+      <li><router-link to="#">게시판</router-link></li>
+      <li><router-link to="/profile-edit">회원정보 수정</router-link></li>
     </ul>
   </aside>
 </template>

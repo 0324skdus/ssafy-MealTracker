@@ -82,36 +82,7 @@ public class UserController {
     }
 
 
-    // 로그인
-//    @PostMapping("/login")
-//    public ResponseEntity<?> login(@RequestBody Map<String, String> loginData) {
-//        String userId = loginData.get("userId");
-//        String userPassword = loginData.get("userPassword");
-//
-//        User user = userService.login(userId, userPassword);
-//        if (user != null) {
-//            return ResponseEntity.ok(user);
-//        } else {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패");
-//        }
-//    }
-   /* @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> loginData) {
-        String userId = loginData.get("userId");
-        String userPassword = loginData.get("userPassword");
 
-        User user = userService.login(userId, userPassword);
-        if (user != null) {
-            String token = jwtUtil.generateToken(user.getUserId());
-            return ResponseEntity.ok(Map.of(
-                "token", token,
-                "userId", user.getUserId(),
-                "email", user.getEmail()
-            ));
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패");
-        }
-    }*/
 
     @GetMapping("/check-id")
     public ResponseEntity<String> checkUserId(@RequestParam String userId) {

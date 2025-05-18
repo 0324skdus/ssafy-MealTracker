@@ -33,7 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         System.out.println("[JwtFilter] 요청 URI: " + uri);
 
         // 인증 제외 경로
-        if (uri.equals("/api/user") ||
+        if ((uri.equals("/api/user") && request.getMethod().equals("POST")) ||
                 uri.startsWith("/api/user/check-id") ||
                 uri.startsWith("/api/user/exists") ||
                 uri.startsWith("/api/auth")) {
