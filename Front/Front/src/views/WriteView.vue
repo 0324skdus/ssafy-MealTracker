@@ -84,7 +84,6 @@ export default {
           }
         })
 
-        // ✅ 등록 성공 시 작성 중 상태 해제
         isDirty = false
 
         alert(response.data)

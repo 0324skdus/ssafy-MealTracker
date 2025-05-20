@@ -63,4 +63,18 @@ public class CommunityServiceImpl implements CommunityService {
         return communityDao.selectBoardList();
     }
 
+    @Override
+    public List<Community> getByLikeCount() {
+        return communityDao.selectByLikeCountDesc();
+    }
+
+    @Override
+    public List<Community> getByCreatedAt() {
+        return communityDao.selectByCreatedAtDesc();
+    }
+
+    @Override
+    public List<Community> getByType(String type) {
+        return communityDao.selectByCommunityType(type);
+    }
 }

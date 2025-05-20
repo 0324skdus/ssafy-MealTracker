@@ -21,20 +21,36 @@
     <update id="update" parameterType="Community">
         UPDATE community
         SET title = #{title},
-            content = #{content}
+        content = #{content}
         WHERE id = #{id}
     </update>
 
     <delete id="delete" parameterType="int">
         DELETE FROM community WHERE id = #{id}
     </delete>
-<!--좋아요 카운트-->
+    <!--좋아요 카운트-->
     <update id="incrementLikeCount">
         UPDATE community
         SET like_count = IFNULL(like_count, 0) + 1
         WHERE id = #{communityId}
     </update>
 
+    <!-- 좋아요 내림차순 -->
+    <select id="selectByLikeCountDesc" resultType="Community">
+        SELECT * FROM community ORDER BY like_count DESC
+    </select>
+
+    <!-- 최신순 -->
+    <select id="selectByCreatedAtDesc" resultType="Community">
+        SELECT * FROM community ORDER BY created_at DESC
+    </select>
+
+    <!-- 게시판별 분류 -->
+    <select id="selectByCommunityType" parameterType="String" resultType="Community">
+        SELECT * FROM community
+        WHERE community_type = #{type}
+        ORDER BY created_at DESC
+    </select>
 
 
 </mapper>

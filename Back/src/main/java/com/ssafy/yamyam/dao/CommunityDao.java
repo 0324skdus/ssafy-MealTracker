@@ -20,5 +20,9 @@ public interface CommunityDao {
     //게시판 조회용 리스트
     List<Community> selectBoardList();
 
+    List<Community> selectByLikeCountDesc();
 
+    List<Community> selectByCreatedAtDesc();
+
+    List<Community> selectByCommunityType(String type);
 }

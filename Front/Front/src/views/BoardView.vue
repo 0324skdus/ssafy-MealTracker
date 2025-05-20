@@ -23,7 +23,7 @@
             <span class="title" :title="post.title">{{ post.title }}</span>
             <span class="likes">❤️ {{ post.likeCount }}</span>
             <span class="writer">{{ maskUsername(post.userId) }}</span>
-            <span class="date">{{ post.createdAt }}</span>
+            <span class="date">{{ formatDate(post.createdAt) }}</span>
           </div>
         </div>
 
@@ -38,7 +38,6 @@
           </button>
         </div>
 
-        <!-- ✅ 검색창 + 글쓰기 버튼 한 줄에 -->
         <div class="action-bar">
           <div class="search-wrapper">
             <span class="search-icon">🔍</span>
@@ -58,13 +57,13 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import axios from 'axios'
+import { useRouter } from 'vue-router'
 import LeftSidebar from '@/components/LeftSidebar.vue'
 import RightSidebar from '@/components/RightSidebar.vue'
-import { useRouter } from 'vue-router'
 
 const router = useRouter()
-
 function goToWrite() {
   router.push('/write')
 }
@@ -75,14 +74,27 @@ const currentPage = ref(1)
 const pageSize = 10
 const searchKeyword = ref("")
 
-const posts = ref([
-  { id: 1, userId: 'ssafy01', title: '5월 18일 점심식단 여기 제목이 몇글자까지 표시되는지 궁금하네요', likeCount: 4, createdAt: '2025-05-18' },
-  { id: 2, userId: 'healthking', title: '헬스인들을 위한 고단백 저녁', likeCount: 7, createdAt: '2025-05-18' },
-  { id: 3, userId: 'sunny33', title: '가벼운 아침 식단 추천', likeCount: 2, createdAt: '2025-05-17' },
-  { id: 4, userId: 'leejin', title: '탄단지 균형 점심식단', likeCount: 5, createdAt: '2025-05-16' },
-  { id: 5, userId: 'ssafy08', title: '다이어트 도시락 구성', likeCount: 10, createdAt: '2025-05-15' },
-  { id: 6, userId: 'testuser', title: '식단 공유합니다', likeCount: 1, createdAt: '2025-05-14' }
-])
+const posts = ref([])
+
+const fetchPosts = async () => {
+  const token = localStorage.getItem('accessToken')
+  try {
+    const response = await axios.get(`/api/community?sort=${currentTab.value}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    posts.value = response.data
+  } catch (err) {
+    console.error('게시글 불러오기 실패', err)
+  }
+}
+
+onMounted(fetchPosts)
+watch(currentTab, () => {
+  currentPage.value = 1
+  fetchPosts()
+})
 
 const filteredPosts = computed(() =>
   posts.value.filter(post =>
@@ -100,11 +112,14 @@ const pagedPosts = computed(() =>
 
 function onTabChange(type) {
   currentTab.value = type
-  currentPage.value = 1
 }
 
 function maskUsername(userId) {
   return userId.length <= 4 ? '*'.repeat(userId.length) : userId.slice(0, 4) + '*'.repeat(3)
+}
+
+function formatDate(dateString) {
+  return dateString?.slice(0, 10)
 }
 </script>
 
@@ -148,6 +163,9 @@ function maskUsername(userId) {
 .board-area {
   padding: 0 20px;
 }
+.board-list {
+  border-top: 1px solid #ccc;
+}
 .board-item {
   display: flex;
   justify-content: space-between;
@@ -190,14 +208,11 @@ function maskUsername(userId) {
   background-color: #65a30d;
   color: white;
 }
-
-/* ✅ 검색창 + 버튼 한 줄 flex */
 .action-bar {
   position: relative;
   height: 60px;
   margin: 30px 20px 40px;
 }
-
 .search-wrapper {
   position: absolute;
   left: 50%;
@@ -205,7 +220,6 @@ function maskUsername(userId) {
   width: 50%;
   min-width: 300px;
 }
-
 .search-box {
   width: 100%;
   padding: 10px 14px;
@@ -215,7 +229,6 @@ function maskUsername(userId) {
   font-size: 16px;
   outline: none;
 }
-
 .search-icon {
   position: absolute;
   left: 12px;
@@ -224,7 +237,6 @@ function maskUsername(userId) {
   font-size: 16px;
   color: #888;
 }
-
 .write-button {
   position: absolute;
   right: 0;
@@ -238,5 +250,4 @@ function maskUsername(userId) {
   font-size: 16px;
   cursor: pointer;
 }
-
 </style>
