@@ -1,4 +1,4 @@
-// ✅ JwtAuthenticationFilter.java - 로그 추가 버전
+// JwtAuthenticationFilter.java
 package com.ssafy.yamyam.config.jwt;
 
 import com.ssafy.yamyam.dto.User;
@@ -32,7 +32,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String uri = request.getRequestURI();
         System.out.println("[JwtFilter] 요청 URI: " + uri);
 
-        if (uri.startsWith("/api/auth")) {
+        // 인증 제외 경로
+        if ((uri.equals("/api/user") && request.getMethod().equals("POST")) ||
+                uri.startsWith("/api/user/check-id") ||
+                uri.startsWith("/api/user/exists") ||
+                uri.startsWith("/api/auth")) {
             filterChain.doFilter(request, response);
             return;
         }

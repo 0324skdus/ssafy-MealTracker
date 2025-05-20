@@ -20,5 +20,8 @@ public interface CommunityService {
     boolean hasUserLiked(int communityId, String userId);
 
     void addLike(int communityId, String userId);
+    
+    //게시판 조회
+    List<Community> getBoardList();
 
 }

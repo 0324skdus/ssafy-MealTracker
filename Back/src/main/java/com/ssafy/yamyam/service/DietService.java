@@ -1,6 +1,7 @@
 package com.ssafy.yamyam.service;
 
 import com.ssafy.yamyam.dto.Diet;
+import com.ssafy.yamyam.dto.MonthlyDiet;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -29,4 +30,6 @@ public interface DietService {
     int scoring(String userId,LocalDate date);
 
     public boolean registerByFoodId(String userId, String mealType, int foodId, LocalDate date);
+
+	List<MonthlyDiet> getMonthlySummary(String userId, LocalDate startDate, LocalDate endDate);
 }

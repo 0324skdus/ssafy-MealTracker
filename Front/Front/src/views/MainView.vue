@@ -15,9 +15,9 @@
     <RightSidebar />
   </div>
 </template>
-
 <script setup>
 import { ref, onMounted } from 'vue'
+import axios from 'axios'
 import LeftSidebar from '@/components/LeftSidebar.vue'
 import RightSidebar from '@/components/RightSidebar.vue'
 import FullCalendar from '@fullcalendar/vue3'
@@ -30,23 +30,12 @@ function getLeafIcon(score) {
   return 'badLeaf.png'
 }
 
-// 더미 점수 데이터
-const scoreData = [
-  { date: '2025-05-26', score: 85, kcal: 1800 },
-  { date: '2025-05-27', score: 65, kcal: 1500 },
-  { date: '2025-05-18', score: 40, kcal: 1200 }
-]
-// 기본적인 dayClick방식으로 쓰니 아이콘 있는 셀만 클릭되고 빈셀은 클릭이 안됨 풀캘린더 자체버그
-// dayClick는 클릭이벤트만다룸, dayCellDidMount로 클릭+셀 디자인 커스텀 
-// 날짜 기반 점수 맵으로 변환
-const scoreMap = Object.fromEntries(
-  scoreData.map(item => [item.date, item])
-)
-
 const calendarRef = ref(null) // FullCalendar 접근용 ref
 const currentTitle = ref('')  // 현재 년월 표시용
 
-// 달 표시 기본형 영어길래 한글로 바꿔봄, 영어가 더 나을거같으면 원복하겠음
+const scoreMap = ref({}) // 날짜 기반 점수 맵 (API로 가져온 후 갱신됨)
+
+// 달 표시 커스텀
 const updateTitle = () => {
   const calendarApi = calendarRef.value.getApi()
   const date = calendarApi.getDate()
@@ -55,21 +44,58 @@ const updateTitle = () => {
   currentTitle.value = `${year}년 ${month}월`
 }
 
+// API에서 한 달치 식단 점수 요약 받아오기
+const fetchMonthlyData = async () => {
+  try {
+    const token = localStorage.getItem('accessToken')
+    const userId = localStorage.getItem('userId')
+
+    // 현재 보여지는 캘린더의 전체 날짜 범위 (지난달~다음달 일부 포함)
+    const calendarApi = calendarRef.value.getApi()
+    const startDate = calendarApi.view.currentStart.toISOString().split('T')[0]
+    const endDate = calendarApi.view.currentEnd.toISOString().split('T')[0]
+
+    const res = await axios.get('http://localhost:8080/api/diet/summary/monthly', {
+      params: { userId, startDate, endDate },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    console.log('응답 데이터:', res.data)  // 이 줄 추가
+
+    // 날짜 기준으로 데이터 변환
+    scoreMap.value = Object.fromEntries(
+      res.data.map(item => [item.date, { score: item.score, kcal: item.totalKcal }])
+    )
+const currentDate = calendarApi.getDate()
+calendarApi.next()
+calendarApi.prev()
+calendarApi.gotoDate(currentDate)
+
+    calendarApi.render() // 셀 다시 그리기
+  } catch (e) {
+    console.error('식단 요약 데이터 불러오기 실패:', e)
+  }
+}
+
 // 이전달 이동
 const prevMonth = () => {
   calendarRef.value.getApi().prev()
   updateTitle()
+  fetchMonthlyData() // 달 변경시 데이터 다시 로딩
 }
 
 // 다음달 이동
 const nextMonth = () => {
   calendarRef.value.getApi().next()
   updateTitle()
+  fetchMonthlyData() // 달 변경시 데이터 다시 로딩
 }
 
-// 컴포넌트 마운트 시 타이틀 초기화
+// 컴포넌트 마운트 시 타이틀 및 데이터 초기화
 onMounted(() => {
   updateTitle()
+  fetchMonthlyData()
 })
 
 const calendarOptions = ref({
@@ -85,7 +111,7 @@ const calendarOptions = ref({
   dayCellDidMount(arg) {
     const localDate = new Date(arg.date.getTime() - arg.date.getTimezoneOffset() * 60000)
     const dateStr = localDate.toISOString().split('T')[0]
-    const info = scoreMap[dateStr]
+    const info = scoreMap.value[dateStr]
 
     const frameEl = arg.el.querySelector('.fc-daygrid-day-frame')
     if (!frameEl) return
@@ -191,7 +217,7 @@ const calendarOptions = ref({
   object-fit: contain;
   display: block;
   width: 20px;
-  height: 20px;
+  height: 25px;
 }
 
 /* 칼로리 텍스트 */
