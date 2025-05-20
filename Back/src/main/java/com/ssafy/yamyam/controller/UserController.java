@@ -33,7 +33,7 @@ public class UserController {
 
     // 사용자 ID로 조회
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable String id) {
+    public ResponseEntity<User> getUser(@PathVariable("id") String id) {
         User user = userService.getUserById(id);
         if (user != null) {
             return ResponseEntity.ok(user);
@@ -85,7 +85,7 @@ public class UserController {
 
 
     @GetMapping("/check-id")
-    public ResponseEntity<String> checkUserId(@RequestParam String userId) {
+    public ResponseEntity<String> checkUserId(@RequestParam("userId") String userId) {
         boolean exists = userService.isUserIdExists(userId);
         if (exists) {
             return ResponseEntity.ok("존재하는 아이디입니다.");

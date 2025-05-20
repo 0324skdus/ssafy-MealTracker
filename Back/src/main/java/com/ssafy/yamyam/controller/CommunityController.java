@@ -127,7 +127,7 @@ public class CommunityController {
 		communityService.addLike(communityId, userId);
 		return ResponseEntity.ok("추천 완료");
 	}
-
+	//게시판 조회
 	@GetMapping("/board")
 	public List<Community> getBoardList() {
 		return communityService.getBoardList();

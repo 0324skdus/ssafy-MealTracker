@@ -13,7 +13,9 @@
       <router-link to="/board" >
         <li>게시판</li>
       </router-link>
-      <li>회원정보 수정</li>
+      <router-link to ="/profile-edit">
+        <li>회원정보 수정</li>
+      </router-link>
     </ul>
   </aside>
 </template>

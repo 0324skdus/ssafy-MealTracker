@@ -20,47 +20,40 @@ import java.util.Arrays;
 @Configuration
 public class SecurityConfig {
 
-    private final JwtUtil jwtUtil;
-    private final UserService userService;
+	private final JwtUtil jwtUtil;
+	private final UserService userService;
 
-    public SecurityConfig(JwtUtil jwtUtil, UserService userService) {
-        this.jwtUtil = jwtUtil;
-        this.userService = userService;
-    }
+	public SecurityConfig(JwtUtil jwtUtil, UserService userService) {
+		this.jwtUtil = jwtUtil;
+		this.userService = userService;
+	}
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http
-                .cors()
-                .and()
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/user").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/api/user").authenticated() // ← 이 줄 반드시 필요
-                        .requestMatchers(HttpMethod.GET, "/api/user/check-id").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/user/exists/**").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/community").permitAll()
-                        .requestMatchers("/api/community/**").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userService),
-                        UsernamePasswordAuthenticationFilter.class)
-                .build();
-    }
+	@Bean
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		return http.cors().and().csrf(csrf -> csrf.disable())
+				.sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.POST, "/api/user").permitAll()
+						.requestMatchers(HttpMethod.PUT, "/api/user").authenticated() // ← 이 줄 반드시 필요
+						.requestMatchers(HttpMethod.GET, "/api/user/check-id").permitAll()
+						.requestMatchers(HttpMethod.GET, "/api/user/exists/**").permitAll()
+						.requestMatchers("/api/auth/**").permitAll().requestMatchers("/api/community").permitAll()
+						.requestMatchers("/api/community/**").permitAll().anyRequest().authenticated())
+				.addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userService),
+						UsernamePasswordAuthenticationFilter.class)
+				.build();
+	}
 
-    @Bean
-    public CorsFilter corsFilter() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(Arrays.asList("*"));
-        config.setAllowCredentials(true);
+	@Bean
+	public CorsFilter corsFilter() {
+		CorsConfiguration config = new CorsConfiguration();
+		config.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+		config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		config.setAllowedHeaders(Arrays.asList("*"));
+		config.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", config);
 
-        return new CorsFilter(source);
-    }
+		return new CorsFilter(source);
+	}
 }
