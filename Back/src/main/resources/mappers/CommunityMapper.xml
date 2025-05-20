@@ -6,8 +6,8 @@
 <mapper namespace="com.ssafy.yamyam.dao.CommunityDao">
 
     <insert id="insert" parameterType="Community">
-        INSERT INTO community (user_id, title, content, created_at)
-        VALUES (#{userId}, #{title}, #{content}, NOW())
+        INSERT INTO community (user_id, title, content, created_at, community_type)
+        VALUES (#{userId}, #{title}, #{content}, NOW(), #{communityType})
     </insert>
 
     <select id="selectById" parameterType="int" resultType="Community">
@@ -34,6 +34,7 @@
         SET like_count = IFNULL(like_count, 0) + 1
         WHERE id = #{communityId}
     </update>
+
 
 
 </mapper>

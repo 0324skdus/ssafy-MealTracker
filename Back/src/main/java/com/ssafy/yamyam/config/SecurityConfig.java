@@ -41,8 +41,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/user/check-id").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/user/exists/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/community").permitAll()
-                        .requestMatchers("/api/community/**").permitAll()
+                        .requestMatchers("/api/community").authenticated()
+                        .requestMatchers("/api/community/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userService),

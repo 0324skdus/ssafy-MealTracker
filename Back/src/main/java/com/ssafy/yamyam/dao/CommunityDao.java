@@ -3,6 +3,7 @@ package com.ssafy.yamyam.dao;
 import com.ssafy.yamyam.dto.Community;
 import java.util.List;
 
+
 public interface CommunityDao {
 
     int insert(Community community);
