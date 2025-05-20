@@ -1,6 +1,7 @@
 package com.ssafy.yamyam.dao;
 
 import com.ssafy.yamyam.dto.Diet;
+import com.ssafy.yamyam.dto.MonthlyDiet;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -26,4 +27,11 @@ public interface DietDao {
 
     // 식단 삭제
     int delete(int dietId);
+    //캘린더용 한달식단리스트 조회
+    List<MonthlyDiet> selectMonthlyDietSummary(
+    	    @Param("userId") String userId,
+    	    @Param("startDate") LocalDate startDate,
+    	    @Param("endDate") LocalDate endDate
+    	);
+
 }

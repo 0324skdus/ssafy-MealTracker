@@ -25,4 +25,6 @@ public interface UserDao {
     // 로그인 기능
 
     User login(@Param("userId") String userId, @Param("userPassword") String userPassword);
+
+    int countByUserId(String userId);
 }

@@ -45,7 +45,7 @@ CREATE TABLE community (
     content TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    like_count INT DEFAULT 0;, --좋아요 카운트
+    like_count INT DEFAULT 0, -- 좋아요 카운트
     FOREIGN KEY (user_id) REFERENCES user(id)
 );
 
