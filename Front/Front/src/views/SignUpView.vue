@@ -165,8 +165,14 @@ async function checkDuplicateId() {
     alert('중복 확인 중 오류가 발생했습니다.')
   }
 }
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 async function submitSignup() {
+  
+
+  
   if (password.value !== passwordConfirm.value) {
     alert('비밀번호가 일치하지 않습니다.')
     return
@@ -186,6 +192,7 @@ async function submitSignup() {
       specialNote: specialNote.value
     })
     alert('회원가입 성공')
+    router.push('/')
   } catch (err) {
     console.error(err)
     alert('회원가입 실패')

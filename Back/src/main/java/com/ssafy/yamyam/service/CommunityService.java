@@ -21,4 +21,7 @@ public interface CommunityService {
 
     void addLike(int communityId, String userId);
 
+    //게시판 조회
+    List<Community> getBoardList();
+
 }

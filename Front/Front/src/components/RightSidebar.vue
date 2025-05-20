@@ -26,7 +26,7 @@
 <style scoped>
 .right-sidebar {
   width: 250px;
-  background-color: #d6f7bb;
+  background-color: #c7eeb0;
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -35,6 +35,7 @@
 
 .info-box h3 {
   margin-bottom: 10px;
+  font-weight: bold;
 }
 
 .info-box ul {

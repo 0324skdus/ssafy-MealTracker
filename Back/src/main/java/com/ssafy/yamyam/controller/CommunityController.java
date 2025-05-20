@@ -36,7 +36,8 @@ public class CommunityController {
         community.setUserId(loginUser.getUserId());
 
         boolean result = communityService.register(community);
-        if (result) return ResponseEntity.ok("게시글 등록 성공");
+        if (result)
+            return ResponseEntity.ok("게시글 등록 성공");
         return ResponseEntity.badRequest().body("게시글 등록 실패");
     }
 
@@ -44,10 +45,10 @@ public class CommunityController {
     public ResponseEntity<Community> get(@PathVariable("id") int id) {
         System.out.println("[게시글 단일 조회] Authentication: " + SecurityContextHolder.getContext().getAuthentication());
         Community community = communityService.getById(id);
-        if (community != null) return ResponseEntity.ok(community);
+        if (community != null)
+            return ResponseEntity.ok(community);
         return ResponseEntity.notFound().build();
     }
-
 
     @GetMapping
     public ResponseEntity<List<Community>> getAll() {
@@ -55,8 +56,7 @@ public class CommunityController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> modify(@PathVariable("id") int id,
-                                         @RequestBody Community community,
+    public ResponseEntity<String> modify(@PathVariable("id") int id, @RequestBody Community community,
                                          @AuthenticationPrincipal CustomUserDetails loginUser) {
         System.out.println("[컨트롤러] loginUser: " + loginUser);
         System.out.println("[컨트롤러] SecurityContext: " + SecurityContextHolder.getContext().getAuthentication());
@@ -78,7 +78,8 @@ public class CommunityController {
         community.setUserId(loginUser.getUserId());
 
         boolean result = communityService.modify(community);
-        if (result) return ResponseEntity.ok("게시글 수정 성공");
+        if (result)
+            return ResponseEntity.ok("게시글 수정 성공");
         return ResponseEntity.badRequest().body("게시글 수정 실패");
     }
 
@@ -102,15 +103,14 @@ public class CommunityController {
         }
 
         boolean result = communityService.remove(id);
-        if (result) return ResponseEntity.ok("삭제 완료");
+        if (result)
+            return ResponseEntity.ok("삭제 완료");
         return ResponseEntity.badRequest().body("삭제 실패");
     }
 
     @PostMapping("/{id}/like")
-    public ResponseEntity<?> likeCommunity(
-            @PathVariable("id") int communityId,
-            @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
+    public ResponseEntity<?> likeCommunity(@PathVariable("id") int communityId,
+                                           @AuthenticationPrincipal CustomUserDetails userDetails) {
         System.out.println("[컨트롤러] userDetails: " + userDetails);
         System.out.println("[컨트롤러] SecurityContext: " + SecurityContextHolder.getContext().getAuthentication());
 
@@ -126,5 +126,10 @@ public class CommunityController {
 
         communityService.addLike(communityId, userId);
         return ResponseEntity.ok("추천 완료");
+    }
+
+    @GetMapping("/board")
+    public List<Community> getBoardList() {
+        return communityService.getBoardList();
     }
 }

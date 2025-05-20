@@ -58,4 +58,9 @@ public class CommunityServiceImpl implements CommunityService {
         communityLikeDao.insert(communityId, userId);
         communityDao.incrementLikeCount(communityId); // like_count 컬럼 필요
     }
+    //게시판 조회
+    public List<Community> getBoardList() {
+        return communityDao.selectBoardList();
+    }
+
 }

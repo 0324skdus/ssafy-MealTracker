@@ -8,6 +8,7 @@ public class Community {
     private String userId;
     private String title;
     private String content;
+    private int likeCount;
     private LocalDateTime createdAt;
 
     public Community() {}
@@ -52,11 +53,21 @@ public class Community {
         this.createdAt = createdAt;
     }
 
-    public Community(int id, String userId, String title, String content, LocalDateTime createdAt) {
+    public int getLikeCount() {
+        return likeCount;
+    }
+
+    public void setLikeCount(int likeCount) {
+        this.likeCount = likeCount;
+    }
+
+    public Community(int id, String userId, String title, String content, int likeCount, LocalDateTime createdAt) {
+        super();
         this.id = id;
         this.userId = userId;
         this.title = title;
         this.content = content;
+        this.likeCount = likeCount;
         this.createdAt = createdAt;
     }
 
