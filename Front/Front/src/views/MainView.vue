@@ -29,6 +29,10 @@ function getLeafIcon(score) {
   if (score >= 50) return 'sosoLeaf.png'
   return 'badLeaf.png'
 }
+/*백에서 한달치 정보 반환하는api생성, 날짜 범위를 받음
+프론트에서 캘린더 정보 이용해서 날짜 범위를 정한 api를 보내면
+백에서 그 날짜정보만큼의 범위로 데이터 잘라서 전달해줌
+반환데이터 형식은 아래 더미데이터 형식 따름름*/ 
 
 // 더미 점수 데이터
 const scoreData = [

@@ -16,5 +16,8 @@ public interface CommunityDao {
     int delete(int id);
     //좋아요수 카운트 기능
     int incrementLikeCount(int communityId);
+    //게시판 조회용 리스트
+    List<Community> selectBoardList();
+
 
 }

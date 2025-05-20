@@ -5,35 +5,51 @@
 
 <mapper namespace="com.ssafy.yamyam.dao.CommunityDao">
 
-    <insert id="insert" parameterType="Community">
-        INSERT INTO community (user_id, title, content, created_at)
-        VALUES (#{userId}, #{title}, #{content}, NOW())
-    </insert>
+	<insert id="insert" parameterType="Community">
+		INSERT INTO community (user_id, title, content, created_at)
+		VALUES (#{userId}, #{title}, #{content}, NOW())
+	</insert>
 
-    <select id="selectById" parameterType="int" resultType="Community">
-        SELECT * FROM community WHERE id = #{id}
-    </select>
+	<select id="selectById" parameterType="int"
+		resultType="Community">
+		SELECT * FROM community WHERE id = #{id}
+	</select>
 
-    <select id="selectAll" resultType="Community">
-        SELECT * FROM community ORDER BY created_at DESC
-    </select>
+	<select id="selectAll" resultType="Community">
+		SELECT * FROM community ORDER BY created_at DESC
+	</select>
 
-    <update id="update" parameterType="Community">
-        UPDATE community
-        SET title = #{title},
-            content = #{content}
-        WHERE id = #{id}
-    </update>
+	<update id="update" parameterType="Community">
+		UPDATE community
+		SET title = #{title},
+		content = #{content}
+		WHERE id = #{id}
+	</update>
 
-    <delete id="delete" parameterType="int">
-        DELETE FROM community WHERE id = #{id}
-    </delete>
-<!--좋아요 카운트-->
-    <update id="incrementLikeCount">
-        UPDATE community
-        SET like_count = IFNULL(like_count, 0) + 1
-        WHERE id = #{communityId}
-    </update>
+	<delete id="delete" parameterType="int">
+		DELETE FROM community WHERE id = #{id}
+	</delete>
+	<!--좋아요 카운트 -->
+	<update id="incrementLikeCount">
+		UPDATE community
+		SET like_count = IFNULL(like_count, 0) + 1
+		WHERE id = #{communityId}
+	</update>
+	<!--게시판 목록 전용 전체리스트 -->
+	<select id="selectBoardList" resultType="Community">
+		SELECT
+		c.id,
+		c.user_id,
+		c.title,
+		c.created_at,
+		COUNT(cl.id) AS like_count
+		FROM community c
+		LEFT JOIN community_like cl ON c.id = cl.community_id
+		GROUP BY c.id
+		ORDER BY c.created_at DESC
+
+	</select>
+
 
 
 </mapper>

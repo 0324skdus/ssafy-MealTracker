@@ -36,4 +36,5 @@ public class CommentServiceImpl implements CommentService {
     public boolean remove(int id) {
         return commentDao.delete(id) > 0;
     }
+
 }
