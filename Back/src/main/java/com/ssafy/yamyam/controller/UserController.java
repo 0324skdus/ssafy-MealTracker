@@ -45,12 +45,18 @@ public class UserController {
     // 사용자 등록
     @PostMapping
     public ResponseEntity<String> register(@RequestBody User user) {
-        boolean result = userService.register(user);
-        if (result) {
-            return ResponseEntity.ok("회원가입 성공");
-        } else {
-            return ResponseEntity.status(400).body("회원가입 실패");
+        System.out.println("[UserController] /api/user POST 요청 도착");
+        System.out.println("[UserController] user 객체: " + user);
+
+        if (user == null) {
+            System.out.println("[UserController] user 객체가 null입니다.");
+            return ResponseEntity.status(400).body("User 객체 바인딩 실패");
         }
+
+        boolean result = userService.register(user);
+        return result ?
+                ResponseEntity.ok("회원가입 성공") :
+                ResponseEntity.status(400).body("회원가입 실패");
     }
 
     // 사용자 정보 수정
@@ -64,7 +70,7 @@ public class UserController {
         }
     }
 
-    // 회원 탈퇴   
+    // 회원 탈퇴
     @DeleteMapping("/{userId}")
     public ResponseEntity<String> delete(@PathVariable("userId") String userId) {
         boolean result = userService.remove(userId);
@@ -76,34 +82,15 @@ public class UserController {
     }
 
 
-    // 로그인
-//    @PostMapping("/login")
-//    public ResponseEntity<?> login(@RequestBody Map<String, String> loginData) {
-//        String userId = loginData.get("userId");
-//        String userPassword = loginData.get("userPassword");
-//
-//        User user = userService.login(userId, userPassword);
-//        if (user != null) {
-//            return ResponseEntity.ok(user);
-//        } else {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패");
-//        }
-//    }
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> loginData) {
-        String userId = loginData.get("userId");
-        String userPassword = loginData.get("userPassword");
 
-        User user = userService.login(userId, userPassword);
-        if (user != null) {
-            String token = jwtUtil.generateToken(user.getUserId());
-            return ResponseEntity.ok(Map.of(
-                "token", token,
-                "userId", user.getUserId(),
-                "email", user.getEmail()
-            ));
+
+    @GetMapping("/check-id")
+    public ResponseEntity<String> checkUserId(@RequestParam String userId) {
+        boolean exists = userService.isUserIdExists(userId);
+        if (exists) {
+            return ResponseEntity.ok("존재하는 아이디입니다.");
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패");
+            return ResponseEntity.ok("사용 가능한 아이디입니다.");
         }
     }
 }
