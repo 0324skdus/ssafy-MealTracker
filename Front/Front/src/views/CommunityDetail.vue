@@ -17,12 +17,14 @@
         </div>
 
         <div class="post-actions">
-          <button class="like-button" @click="likePost">❤️ 좋아요 {{ post.likeCount }}</button>
+          <div class="left-group">
+            <button class="like-button" @click="likePost">❤️ 좋아요 {{ post.likeCount }}</button>
+          </div>
 
-          <template v-if="isAuthor">
+          <div class="right-group" v-if="isAuthor">
             <button class="edit-button" @click="goToEdit">수정</button>
             <button class="delete-button" @click="deletePost">삭제</button>
-          </template>
+          </div>
         </div>
       </div>
 
@@ -57,12 +59,8 @@ const fetchPost = async () => {
     post.value = res.data
 
     const decoded = parseJwt(token)
-    const loggedInUserId = decoded?.userId?.trim().toLowerCase()
-    const postOwnerId = res.data.userId?.trim().toLowerCase()
-
-    console.log('로그인된 유저:', loggedInUserId)
-    console.log('글 작성자:', postOwnerId)
-    console.log('둘이 같은가?', loggedInUserId === postOwnerId)
+    const loggedInUserId = (decoded?.userId || decoded?.sub || '').trim().toLowerCase()
+    const postOwnerId = (res.data.userId || '').trim().toLowerCase()
 
     isAuthor.value = loggedInUserId === postOwnerId
   } catch (err) {
@@ -150,7 +148,7 @@ onMounted(fetchPost)
 .post-content-box {
   border: 1px solid #ccc;
   padding: 20px;
-  background-color: white;
+  background-color: #fafafa;
   border-radius: 6px;
   margin-bottom: 30px;
 }
@@ -159,31 +157,38 @@ onMounted(fetchPost)
   line-height: 1.6;
   white-space: pre-wrap;
 }
+
 .post-actions {
   display: flex;
-  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
 }
+.left-group,
+.right-group {
+  display: flex;
+  gap: 12px;
+}
+
+/* 버튼 통일 색상 */
 .like-button,
 .edit-button,
 .delete-button {
-  padding: 8px 16px;
+  background-color: #86efac;
   border: none;
   border-radius: 6px;
-  cursor: pointer;
+  padding: 8px 16px;
   font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
 }
-.like-button {
-  background-color: #f87171;
-  color: white;
+
+.like-button:hover,
+.edit-button:hover,
+.delete-button:hover {
+  background-color: #4ade80;
 }
-.edit-button {
-  background-color: #60a5fa;
-  color: white;
-}
-.delete-button {
-  background-color: #d1d5db;
-  color: black;
-}
+
 .loading {
   padding: 40px;
   text-align: center;

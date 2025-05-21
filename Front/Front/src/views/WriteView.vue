@@ -30,7 +30,9 @@
         ></textarea>
 
         <div class="button-wrapper">
-          <button @click="submitPost" class="submit-button">등록</button>
+          <button @click="submitPost" class="submit-button">
+            {{ isEditMode ? '수정' : '등록' }}
+          </button>
         </div>
       </div>
     </div>
@@ -40,8 +42,8 @@
 </template>
 
 <script>
-import { ref, watch } from 'vue'
-import { onBeforeRouteLeave, useRouter } from 'vue-router'
+import { ref, watch, onMounted } from 'vue'
+import { useRouter, useRoute, onBeforeRouteLeave } from 'vue-router'
 import axios from 'axios'
 import LeftSidebar from '@/components/LeftSidebar.vue'
 import RightSidebar from '@/components/RightSidebar.vue'
@@ -54,6 +56,9 @@ export default {
   },
   setup() {
     const router = useRouter()
+    const route = useRoute()
+    const postId = route.params.id
+    const isEditMode = ref(!!postId)
 
     const form = ref({
       communityType: '',
@@ -61,9 +66,25 @@ export default {
       content: '',
     })
 
-    let isDirty = false
-    const markDirty = () => { isDirty = true }
-    watch(form, markDirty, { deep: true })
+    const isDirty = ref(false)
+    watch(form, () => { isDirty.value = true }, { deep: true })
+
+    onMounted(async () => {
+      if (isEditMode.value) {
+        try {
+          const token = localStorage.getItem('accessToken')
+          const res = await axios.get(`/api/community/${postId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+          form.value.communityType = res.data.communityType
+          form.value.title = res.data.title
+          form.value.content = res.data.content
+        } catch (err) {
+          alert('글 정보를 불러오지 못했습니다.')
+          router.push('/board')
+        }
+      }
+    })
 
     const submitPost = async () => {
       if (!form.value.communityType || !form.value.title || !form.value.content) {
@@ -78,27 +99,32 @@ export default {
       }
 
       try {
-        const response = await axios.post('/api/community', { ...form.value }, {
+        const config = {
           headers: {
             Authorization: `Bearer ${token}`
           }
-        })
+        }
 
-        isDirty = false
+        if (isEditMode.value) {
+          await axios.put(`/api/community/${postId}`, form.value, config)
+          alert('게시글 수정 완료')
+        } else {
+          const response = await axios.post('/api/community', form.value, config)
+          alert(response.data)
+        }
 
-        alert(response.data)
+        isDirty.value = false
         router.push('/board')
       } catch (err) {
-        alert('게시글 등록 실패')
+        alert(isEditMode.value ? '게시글 수정 실패' : '게시글 등록 실패')
         console.error(err)
       }
     }
 
     onBeforeRouteLeave((to, from, next) => {
-      if (isDirty && (form.value.title || form.value.content)) {
+      if (isDirty.value && (form.value.title || form.value.content)) {
         const confirmLeave = confirm('작성 중인 내용이 있습니다. 나가시겠습니까?')
-        if (confirmLeave) next()
-        else next(false)
+        next(confirmLeave)
       } else {
         next()
       }
@@ -107,6 +133,7 @@ export default {
     return {
       form,
       submitPost,
+      isEditMode,
     }
   },
 }

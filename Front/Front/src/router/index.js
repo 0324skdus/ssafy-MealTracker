@@ -19,7 +19,11 @@ const routes = [
     path: '/community/:id',
     name: 'CommunityDetail',
     component: CommunityDetail
-  }
+  },
+  {
+  path: '/edit/:id',
+  component: WriteView
+}
 ]
 
 const router = createRouter({
