@@ -9,6 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -27,7 +30,13 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("아이디 또는 비밀번호가 일치하지 않습니다.");
         }
 
-        String token = jwtUtil.generateToken(String.valueOf(user.getUserId()));
-        return ResponseEntity.ok(token);
+        String token = jwtUtil.generateToken(user.getUserId());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("token", token);
+        response.put("userId", user.getUserId());
+        response.put("name", user.getName());
+
+        return ResponseEntity.ok(response);
     }
 }

@@ -41,6 +41,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/user/check-id").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/user/exists/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/nutrition/target").authenticated()
                         .requestMatchers("/api/community").authenticated()
                         .requestMatchers("/api/community/**").authenticated()
                         .anyRequest().authenticated()

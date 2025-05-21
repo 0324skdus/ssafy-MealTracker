@@ -4,6 +4,7 @@ import com.ssafy.yamyam.dao.DietDao;
 import com.ssafy.yamyam.dao.FoodDao;
 import com.ssafy.yamyam.dto.Diet;
 import com.ssafy.yamyam.dto.Food;
+import com.ssafy.yamyam.dto.MonthlyDiet;
 import com.ssafy.yamyam.dto.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +19,14 @@ public class DietServiceImpl implements DietService {
     private final DietDao dietDao;
     private final UserService userService;
     private final FoodDao foodDao;
+    private final NutritionService nutritionService;
 
     @Autowired
-    public DietServiceImpl(DietDao dietDao, UserService userService, FoodDao foodDao) {
+    public DietServiceImpl(DietDao dietDao, UserService userService, FoodDao foodDao, NutritionService nutritionService) {
         this.dietDao = dietDao;
         this.userService = userService;
         this.foodDao = foodDao;
+        this.nutritionService = nutritionService;
     }
 
     @Override
@@ -82,7 +85,8 @@ public class DietServiceImpl implements DietService {
         List<Diet> meals = dietDao.selectByUserIdAndDate(userId, date);
         if (meals == null || meals.isEmpty()) return 0;
 
-        double recommendedCalories = userService.calculateRecommendedCalories(user);
+        double recommendedCalories = nutritionService.calculateNutritionTargets(user.getUserId()).getKcal();
+
         String goal = user.getSpecialNote(); // "체중감량", "체중유지", "근육량증가"
 
         double totalCal = 0, totalCarb = 0, totalProtein = 0, totalFat = 0;
@@ -172,6 +176,12 @@ public class DietServiceImpl implements DietService {
     @Override
     public List<Diet> getByUserIdAndDate(String userId, LocalDate date) {
         return dietDao.selectByUserIdAndDate(userId, date);
+    }
+
+    //캘린더용 한달식단 조회
+    @Override
+    public List<MonthlyDiet> getMonthlySummary(String userId, LocalDate startDate, LocalDate endDate) {
+        return dietDao.selectMonthlyDietSummary(userId, startDate, endDate);
     }
 
 

@@ -1,4 +1,7 @@
 package com.ssafy.yamyam.service;
 
-public class NutritionService {
+import com.ssafy.yamyam.dto.DailyNutrition;
+
+public interface NutritionService {
+    DailyNutrition calculateNutritionTargets(String userId);
 }

@@ -4,12 +4,10 @@ import com.ssafy.yamyam.dto.User;
 import com.ssafy.yamyam.config.jwt.JwtUtil;
 import com.ssafy.yamyam.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/user")
@@ -17,7 +15,6 @@ public class UserController {
 
     private final UserService userService;
     private final JwtUtil jwtUtil;
-
 
     @Autowired
     public UserController(UserService userService, JwtUtil jwtUtil) {
@@ -33,7 +30,7 @@ public class UserController {
 
     // 사용자 ID로 조회
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable String id) {
+    public ResponseEntity<User> getUser(@PathVariable("id") String id) {
         User user = userService.getUserById(id);
         if (user != null) {
             return ResponseEntity.ok(user);
@@ -50,13 +47,13 @@ public class UserController {
 
         if (user == null) {
             System.out.println("[UserController] user 객체가 null입니다.");
-            return ResponseEntity.status(400).body("User 객체 바인딩 실패");
+            return ResponseEntity.badRequest().body("User 객체 바인딩 실패");
         }
 
         boolean result = userService.register(user);
         return result ?
                 ResponseEntity.ok("회원가입 성공") :
-                ResponseEntity.status(400).body("회원가입 실패");
+                ResponseEntity.badRequest().body("회원가입 실패");
     }
 
     // 사용자 정보 수정
@@ -66,7 +63,7 @@ public class UserController {
         if (result) {
             return ResponseEntity.ok("회원 정보 수정 성공");
         } else {
-            return ResponseEntity.status(400).body("수정 실패");
+            return ResponseEntity.badRequest().body("수정 실패");
         }
     }
 
@@ -77,15 +74,13 @@ public class UserController {
         if (result) {
             return ResponseEntity.ok("회원 탈퇴 성공");
         } else {
-            return ResponseEntity.status(400).body("회원 탈퇴 실패");
+            return ResponseEntity.badRequest().body("회원 탈퇴 실패");
         }
     }
 
-
-
-
+    // 아이디 중복 확인
     @GetMapping("/check-id")
-    public ResponseEntity<String> checkUserId(@RequestParam String userId) {
+    public ResponseEntity<String> checkUserId(@RequestParam("userId") String userId) {
         boolean exists = userService.isUserIdExists(userId);
         if (exists) {
             return ResponseEntity.ok("존재하는 아이디입니다.");

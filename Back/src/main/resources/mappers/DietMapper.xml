@@ -61,4 +61,16 @@
         DELETE FROM diet WHERE diet_id = #{dietId}
     </delete>
 
+    <select id="selectMonthlyDietSummary" resultType="com.ssafy.yamyam.dto.MonthlyDiet">
+        SELECT
+        date,
+        MAX(score) AS score,
+        SUM(kcal) AS totalKcal
+        FROM diet
+        WHERE user_id = #{userId}
+        AND date BETWEEN #{startDate} AND #{endDate}
+        GROUP BY date
+    </select>
+
+
 </mapper>
