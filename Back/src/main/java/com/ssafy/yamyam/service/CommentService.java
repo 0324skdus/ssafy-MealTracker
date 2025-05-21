@@ -12,5 +12,5 @@ public interface CommentService {
     boolean modify(Comment comment);
 
     boolean remove(int id);
-    
+
 }

@@ -4,25 +4,28 @@
 
     <div class="content-area">
       <header class="header-area">
-      </header>
-
-      <div class="search-area">
-        <div class="search-wrapper">
-          <span class="search-icon">🔍</span>
-          <input
-            v-model="searchKeyword"
-            placeholder="식단 제목 검색"
-            class="search-box"
-          />
+        <h2 class="board-title">게시판</h2>
+        <div class="board-tabs">
+          <button
+            v-for="type in tabTypes"
+            :key="type"
+            :class="{ active: currentTab === type }"
+            @click="onTabChange(type)"
+          >
+            {{ type }}
+          </button>
         </div>
-      </div>
+      </header>
 
       <main class="board-area">
         <div class="board-list">
           <div class="board-item" v-for="post in pagedPosts" :key="post.id">
-            <span class="title" :title="post.title">{{ post.title }}</span>
+            <router-link :to="`/community/${post.id}`" class="title" :title="post.title">
+  {{ post.title }}
+</router-link>
             <span class="likes">❤️ {{ post.likeCount }}</span>
             <span class="writer">{{ maskUsername(post.userId) }}</span>
+            <span class="date">{{ formatDate(post.createdAt) }}</span>
           </div>
         </div>
 
@@ -36,6 +39,18 @@
             {{ n }}
           </button>
         </div>
+
+        <div class="action-bar">
+          <div class="search-wrapper">
+            <span class="search-icon">🔍</span>
+            <input
+              v-model="searchKeyword"
+              placeholder="제목 검색"
+              class="search-box"
+            />
+          </div>
+          <button class="write-button" @click="goToWrite">글쓰기</button>
+        </div>
       </main>
     </div>
 
@@ -44,24 +59,44 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import axios from 'axios'
+import { useRouter } from 'vue-router'
 import LeftSidebar from '@/components/LeftSidebar.vue'
 import RightSidebar from '@/components/RightSidebar.vue'
 
-//게시글 수가 많지않은 상황이라 전체글정보를 가져와서 프론트선에서 잘라서 페이지네이션 표시, 여유생기면 서버페이지네이션 도전
-//더미데이터
-const posts = ref([
-  { id: 1, userId: 'ssafy01', title: '5월 18일 점심식단 여기 제목이 몇글자까지 표시되는지 궁금하네요', likeCount: 4, createdAt: '2025-05-18' },
-  { id: 2, userId: 'healthking', title: '헬스인들을 위한 고단백 저녁', likeCount: 7, createdAt: '2025-05-18' },
-  { id: 3, userId: 'sunny33', title: '가벼운 아침 식단 추천', likeCount: 2, createdAt: '2025-05-17' },
-  { id: 4, userId: 'leejin', title: '탄단지 균형 점심식단', likeCount: 5, createdAt: '2025-05-16' },
-  { id: 5, userId: 'ssafy08', title: '다이어트 도시락 구성', likeCount: 10, createdAt: '2025-05-15' },
-  { id: 6, userId: 'testuser', title: '식단 공유합니다', likeCount: 1, createdAt: '2025-05-14' }
-])
+const router = useRouter()
+function goToWrite() {
+  router.push('/write')
+}
 
-const searchKeyword = ref("")
+const tabTypes = ['인기글', '최신글', '식단', '자유게시판']
+const currentTab = ref('최신글')
 const currentPage = ref(1)
-const pageSize = 3
+const pageSize = 10
+const searchKeyword = ref("")
+
+const posts = ref([])
+
+const fetchPosts = async () => {
+  const token = localStorage.getItem('accessToken')
+  try {
+    const response = await axios.get(`/api/community?sort=${currentTab.value}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    posts.value = response.data
+  } catch (err) {
+    console.error('게시글 불러오기 실패', err)
+  }
+}
+
+onMounted(fetchPosts)
+watch(currentTab, () => {
+  currentPage.value = 1
+  fetchPosts()
+})
 
 const filteredPosts = computed(() =>
   posts.value.filter(post =>
@@ -77,8 +112,16 @@ const pagedPosts = computed(() =>
   filteredPosts.value.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize)
 )
 
+function onTabChange(type) {
+  currentTab.value = type
+}
+
 function maskUsername(userId) {
   return userId.length <= 4 ? '*'.repeat(userId.length) : userId.slice(0, 4) + '*'.repeat(3)
+}
+
+function formatDate(dateString) {
+  return dateString?.slice(0, 10)
 }
 </script>
 
@@ -93,17 +136,89 @@ function maskUsername(userId) {
 }
 .header-area {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  padding: 20px;
+  padding: 20px 0;
 }
-.search-area {
+.board-title {
+  font-size: 42px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+.board-tabs {
   display: flex;
-  justify-content: center;
+  gap: 10px;
   margin-bottom: 20px;
 }
-.search-wrapper {
+.board-tabs button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 9999px;
+  background-color: #eee;
+  cursor: pointer;
+  font-size: 16px;
+}
+.board-tabs button.active {
+  background-color: #65a30d;
+  color: white;
+}
+.board-area {
+  padding: 0 20px;
+}
+.board-list {
+  border-top: 1px solid #ccc;
+}
+.board-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+.title {
+  flex: 3;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.likes {
+  flex: 0.7;
+  text-align: center;
+}
+.writer {
+  flex: 1;
+  text-align: right;
+}
+.date {
+  flex: 1;
+  text-align: right;
+  color: #666;
+  font-size: 14px;
+}
+.pagination {
+  margin-top: 16px;
+  text-align: center;
+}
+.pagination button {
+  margin: 0 4px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 4px;
+  background-color: #eee;
+  cursor: pointer;
+}
+.pagination button.active {
+  background-color: #65a30d;
+  color: white;
+}
+.action-bar {
   position: relative;
+  height: 60px;
+  margin: 30px 20px 40px;
+}
+.search-wrapper {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   width: 50%;
   min-width: 300px;
 }
@@ -124,43 +239,17 @@ function maskUsername(userId) {
   font-size: 16px;
   color: #888;
 }
-.board-area {
-  padding: 0 20px;
-}
-.board-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px;
-  border-bottom: 1px solid #ddd;
-}
-.title {
-  flex: 2;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-.likes {
-  flex: 0.5;
-  text-align: center;
-}
-.writer {
-  flex: 1;
-  text-align: right;
-}
-.pagination {
-  margin-top: 16px;
-  text-align: center;
-}
-.pagination button {
-  margin: 0 4px;
-  padding: 6px 10px;
+.write-button {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-70%);
+  padding: 10px 20px;
   border: none;
-  border-radius: 4px;
-  background-color: #eee;
-  cursor: pointer;
-}
-.pagination button.active {
+  border-radius: 9999px;
   background-color: #65a30d;
   color: white;
+  font-size: 16px;
+  cursor: pointer;
 }
 </style>

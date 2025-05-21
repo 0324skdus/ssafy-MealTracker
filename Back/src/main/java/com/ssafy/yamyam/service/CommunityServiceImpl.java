@@ -63,4 +63,32 @@ public class CommunityServiceImpl implements CommunityService {
         return communityDao.selectBoardList();
     }
 
+    @Override
+    public List<Community> getByLikeCount() {
+        return communityDao.selectByLikeCountDesc();
+    }
+
+    @Override
+    public List<Community> getByCreatedAt() {
+        return communityDao.selectByCreatedAtDesc();
+    }
+
+    @Override
+    public List<Community> getByType(String type) {
+        return communityDao.selectByCommunityType(type);
+    }
+
+    @Override
+    public boolean toggleLike(int communityId, String userId) {
+        if (communityLikeDao.hasUserLiked(communityId, userId)) {
+            communityDao.decrementLikeCount(communityId); // 좋아요 수 감소
+            communityLikeDao.removeLike(communityId, userId); // 좋아요 기록 삭제
+            return false; // 좋아요 취소됨
+        } else {
+            communityDao.incrementLikeCount(communityId); // 좋아요 수 증가
+            communityLikeDao.addLike(communityId, userId); // 좋아요 기록 추가
+            return true; // 좋아요 등록됨
+        }
+    }
+
 }

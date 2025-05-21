@@ -1,101 +1,72 @@
 <template>
-  <div class="backdrop" @click.self="emit('close')">
+  <div class="backdrop" @click.self="close">
     <div class="panel">
+      <!-- 날짜 -->
       <div class="header">
-        <h2>{{ date }} 식단 상세</h2>
-        <button class="close-btn" @click="emit('close')">X</button>
+        <h2 class="date-title">{{ date }} 식단 상세</h2>
+        <button class="close-btn" @click="close">X</button>
       </div>
 
+      <!-- 식사 등록 버튼 -->
+      <div class="meal-buttons">
+        <button @click="register('아침')">아침</button>
+        <button @click="register('점심')">점심</button>
+        <button @click="register('저녁')">저녁</button>
+        <button @click="register('간식')">간식</button>
+      </div>
+
+      <!-- 영양성분 요약 -->
+      <div class="nutrition-summary" v-if="nutritionTarget">
+        <div class="nutrient kcal">총 칼로리: {{ nutrition.kcal }} / {{ nutritionTarget.kcal }} kcal</div>
+        <div class="nutrient carb">탄수화물: {{ nutrition.carb }} / {{ nutritionTarget.carb }}g</div>
+        <div class="nutrient protein">단백질: {{ nutrition.protein }} / {{ nutritionTarget.protein }}g</div>
+        <div class="nutrient fat">지방: {{ nutrition.fat }} / {{ nutritionTarget.fat }}g</div>
+        <div class="nutrient fiber">식이섬유: {{ nutrition.fiber }} / {{ nutritionTarget.fiber }}g</div>
+        <div class="nutrient sugar">당류: {{ nutrition.sugar }} / {{ nutritionTarget.sugar }}g</div>
+      </div>
+
+      <!-- 식단 상세 (더미 or 추후 API 연동 예정) -->
       <div class="meal-section">
-        <div v-for="meal in ['아침', '점심', '저녁', '간식']" :key="meal">
-          <p><strong>{{ meal }}:</strong> 
-            <span v-if="groupedDietList[meal]">
-              {{ groupedDietList[meal].map(item => item.foodName).join(', ') }}
-            </span>
-            <span v-else>없음</span>
-          </p>
-        </div>
-
-        <p><strong>총 칼로리:</strong> {{ total.kcal }} kcal</p>
-      </div>
-
-      <div class="footer">
-        <div class="meal-buttons">
-          <button @click="register('아침')">아침</button>
-          <button @click="register('점심')">점심</button>
-          <button @click="register('저녁')">저녁</button>
-          <button @click="register('간식')">간식</button>
-        </div>
+        <p><strong>아침:</strong> {{ meal.breakfast || '등록된 식단 없음' }}</p>
+        <p><strong>점심:</strong> {{ meal.lunch || '등록된 식단 없음' }}</p>
+        <p><strong>저녁:</strong> {{ meal.dinner || '등록된 식단 없음' }}</p>
+        <p><strong>간식:</strong> {{ meal.snack || '등록된 식단 없음' }}</p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
-import axios from 'axios'
+const props = defineProps({
+  date: String,
+  nutritionTarget: Object
+})
 
-const props = defineProps({ date: String })
 const emit = defineEmits(['close', 'openRegister'])
 
-const dietList = ref([])
-const groupedDietList = ref({})
-const total = ref({ kcal: 0, carbo: 0, protein: 0, fat: 0, fiber: 0, sugar: 0 })
+const nutrition = {
+  kcal: 0,
+  carb: 0,
+  protein: 0,
+  fat: 0,
+  fiber: 0,
+  sugar: 0
+}
+
+const meal = {
+  breakfast: '',
+  lunch: '',
+  dinner: '',
+  snack: ''
+}
+
+function close() {
+  emit('close')
+}
 
 function register(mealType) {
   emit('openRegister', { date: props.date, mealType })
 }
-async function fetchDietList() {
-  const userId = localStorage.getItem('userId')
-  const token = localStorage.getItem('accessToken')
-  if (!userId || !props.date || !token) return
-
-  try {
-    const res = await axios.get(`/api/diet/user/${userId}/date`, {
-      params: { date: props.date },
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    dietList.value = res.data
-    calculateGroupedAndTotal()
-  } catch (err) {
-    console.error('식단 조회 실패:', err)
-  }
-}
-
-function calculateGroupedAndTotal() {
-  const grouped = { 아침: [], 점심: [], 저녁: [], 간식: [] }
-  const sum = { kcal: 0, carbo: 0, protein: 0, fat: 0, fiber: 0, sugar: 0 }
-
-  // 영어 mealType → 한글 매핑
-  const mealMap = {
-    breakfast: '아침',
-    lunch: '점심',
-    dinner: '저녁',
-    snack: '간식'
-  }
-
-  for (const item of dietList.value) {
-    const translated = mealMap[item.mealType] // 예: 'breakfast' → '아침'
-    if (translated) grouped[translated].push(item)
-
-    sum.kcal += Number(item.kcal) || 0
-    sum.carbo += Number(item.carbo) || 0
-    sum.protein += Number(item.protein) || 0
-    sum.fat += Number(item.fat) || 0
-    sum.fiber += Number(item.fiber) || 0
-    sum.sugar += Number(item.sugar) || 0
-  }
-
-  groupedDietList.value = grouped
-  total.value = sum
-}
-
-
-
-watch(() => props.date, fetchDietList, { immediate: true })
-onMounted(fetchDietList)
 </script>
 
 <style scoped>
@@ -119,6 +90,10 @@ onMounted(fetchDietList)
   display: flex;
   flex-direction: column;
 }
+.date-title {
+  font-size: 20px;
+  font-weight: bold;
+}
 .header {
   display: flex;
   justify-content: space-between;
@@ -130,20 +105,12 @@ onMounted(fetchDietList)
   font-size: 20px;
   cursor: pointer;
 }
-.meal-section {
-  flex-grow: 1;
-  margin-top: 20px;
-}
-.footer {
-  text-align: center;
-  margin-top: 20px;
-}
 .meal-buttons {
   display: flex;
   justify-content: space-around;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 10px;
+  margin: 20px 0;
 }
 .meal-buttons button {
   padding: 10px 20px;
@@ -158,12 +125,30 @@ onMounted(fetchDietList)
 .meal-buttons button:nth-child(2) { background-color: #f8b400; }
 .meal-buttons button:nth-child(3) { background-color: #6a67ce; }
 .meal-buttons button:nth-child(4) { background-color: #ff8360; }
+
+.nutrition-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.nutrient {
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  color: white;
+}
+.nutrient.kcal    { background-color: #e76f51; }
+.nutrient.carb    { background-color: #f9c74f; }
+.nutrient.protein { background-color: #f9844a; }
+.nutrient.fat     { background-color: #90be6d; }
+.nutrient.fiber   { background-color: #43aa8b; }
+.nutrient.sugar   { background-color: #577590; }
+
+.meal-section {
+  margin-top: 30px;
+}
 @keyframes slideIn {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0);
-  }
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
 }
 </style>

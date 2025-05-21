@@ -3,6 +3,7 @@ package com.ssafy.yamyam.dao;
 import com.ssafy.yamyam.dto.Community;
 import java.util.List;
 
+
 public interface CommunityDao {
 
     int insert(Community community);
@@ -19,5 +20,12 @@ public interface CommunityDao {
     //게시판 조회용 리스트
     List<Community> selectBoardList();
 
+    List<Community> selectByLikeCountDesc();
+
+    List<Community> selectByCreatedAtDesc();
+
+    List<Community> selectByCommunityType(String type);
+
+    int decrementLikeCount(int communityId);
 
 }

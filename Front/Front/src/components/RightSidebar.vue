@@ -35,6 +35,7 @@
 
 .info-box h3 {
   margin-bottom: 10px;
+  font-weight: bold;
 }
 
 .info-box ul {

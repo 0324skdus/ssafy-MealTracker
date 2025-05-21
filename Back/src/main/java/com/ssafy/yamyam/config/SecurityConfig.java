@@ -28,20 +28,28 @@ public class SecurityConfig {
 		this.userService = userService;
 	}
 
-	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		return http.cors().and().csrf(csrf -> csrf.disable())
-				.sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.POST, "/api/user").permitAll()
-						.requestMatchers(HttpMethod.PUT, "/api/user").authenticated() // ← 이 줄 반드시 필요
-						.requestMatchers(HttpMethod.GET, "/api/user/check-id").permitAll()
-						.requestMatchers(HttpMethod.GET, "/api/user/exists/**").permitAll()
-						.requestMatchers("/api/auth/**").permitAll().requestMatchers("/api/community").permitAll()
-						.requestMatchers("/api/community/**").permitAll().anyRequest().authenticated())
-				.addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userService),
-						UsernamePasswordAuthenticationFilter.class)
-				.build();
-	}
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        return http
+                .cors()
+                .and()
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.POST, "/api/user").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/user").authenticated() // ← 이 줄 반드시 필요
+                        .requestMatchers(HttpMethod.GET, "/api/user/check-id").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/user/exists/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/nutrition/target").authenticated()
+                        .requestMatchers("/api/community").authenticated()
+                        .requestMatchers("/api/community/**").authenticated()
+                        .anyRequest().authenticated()
+                )
+                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userService),
+                        UsernamePasswordAuthenticationFilter.class)
+                .build();
+    }
 
 	@Bean
 	public CorsFilter corsFilter() {

@@ -19,7 +19,6 @@ public interface UserService {
 
     User login(String userId, String userPassword);
 
-    public double calculateRecommendedCalories(User user);
 
     boolean isUserIdExists(String userId);
 }

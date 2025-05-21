@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String uri = request.getRequestURI();
         System.out.println("[JwtFilter] 요청 URI: " + uri);
 
-        // 인증 제외 경로
+        // 인증 제외 경로 (회원가입, 로그인 등만 통과)
         if ((uri.equals("/api/user") && request.getMethod().equals("POST")) ||
                 uri.startsWith("/api/user/check-id") ||
                 uri.startsWith("/api/user/exists") ||
@@ -41,37 +41,42 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+        // 나머지 경로는 모두 인증 필수 → 토큰 검사
         String authHeader = request.getHeader("Authorization");
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            System.out.println("[JwtFilter] 추출된 토큰: " + token);
-
-            if (jwtUtil.validateToken(token)) {
-                String userId = jwtUtil.getUserId(token);
-                System.out.println("[JwtFilter] userId from token: " + userId);
-
-                User user = userService.getUserById(userId);
-                System.out.println("[JwtFilter] user 조회 결과: " + user);
-
-                if (user != null) {
-                    CustomUserDetails userDetails = new CustomUserDetails(user);
-
-                    UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                    System.out.println("[JwtFilter] 인증 객체 등록 완료");
-                } else {
-                    System.out.println("[JwtFilter] user 조회 실패 - SecurityContext에 등록 안 함");
-                }
-            } else {
-                System.out.println("[JwtFilter] 유효하지 않은 토큰");
-            }
-        } else {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             System.out.println("[JwtFilter] Authorization 헤더 없음 또는 형식 오류");
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return;
         }
 
+        String token = authHeader.substring(7);
+        System.out.println("[JwtFilter] 추출된 토큰: " + token);
+
+        if (!jwtUtil.validateToken(token)) {
+            System.out.println("[JwtFilter] 유효하지 않은 토큰");
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+
+        String userId = jwtUtil.getUserId(token);
+        System.out.println("[JwtFilter] userId from token: " + userId);
+
+        User user = userService.getUserById(userId);
+        System.out.println("[JwtFilter] user 조회 결과: " + user);
+
+        if (user != null) {
+            CustomUserDetails userDetails = new CustomUserDetails(user);
+
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            System.out.println("[JwtFilter] 인증 객체 등록 완료");
+        }
+
+        // 마지막에 통과
         filterChain.doFilter(request, response);
     }
+
 }
