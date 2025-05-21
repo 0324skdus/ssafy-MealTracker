@@ -177,6 +177,12 @@ public class DietServiceImpl implements DietService {
     public List<Diet> getByUserIdAndDate(String userId, LocalDate date) {
         return dietDao.selectByUserIdAndDate(userId, date);
     }
+    //캘린더용 한달식단 조회
+    @Override
+    public List<MonthlyDiet> getMonthlySummary(String userId, LocalDate startDate, LocalDate endDate) {
+        return dietDao.selectMonthlyDietSummary(userId, startDate, endDate);
+    }
+
 
     //캘린더용 한달식단 조회
     @Override

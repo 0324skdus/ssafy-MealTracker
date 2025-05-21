@@ -10,7 +10,6 @@
       </div>
       <FullCalendar ref="calendarRef" :options="calendarOptions" />
     </main>
-
     <RightSidebar />
 
     <DietDetailPanel
@@ -70,6 +69,7 @@ async function openDetail(date) {
 
 function openRegisterFromDetail({ date, mealType }) {
   showDetailPanel.value = false
+  detailShouldReopen.value = true // 닫고 다시 열게끔 기억해둠
   registerInfo.value = { date, mealType }
   showRegisterPanel.value = true
 }
@@ -80,10 +80,25 @@ function getLeafIcon(score) {
   return 'badLeaf.png'
 }
 
-const calendarRef = ref(null)
-const currentTitle = ref('')
-const scoreMap = ref({})
+//등록 패널이 닫힐 때 상세 패널 다시 열기 처리
+function handlePanelBackdropClick() {
+  if (showRegisterPanel.value) {
+    showRegisterPanel.value = false
+    nextTick(() => {
+      if (detailShouldReopen.value) {
+        showDetailPanel.value = true
+        detailShouldReopen.value = false
+      }
+    })
+  } else {
+    showDetailPanel.value = false
+  }
+}
+const calendarRef = ref(null) // FullCalendar 접근용 ref
+const currentTitle = ref('')  // 현재 년월 표시용
+const scoreMap = ref({}) // 날짜 기반 점수 맵 (API로 가져온 후 갱신됨)
 
+// 달 표시 커스텀
 const updateTitle = () => {
   const calendarApi = calendarRef.value.getApi()
   const date = calendarApi.getDate()
@@ -92,13 +107,13 @@ const updateTitle = () => {
   currentTitle.value = `${year}년 ${month}월`
 }
 
+// API에서 한 달치 식단 점수 요약 받아오기
 const fetchMonthlyData = async () => {
-  const token = localStorage.getItem('accessToken')
-  const userId = localStorage.getItem('userId')
-
-  console.log('토큰 확인:', token)
-
   try {
+    const token = localStorage.getItem('accessToken')
+    const userId = localStorage.getItem('userId')
+
+    // 현재 보여지는 캘린더의 전체 날짜 범위 (지난달~다음달 일부 포함)
     const calendarApi = calendarRef.value.getApi()
     const startDate = calendarApi.view.currentStart.toISOString().split('T')[0]
     const endDate = calendarApi.view.currentEnd.toISOString().split('T')[0]
@@ -109,27 +124,37 @@ const fetchMonthlyData = async () => {
         Authorization: `Bearer ${token}`
       }
     })
+    console.log('응답 데이터:', res.data)  // 제출전 삭제필요요
 
+    // 날짜 기준으로 데이터 변환
     scoreMap.value = Object.fromEntries(
       res.data.map(item => [item.date, { score: item.score, kcal: item.totalKcal }])
-  )
+    )
+const currentDate = calendarApi.getDate()
+calendarApi.next()
+calendarApi.prev()
+calendarApi.gotoDate(currentDate)
+
+    calendarApi.render() // 셀 다시 그리기
   } catch (e) {
     console.error('식단 요약 데이터 불러오기 실패:', e)
   }
 }
 
+// 이전달 이동
 const prevMonth = () => {
   calendarRef.value.getApi().prev()
   updateTitle()
-  fetchMonthlyData()
+  fetchMonthlyData() // 달 변경시 데이터 다시 로딩
 }
 
 const nextMonth = () => {
   calendarRef.value.getApi().next()
   updateTitle()
-  fetchMonthlyData()
+  fetchMonthlyData() // 달 변경시 데이터 다시 로딩
 }
 
+// 컴포넌트 마운트 시 타이틀 및 데이터 초기화
 onMounted(() => {
   updateTitle()
   fetchMonthlyData()
@@ -246,4 +271,16 @@ const calendarOptions = ref({
 .main-layout > * {
   min-width: 180px;
 }
+.panel-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000; /* 캘린더보다 위 */
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: flex-end; /* 패널 오른쪽에서 슬라이딩 되도록 */
+}
+
 </style>

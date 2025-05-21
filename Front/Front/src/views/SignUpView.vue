@@ -2,7 +2,9 @@
   <div class="signup-wrapper">
     <div class="signup-container">
       <div class="logo-box">
+        <router-link to="/main">
         <img src="/logo.png" alt="logo" class="logo" />
+        </router-link>
       </div>
 
       <div v-if="step === 1" class="step-box">

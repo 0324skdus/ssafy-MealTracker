@@ -15,12 +15,12 @@ import java.util.List;
 @RequestMapping("/api/community")
 public class CommunityController {
 
-    private final CommunityService communityService;
+	private final CommunityService communityService;
 
-    @Autowired
-    public CommunityController(CommunityService communityService) {
-        this.communityService = communityService;
-    }
+	@Autowired
+	public CommunityController(CommunityService communityService) {
+		this.communityService = communityService;
+	}
 
     @PostMapping
     public ResponseEntity<String> register(@RequestBody Community community,
@@ -73,17 +73,18 @@ public class CommunityController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다");
         }
 
-        Community original = communityService.getById(id);
-        if (original == null) {
-            return ResponseEntity.notFound().build();
-        }
+		if (!original.getUserId().equals(loginUser.getUserId())) {
+			return ResponseEntity.status(403).body("작성자만 수정할 수 있습니다");
+		}
 
-        if (!original.getUserId().equals(loginUser.getUserId())) {
-            return ResponseEntity.status(403).body("작성자만 수정할 수 있습니다");
-        }
+		community.setId(id);
+		community.setUserId(loginUser.getUserId());
 
-        community.setId(id);
-        community.setUserId(loginUser.getUserId());
+		boolean result = communityService.modify(community);
+		if (result)
+			return ResponseEntity.ok("게시글 수정 성공");
+		return ResponseEntity.badRequest().body("게시글 수정 실패");
+	}
 
         boolean result = communityService.modify(community);
         return result ?
@@ -98,14 +99,15 @@ public class CommunityController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다");
         }
 
-        Community original = communityService.getById(id);
-        if (original == null) {
-            return ResponseEntity.notFound().build();
-        }
+		if (!original.getUserId().equals(loginUser.getUserId())) {
+			return ResponseEntity.status(403).body("작성자만 삭제할 수 있습니다");
+		}
 
-        if (!original.getUserId().equals(loginUser.getUserId())) {
-            return ResponseEntity.status(403).body("작성자만 삭제할 수 있습니다");
-        }
+		boolean result = communityService.remove(id);
+		if (result)
+			return ResponseEntity.ok("삭제 완료");
+		return ResponseEntity.badRequest().body("삭제 실패");
+	}
 
         boolean result = communityService.remove(id);
         return result ?

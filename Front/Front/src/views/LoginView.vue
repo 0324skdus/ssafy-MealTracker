@@ -4,11 +4,13 @@
       
       <!-- 로고 -->
       <div class="logo-box">
+        <router-link to="/main">
         <img
           src="/logo.png"
           alt="Meal Tracker Logo"
           class="logo"
         />
+        </router-link>
       </div>
 
       <!-- ID 입력 -->
