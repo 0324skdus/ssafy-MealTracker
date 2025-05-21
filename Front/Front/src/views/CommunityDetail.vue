@@ -59,6 +59,11 @@ const fetchPost = async () => {
     const decoded = parseJwt(token)
     const loggedInUserId = decoded?.userId?.trim().toLowerCase()
     const postOwnerId = res.data.userId?.trim().toLowerCase()
+
+    console.log('로그인된 유저:', loggedInUserId)
+    console.log('글 작성자:', postOwnerId)
+    console.log('둘이 같은가?', loggedInUserId === postOwnerId)
+
     isAuthor.value = loggedInUserId === postOwnerId
   } catch (err) {
     alert('게시글을 불러오지 못했습니다.')

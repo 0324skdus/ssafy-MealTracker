@@ -11,11 +11,29 @@
     </insert>
 
     <select id="selectById" parameterType="int" resultType="Community">
-        SELECT * FROM community WHERE id = #{id}
+        SELECT
+        id,
+        user_id AS userId,
+        title,
+        content,
+        like_count AS likeCount,
+        created_at AS createdAt,
+        community_type AS communityType
+        FROM community
+        WHERE id = #{id}
     </select>
 
     <select id="selectAll" resultType="Community">
-        SELECT * FROM community ORDER BY created_at DESC
+        SELECT
+        id,
+        user_id AS userId,
+        title,
+        content,
+        like_count AS likeCount,
+        created_at AS createdAt,
+        community_type AS communityType
+        FROM community
+        ORDER BY created_at DESC
     </select>
 
     <update id="update" parameterType="Community">
@@ -28,33 +46,59 @@
     <delete id="delete" parameterType="int">
         DELETE FROM community WHERE id = #{id}
     </delete>
-    <!--좋아요 카운트-->
+
+    <!-- 좋아요 카운트 증가 -->
     <update id="incrementLikeCount">
         UPDATE community
         SET like_count = IFNULL(like_count, 0) + 1
         WHERE id = #{communityId}
     </update>
 
-    <!-- 좋아요 내림차순 -->
-    <select id="selectByLikeCountDesc" resultType="Community">
-        SELECT * FROM community ORDER BY like_count DESC
-    </select>
-
-    <!-- 최신순 -->
-    <select id="selectByCreatedAtDesc" resultType="Community">
-        SELECT * FROM community ORDER BY created_at DESC
-    </select>
-
-    <!-- 게시판별 분류 -->
-    <select id="selectByCommunityType" parameterType="String" resultType="Community">
-        SELECT * FROM community
-        WHERE community_type = #{type}
-        ORDER BY created_at DESC
-    </select>
-
+    <!-- 좋아요 카운트 감소 -->
     <update id="decrementLikeCount">
         UPDATE community
         SET like_count = IF(like_count > 0, like_count - 1, 0)
         WHERE id = #{communityId}
     </update>
+
+    <select id="selectByLikeCountDesc" resultType="Community">
+        SELECT
+        id,
+        user_id AS userId,
+        title,
+        content,
+        like_count AS likeCount,
+        created_at AS createdAt,
+        community_type AS communityType
+        FROM community
+        ORDER BY like_count DESC
+    </select>
+
+    <select id="selectByCreatedAtDesc" resultType="Community">
+        SELECT
+        id,
+        user_id AS userId,
+        title,
+        content,
+        like_count AS likeCount,
+        created_at AS createdAt,
+        community_type AS communityType
+        FROM community
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="selectByCommunityType" parameterType="String" resultType="Community">
+        SELECT
+        id,
+        user_id AS userId,
+        title,
+        content,
+        like_count AS likeCount,
+        created_at AS createdAt,
+        community_type AS communityType
+        FROM community
+        WHERE community_type = #{type}
+        ORDER BY created_at DESC
+    </select>
+
 </mapper>
