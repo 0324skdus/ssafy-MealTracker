@@ -29,4 +29,6 @@ public interface CommunityService {
     List<Community> getByCreatedAt();
 
     List<Community> getByType(String type);
+
+    boolean toggleLike(int communityId, String userId);
 }

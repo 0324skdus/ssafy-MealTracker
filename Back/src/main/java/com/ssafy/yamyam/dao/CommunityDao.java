@@ -25,4 +25,7 @@ public interface CommunityDao {
     List<Community> selectByCreatedAtDesc();
 
     List<Community> selectByCommunityType(String type);
+
+    int decrementLikeCount(int communityId);
+
 }

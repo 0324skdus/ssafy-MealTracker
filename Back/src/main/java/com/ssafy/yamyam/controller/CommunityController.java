@@ -114,25 +114,22 @@ public class CommunityController {
                 ResponseEntity.badRequest().body("삭제 실패");
     }
 
+
+
+    @GetMapping("/board")
+    public List<Community> getBoardList() {
+        return communityService.getBoardList();
+    }
+
     @PostMapping("/{id}/like")
-    public ResponseEntity<?> likeCommunity(@PathVariable("id") int communityId,
-                                           @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<?> toggleLike(@PathVariable("id") int communityId,
+                                        @AuthenticationPrincipal CustomUserDetails userDetails) {
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다");
         }
 
         String userId = userDetails.getUserId();
-
-        if (communityService.hasUserLiked(communityId, userId)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 추천한 게시글입니다.");
-        }
-
-        communityService.addLike(communityId, userId);
-        return ResponseEntity.ok("추천 완료");
-    }
-
-    @GetMapping("/board")
-    public List<Community> getBoardList() {
-        return communityService.getBoardList();
+        boolean liked = communityService.toggleLike(communityId, userId);
+        return ResponseEntity.ok(liked ? "좋아요 등록" : "좋아요 취소");
     }
 }

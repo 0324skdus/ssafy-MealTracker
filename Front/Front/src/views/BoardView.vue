@@ -20,7 +20,9 @@
       <main class="board-area">
         <div class="board-list">
           <div class="board-item" v-for="post in pagedPosts" :key="post.id">
-            <span class="title" :title="post.title">{{ post.title }}</span>
+            <router-link :to="`/community/${post.id}`" class="title" :title="post.title">
+  {{ post.title }}
+</router-link>
             <span class="likes">❤️ {{ post.likeCount }}</span>
             <span class="writer">{{ maskUsername(post.userId) }}</span>
             <span class="date">{{ formatDate(post.createdAt) }}</span>

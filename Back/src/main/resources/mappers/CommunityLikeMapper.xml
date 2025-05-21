@@ -17,5 +17,23 @@
         VALUES (#{communityId}, #{userId})
     </insert>
 
+
+    <select id="hasUserLiked" resultType="boolean">
+        SELECT EXISTS(
+        SELECT 1 FROM community_like
+        WHERE community_id = #{communityId} AND user_id = #{userId}
+        )
+    </select>
+
+    <insert id="addLike">
+        INSERT INTO community_like (community_id, user_id)
+        VALUES (#{communityId}, #{userId})
+    </insert>
+
+    <delete id="removeLike">
+        DELETE FROM community_like
+        WHERE community_id = #{communityId} AND user_id = #{userId}
+    </delete>
+
 </mapper>
 

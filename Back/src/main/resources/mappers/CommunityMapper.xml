@@ -52,5 +52,9 @@
         ORDER BY created_at DESC
     </select>
 
-
+    <update id="decrementLikeCount">
+        UPDATE community
+        SET like_count = IF(like_count > 0, like_count - 1, 0)
+        WHERE id = #{communityId}
+    </update>
 </mapper>

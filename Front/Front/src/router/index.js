@@ -5,6 +5,8 @@ import MainView from '../views/MainView.vue'
 import BoardView from '@/views/BoardView.vue'
 import ProfileEdit from '@/views/ProfileEditView.vue'
 import WriteView from '@/views/WriteView.vue'
+import CommunityDetail from '@/views/CommunityDetail.vue'
+
 
 const routes = [
   { path: '/', component: LoginView },
@@ -12,7 +14,12 @@ const routes = [
   { path: '/main', component: MainView },//메인페이지(캘린더) 링크
   { path: '/board',component: BoardView },
   { path: '/profile-edit', component: ProfileEdit },
-   { path: '/write', component: WriteView }
+   { path: '/write', component: WriteView },
+    {
+    path: '/community/:id',
+    name: 'CommunityDetail',
+    component: CommunityDetail
+  }
 ]
 
 const router = createRouter({
