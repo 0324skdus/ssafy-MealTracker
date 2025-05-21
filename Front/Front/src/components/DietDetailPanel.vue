@@ -1,17 +1,22 @@
 <template>
-  <div class="backdrop" @click.self="close">
+  <div class="backdrop" @click.self="emit('close')">
     <div class="panel">
       <div class="header">
         <h2>{{ date }} 식단 상세</h2>
-        <button class="close-btn" @click="close">X</button>
+        <button class="close-btn" @click="emit('close')">X</button>
       </div>
 
-      <!-- 실제 데이터는 API나 props로 불러오게 구현 가능 -->
       <div class="meal-section">
-        <p><strong>아침:</strong> 고구마, 달걀</p>
-        <p><strong>점심:</strong> 닭가슴살, 밥</p>
-        <p><strong>저녁:</strong> 샐러드</p>
-        <p><strong>총 칼로리:</strong> 800 kcal</p>
+        <div v-for="meal in ['아침', '점심', '저녁', '간식']" :key="meal">
+          <p><strong>{{ meal }}:</strong> 
+            <span v-if="groupedDietList[meal]">
+              {{ groupedDietList[meal].map(item => item.foodName).join(', ') }}
+            </span>
+            <span v-else>없음</span>
+          </p>
+        </div>
+
+        <p><strong>총 칼로리:</strong> {{ total.kcal }} kcal</p>
       </div>
 
       <div class="footer">
@@ -27,17 +32,70 @@
 </template>
 
 <script setup>
-const props = defineProps({
-  date: String, // 예: '2025-06-01'
-})
+import { ref, watch, onMounted } from 'vue'
+import axios from 'axios'
+
+const props = defineProps({ date: String })
 const emit = defineEmits(['close', 'openRegister'])
 
-function close() {
-  emit('close')
-}
+const dietList = ref([])
+const groupedDietList = ref({})
+const total = ref({ kcal: 0, carbo: 0, protein: 0, fat: 0, fiber: 0, sugar: 0 })
+
 function register(mealType) {
   emit('openRegister', { date: props.date, mealType })
 }
+async function fetchDietList() {
+  const userId = localStorage.getItem('userId')
+  const token = localStorage.getItem('accessToken')
+  if (!userId || !props.date || !token) return
+
+  try {
+    const res = await axios.get(`/api/diet/user/${userId}/date`, {
+      params: { date: props.date },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    dietList.value = res.data
+    calculateGroupedAndTotal()
+  } catch (err) {
+    console.error('식단 조회 실패:', err)
+  }
+}
+
+function calculateGroupedAndTotal() {
+  const grouped = { 아침: [], 점심: [], 저녁: [], 간식: [] }
+  const sum = { kcal: 0, carbo: 0, protein: 0, fat: 0, fiber: 0, sugar: 0 }
+
+  // 영어 mealType → 한글 매핑
+  const mealMap = {
+    breakfast: '아침',
+    lunch: '점심',
+    dinner: '저녁',
+    snack: '간식'
+  }
+
+  for (const item of dietList.value) {
+    const translated = mealMap[item.mealType] // 예: 'breakfast' → '아침'
+    if (translated) grouped[translated].push(item)
+
+    sum.kcal += Number(item.kcal) || 0
+    sum.carbo += Number(item.carbo) || 0
+    sum.protein += Number(item.protein) || 0
+    sum.fat += Number(item.fat) || 0
+    sum.fiber += Number(item.fiber) || 0
+    sum.sugar += Number(item.sugar) || 0
+  }
+
+  groupedDietList.value = grouped
+  total.value = sum
+}
+
+
+
+watch(() => props.date, fetchDietList, { immediate: true })
+onMounted(fetchDietList)
 </script>
 
 <style scoped>
