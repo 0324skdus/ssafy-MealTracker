@@ -65,9 +65,12 @@ async function login() {
       userId: form.userId,
       userPassword: form.userPassword
     })
-    const token = response.data
+
+    const { token, userId, name } = response.data
     localStorage.setItem('accessToken', token)
-     localStorage.setItem('userId', form.userId)
+    localStorage.setItem('userId', userId)
+    localStorage.setItem('userName', name) // 추가 저장
+
     router.push('/main')
   } catch (err) {
     alert('로그인 실패: 아이디 또는 비밀번호 확인')

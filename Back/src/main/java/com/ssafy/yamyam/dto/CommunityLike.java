@@ -7,5 +7,7 @@ public class CommunityLike {
     private int userId;
     private int communityId;
     private LocalDateTime createdAt;
+
+
 }
 

@@ -3,7 +3,6 @@
     <LeftSidebar />
 
     <main class="calendar-area">
-      <!-- 상단 달 이동 헤더 -->
       <div class="calendar-header">
         <button class="nav-btn" @click="prevMonth">«</button>
         <span class="calendar-title">{{ currentTitle }}</span>
@@ -12,30 +11,22 @@
       <FullCalendar ref="calendarRef" :options="calendarOptions" />
     </main>
     <RightSidebar />
-     <!-- 슬라이딩 패널 wrapper (배경 역할) -->
-<div 
-  v-if="showDetailPanel || showRegisterPanel"
-  class="panel-backdrop"
-  @click.self="handlePanelBackdropClick"
->
-  <!-- 식단 상세 패널 -->
-  <DietDetailPanel
-    v-if="showDetailPanel"
-    :date="selectedDate"
-    @close="showDetailPanel = false"
-    @openRegister="openRegisterFromDetail"
-  />
 
-  <!-- 식단 등록 패널 -->
-  <DietRegisterPanel
-  v-if="showRegisterPanel"
-  :date="registerInfo.date"
-  :mealType="registerInfo.mealType"
-  @close="handlePanelBackdropClick"
-/>
+    <DietDetailPanel
+      v-if="showDetailPanel"
+      :date="selectedDate"
+      :nutritionTarget="nutritionTarget"
+      @close="showDetailPanel = false"
+      @openRegister="openRegisterFromDetail"
+    />
 
-</div>
-    </div>
+    <DietRegisterPanel
+      v-if="showRegisterPanel"
+      :date="registerInfo.date"
+      :mealType="registerInfo.mealType"
+      @close="showRegisterPanel = false"
+    />
+  </div>
 </template>
 
 <script setup>
@@ -47,19 +38,33 @@ import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import DietDetailPanel from '@/components/DietDetailPanel.vue'
 import DietRegisterPanel from '@/components/DietRegisterPanel.vue'
-import { nextTick } from 'vue'
-
 
 const selectedDate = ref(null)
 const showDetailPanel = ref(false)
+const nutritionTarget = ref(null)
 
 const showRegisterPanel = ref(false)
 const registerInfo = ref({ date: '', mealType: '' })
-const detailShouldReopen = ref(false) // 상세 패널 다시 열릴지 추적하는 상태
 
-function openDetail(date) {
+async function openDetail(date) {
   selectedDate.value = date
   showDetailPanel.value = true
+
+  const userId = localStorage.getItem('userId')
+  const token = localStorage.getItem('accessToken') // 추가
+
+  try {
+    const res = await axios.get('http://localhost:8080/api/nutrition/target', {
+      params: { userId },
+      headers: {
+        Authorization: `Bearer ${token}` // 추가
+      }
+    })
+    nutritionTarget.value = res.data
+  } catch (e) {
+    console.error('권장 섭취량 불러오기 실패:', e)
+    nutritionTarget.value = null
+  }
 }
 
 function openRegisterFromDetail({ date, mealType }) {
@@ -69,7 +74,6 @@ function openRegisterFromDetail({ date, mealType }) {
   showRegisterPanel.value = true
 }
 
-// 점수에 따라 아이콘 경로 반환
 function getLeafIcon(score) {
   if (score >= 80) return 'healthyLeaf.png'
   if (score >= 50) return 'sosoLeaf.png'
@@ -144,7 +148,6 @@ const prevMonth = () => {
   fetchMonthlyData() // 달 변경시 데이터 다시 로딩
 }
 
-// 다음달 이동
 const nextMonth = () => {
   calendarRef.value.getApi().next()
   updateTitle()
@@ -177,7 +180,6 @@ const calendarOptions = ref({
       openDetail(dateStr)
     })
 
-    // 점수 정보가 있으면 아이콘표시
     if (info) {
       const wrapper = document.createElement('div')
       wrapper.classList.add('custom-cell')
@@ -195,13 +197,11 @@ const calendarOptions = ref({
 </script>
 
 <style>
-/* 전체 화면 구성 */
 .main-layout {
   display: flex;
   height: 100vh;
 }
 
-/* 중앙 캘린더 영역 */
 .calendar-area {
   flex-grow: 1;
   padding: 30px;
@@ -209,10 +209,8 @@ const calendarOptions = ref({
   min-width: 0;
 }
 
-/* 달력헤더 */
 .calendar-header {
   font-family: 'Apple SD Gothic Neo', sans-serif;
-
   display: flex;
   justify-content: center;
   align-items: center;
@@ -222,7 +220,6 @@ const calendarOptions = ref({
   margin-bottom: 16px;
 }
 
-/* 달 이동 버튼 */
 .nav-btn {
   font-size: 40px;
   background: none;
@@ -231,13 +228,10 @@ const calendarOptions = ref({
   padding: 4px 12px;
 }
 
-/* 아이콘 넣으면 칸 크기 변해서 고정한 날짜칸 */
 .fc-daygrid-day {
   height: 100px !important;
   vertical-align: top !important;
 }
-
-/* 날짜 셀 안쪽 프레임 설정 */
 .fc-daygrid-day-frame {
   height: 100%;
   display: flex;
@@ -249,7 +243,6 @@ const calendarOptions = ref({
   overflow: hidden;
 }
 
-/* 커스텀 셀 콘텐츠 */
 .custom-cell {
   margin-top: 4px;
   display: flex;
@@ -259,30 +252,22 @@ const calendarOptions = ref({
   width: 100%;
   flex-shrink: 1;
 }
-
-/* 당근 아이콘+칼로리*/
 .bottom-row {
   display: flex;
   align-items: center;
   gap: 0px;
 }
-
-/* 공통 아이콘 스타일 */
 .icon-img {
   object-fit: contain;
   display: block;
   width: 20px;
   height: 25px;
 }
-
-/* 칼로리 텍스트 */
 .kcal-text {
   font-size: 11px;
   color: #333;
-  margin-left: 4px; /* 아이콘과 텍스트만 약간 띄움 */
+  margin-left: 4px;
 }
-
-/* 좌우 사이드바 최소 폭 보장 */
 .main-layout > * {
   min-width: 180px;
 }

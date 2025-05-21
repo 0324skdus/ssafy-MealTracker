@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,58 +22,56 @@ public class CommunityController {
 		this.communityService = communityService;
 	}
 
-	@PostMapping
-	public ResponseEntity<String> register(@RequestBody Community community,
-			@AuthenticationPrincipal CustomUserDetails loginUser) {
-		// 인증 체크용 출력코드, 제출 전 삭제할것
-		System.out.println("[컨트롤러] loginUser: " + loginUser);
-		System.out.println("[컨트롤러] SecurityContext: " + SecurityContextHolder.getContext().getAuthentication());
+    @PostMapping
+    public ResponseEntity<String> register(@RequestBody Community community,
+                                           @AuthenticationPrincipal CustomUserDetails loginUser) {
+        if (loginUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 필요");
+        }
 
-		if (loginUser == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 필요");
-		}
+        community.setUserId(loginUser.getUserId());
+        boolean result = communityService.register(community);
+        return result ?
+                ResponseEntity.ok("게시글 등록 성공") :
+                ResponseEntity.badRequest().body("게시글 등록 실패");
+    }
 
-		community.setUserId(loginUser.getUserId());
+    @GetMapping("/{id}")
+    public ResponseEntity<Community> get(@PathVariable("id") int id) {
+        Community community = communityService.getById(id);
+        return community != null ?
+                ResponseEntity.ok(community) :
+                ResponseEntity.notFound().build();
+    }
 
-		boolean result = communityService.register(community);
-		if (result)
-			return ResponseEntity.ok("게시글 등록 성공");
-		return ResponseEntity.badRequest().body("게시글 등록 실패");
-	}
+    @GetMapping
+    public ResponseEntity<List<Community>> getAll(@RequestParam("sort") String sort) {
+        List<Community> list;
+        switch (sort) {
+            case "인기글":
+                list = communityService.getByLikeCount();
+                break;
+            case "최신글":
+                list = communityService.getByCreatedAt();
+                break;
+            case "식단":
+                list = communityService.getByType("식단 게시판");
+                break;
+            case "자유게시판":
+                list = communityService.getByType("자유 게시판");
+                break;
+            default:
+                return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(list);
+    }
 
-//게시글 단일조회
-	@GetMapping("/{id}")
-	public ResponseEntity<Community> get(@PathVariable("id") int id) {
-		// 체크용 출력코드, 제출전 삭제할것
-		System.out.println("[게시글 단일 조회] Authentication: " + SecurityContextHolder.getContext().getAuthentication());
-		Community community = communityService.getById(id);
-		if (community != null)
-			return ResponseEntity.ok(community);
-		return ResponseEntity.notFound().build();
-	}
-
-//게시글 전체조회
-	@GetMapping
-	public ResponseEntity<List<Community>> getAll() {
-		return ResponseEntity.ok(communityService.getAll());
-	}
-
-	// 게시글 수정
-	@PutMapping("/{id}")
-	public ResponseEntity<String> modify(@PathVariable("id") int id, @RequestBody Community community,
-			@AuthenticationPrincipal CustomUserDetails loginUser) {
-		// 체크용 출력코드, 제출전 삭제할것
-		System.out.println("[컨트롤러] loginUser: " + loginUser);
-		System.out.println("[컨트롤러] SecurityContext: " + SecurityContextHolder.getContext().getAuthentication());
-
-		if (loginUser == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다");
-		}
-
-		Community original = communityService.getById(id);
-		if (original == null) {
-			return ResponseEntity.notFound().build();
-		}
+    @PutMapping("/{id}")
+    public ResponseEntity<String> modify(@PathVariable("id") int id, @RequestBody Community community,
+                                         @AuthenticationPrincipal CustomUserDetails loginUser) {
+        if (loginUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다");
+        }
 
 		if (!original.getUserId().equals(loginUser.getUserId())) {
 			return ResponseEntity.status(403).body("작성자만 수정할 수 있습니다");
@@ -89,22 +86,18 @@ public class CommunityController {
 		return ResponseEntity.badRequest().body("게시글 수정 실패");
 	}
 
-//게시글 삭제
-	@DeleteMapping("/{id}")
-	public ResponseEntity<String> delete(@PathVariable("id") int id,
-			@AuthenticationPrincipal CustomUserDetails loginUser) {
-		// 체크용 출력코드, 제출전 삭제할것
-		System.out.println("[컨트롤러] loginUser: " + loginUser);
-		System.out.println("[컨트롤러] SecurityContext: " + SecurityContextHolder.getContext().getAuthentication());
+        boolean result = communityService.modify(community);
+        return result ?
+                ResponseEntity.ok("게시글 수정 성공") :
+                ResponseEntity.badRequest().body("게시글 수정 실패");
+    }
 
-		if (loginUser == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다");
-		}
-
-		Community original = communityService.getById(id);
-		if (original == null) {
-			return ResponseEntity.notFound().build();
-		}
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> delete(@PathVariable("id") int id,
+                                         @AuthenticationPrincipal CustomUserDetails loginUser) {
+        if (loginUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다");
+        }
 
 		if (!original.getUserId().equals(loginUser.getUserId())) {
 			return ResponseEntity.status(403).body("작성자만 삭제할 수 있습니다");
@@ -116,31 +109,26 @@ public class CommunityController {
 		return ResponseEntity.badRequest().body("삭제 실패");
 	}
 
-//좋아요 달기
-	@PostMapping("/{id}/like")
-	public ResponseEntity<?> likeCommunity(@PathVariable("id") int communityId,
-			@AuthenticationPrincipal CustomUserDetails userDetails) {
-		// 체크용 출력코드, 제출전 삭제할것
-		System.out.println("[컨트롤러] userDetails: " + userDetails);
-		System.out.println("[컨트롤러] SecurityContext: " + SecurityContextHolder.getContext().getAuthentication());
+        boolean result = communityService.remove(id);
+        return result ?
+                ResponseEntity.ok("삭제 완료") :
+                ResponseEntity.badRequest().body("삭제 실패");
+    }
 
-		if (userDetails == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다");
-		}
+    @GetMapping("/board")
+    public List<Community> getBoardList() {
+        return communityService.getBoardList();
+    }
 
-		String userId = userDetails.getUserId();
+    @PostMapping("/{id}/like")
+    public ResponseEntity<?> toggleLike(@PathVariable("id") int communityId,
+                                        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다");
+        }
 
-		if (communityService.hasUserLiked(communityId, userId)) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 추천한 게시글입니다.");
-		}
-
-		communityService.addLike(communityId, userId);
-		return ResponseEntity.ok("추천 완료");
-	}
-
-	// 게시판 조회
-	@GetMapping("/board")
-	public List<Community> getBoardList() {
-		return communityService.getBoardList();
-	}
+        String userId = userDetails.getUserId();
+        boolean liked = communityService.toggleLike(communityId, userId);
+        return ResponseEntity.ok(liked ? "좋아요 등록" : "좋아요 취소");
+    }
 }

@@ -10,6 +10,15 @@ public class Community {
     private String content;
     private int likeCount;
     private LocalDateTime createdAt;
+    private String communityType;
+
+    public String getCommunityType() {
+        return communityType;
+    }
+
+    public void setCommunityType(String communityType) {
+        this.communityType = communityType;
+    }
 
     public Community() {}
 
@@ -53,22 +62,21 @@ public class Community {
         this.createdAt = createdAt;
     }
 
-	public int getLikeCount() {
-		return likeCount;
-	}
+    public int getLikeCount() {
+        return likeCount;
+    }
 
-	public void setLikeCount(int likeCount) {
-		this.likeCount = likeCount;
-	}
+    public void setLikeCount(int likeCount) {
+        this.likeCount = likeCount;
+    }
 
-	public Community(int id, String userId, String title, String content, int likeCount, LocalDateTime createdAt) {
-		super();
-		this.id = id;
-		this.userId = userId;
-		this.title = title;
-		this.content = content;
-		this.likeCount = likeCount;
-		this.createdAt = createdAt;
-	}
-
+    public Community(int id, String userId, String title, String content, int likeCount, LocalDateTime createdAt, String communityType) {
+        this.id = id;
+        this.userId = userId;
+        this.title = title;
+        this.content = content;
+        this.likeCount = likeCount;
+        this.createdAt = createdAt;
+        this.communityType = communityType;
+    }
 }

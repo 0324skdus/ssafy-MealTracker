@@ -18,8 +18,11 @@ public class JwtUtil {
     }
 
     public String generateToken(String userId) {
+        Claims claims = Jwts.claims().setSubject(userId);
+        claims.put("userId", userId);
+
         return Jwts.builder()
-                .setSubject(userId)
+                .setClaims(claims)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)

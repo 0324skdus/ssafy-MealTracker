@@ -24,4 +24,14 @@ public interface CommunityService {
     //게시판 조회
     List<Community> getBoardList();
 
+    //게시판 조회
+    List<Community> getBoardList();
+
+    List<Community> getByLikeCount();
+
+    List<Community> getByCreatedAt();
+
+    List<Community> getByType(String type);
+
+    boolean toggleLike(int communityId, String userId);
 }
