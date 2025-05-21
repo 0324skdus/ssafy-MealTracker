@@ -11,10 +11,25 @@
       </div>
       <FullCalendar ref="calendarRef" :options="calendarOptions" />
     </main>
-
     <RightSidebar />
-  </div>
+     <!-- 식단 상세 패널 -->
+    <DietDetailPanel
+      v-if="showDetailPanel"
+      :date="selectedDate"
+      @close="showDetailPanel = false"
+      @openRegister="openRegisterFromDetail"
+    />
+
+    <!-- 식단 등록 패널 -->
+    <DietRegisterPanel
+      v-if="showRegisterPanel"
+      :date="registerInfo.date"
+      :mealType="registerInfo.mealType"
+      @close="showRegisterPanel = false"
+    />
+    </div>
 </template>
+
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
@@ -22,6 +37,25 @@ import LeftSidebar from '@/components/LeftSidebar.vue'
 import RightSidebar from '@/components/RightSidebar.vue'
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
+import DietDetailPanel from '@/components/DietDetailPanel.vue'
+import DietRegisterPanel from '@/components/DietRegisterPanel.vue'
+
+const selectedDate = ref(null)
+const showDetailPanel = ref(false)
+
+const showRegisterPanel = ref(false)
+const registerInfo = ref({ date: '', mealType: '' })
+
+function openDetail(date) {
+  selectedDate.value = date
+  showDetailPanel.value = true
+}
+
+function openRegisterFromDetail({ date, mealType }) {
+  showDetailPanel.value = false
+  registerInfo.value = { date, mealType }
+  showRegisterPanel.value = true
+}
 
 // 점수에 따라 아이콘 경로 반환
 function getLeafIcon(score) {
@@ -61,7 +95,7 @@ const fetchMonthlyData = async () => {
         Authorization: `Bearer ${token}`
       }
     })
-    console.log('응답 데이터:', res.data)  // 이 줄 추가
+    console.log('응답 데이터:', res.data)  // 제출전 삭제필요요
 
     // 날짜 기준으로 데이터 변환
     scoreMap.value = Object.fromEntries(
@@ -104,10 +138,7 @@ const calendarOptions = ref({
   height: 700,
   fixedWeekCount: true,
   dayMaxEventRows: true,
-  headerToolbar: false, // 기본 헤더 숨김
-
-  // 각 셀 렌더링 이후 DOM 커스터마이징
-  // utf 날짜 시차 조정
+  headerToolbar: false,
   dayCellDidMount(arg) {
     const localDate = new Date(arg.date.getTime() - arg.date.getTimezoneOffset() * 60000)
     const dateStr = localDate.toISOString().split('T')[0]
@@ -116,10 +147,9 @@ const calendarOptions = ref({
     const frameEl = arg.el.querySelector('.fc-daygrid-day-frame')
     if (!frameEl) return
 
-    // 날짜칸 클릭하면 링크이동(날짜 정보가 담긴 포스트맨에코)
     frameEl.style.cursor = 'pointer'
     frameEl.addEventListener('click', () => {
-      window.location.href = `https://postman-echo.com/get?date=${dateStr}`
+      openDetail(dateStr)
     })
 
     // 점수 정보가 있으면 아이콘표시
