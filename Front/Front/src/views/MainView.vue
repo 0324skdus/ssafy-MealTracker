@@ -11,10 +11,33 @@
       </div>
       <FullCalendar ref="calendarRef" :options="calendarOptions" />
     </main>
-
     <RightSidebar />
-  </div>
+     <!-- 슬라이딩 패널 wrapper (배경 역할) -->
+<div 
+  v-if="showDetailPanel || showRegisterPanel"
+  class="panel-backdrop"
+  @click.self="handlePanelBackdropClick"
+>
+  <!-- 식단 상세 패널 -->
+  <DietDetailPanel
+    v-if="showDetailPanel"
+    :date="selectedDate"
+    @close="showDetailPanel = false"
+    @openRegister="openRegisterFromDetail"
+  />
+
+  <!-- 식단 등록 패널 -->
+  <DietRegisterPanel
+  v-if="showRegisterPanel"
+  :date="registerInfo.date"
+  :mealType="registerInfo.mealType"
+  @close="handlePanelBackdropClick"
+/>
+
+</div>
+    </div>
 </template>
+
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
@@ -22,6 +45,29 @@ import LeftSidebar from '@/components/LeftSidebar.vue'
 import RightSidebar from '@/components/RightSidebar.vue'
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
+import DietDetailPanel from '@/components/DietDetailPanel.vue'
+import DietRegisterPanel from '@/components/DietRegisterPanel.vue'
+import { nextTick } from 'vue'
+
+
+const selectedDate = ref(null)
+const showDetailPanel = ref(false)
+
+const showRegisterPanel = ref(false)
+const registerInfo = ref({ date: '', mealType: '' })
+const detailShouldReopen = ref(false) // 상세 패널 다시 열릴지 추적하는 상태
+
+function openDetail(date) {
+  selectedDate.value = date
+  showDetailPanel.value = true
+}
+
+function openRegisterFromDetail({ date, mealType }) {
+  showDetailPanel.value = false
+  detailShouldReopen.value = true // 닫고 다시 열게끔 기억해둠
+  registerInfo.value = { date, mealType }
+  showRegisterPanel.value = true
+}
 
 // 점수에 따라 아이콘 경로 반환
 function getLeafIcon(score) {
@@ -30,9 +76,22 @@ function getLeafIcon(score) {
   return 'badLeaf.png'
 }
 
+//등록 패널이 닫힐 때 상세 패널 다시 열기 처리
+function handlePanelBackdropClick() {
+  if (showRegisterPanel.value) {
+    showRegisterPanel.value = false
+    nextTick(() => {
+      if (detailShouldReopen.value) {
+        showDetailPanel.value = true
+        detailShouldReopen.value = false
+      }
+    })
+  } else {
+    showDetailPanel.value = false
+  }
+}
 const calendarRef = ref(null) // FullCalendar 접근용 ref
 const currentTitle = ref('')  // 현재 년월 표시용
-
 const scoreMap = ref({}) // 날짜 기반 점수 맵 (API로 가져온 후 갱신됨)
 
 // 달 표시 커스텀
@@ -61,7 +120,7 @@ const fetchMonthlyData = async () => {
         Authorization: `Bearer ${token}`
       }
     })
-    console.log('응답 데이터:', res.data)  // 이 줄 추가
+    console.log('응답 데이터:', res.data)  // 제출전 삭제필요요
 
     // 날짜 기준으로 데이터 변환
     scoreMap.value = Object.fromEntries(
@@ -104,10 +163,7 @@ const calendarOptions = ref({
   height: 700,
   fixedWeekCount: true,
   dayMaxEventRows: true,
-  headerToolbar: false, // 기본 헤더 숨김
-
-  // 각 셀 렌더링 이후 DOM 커스터마이징
-  // utf 날짜 시차 조정
+  headerToolbar: false,
   dayCellDidMount(arg) {
     const localDate = new Date(arg.date.getTime() - arg.date.getTimezoneOffset() * 60000)
     const dateStr = localDate.toISOString().split('T')[0]
@@ -116,10 +172,9 @@ const calendarOptions = ref({
     const frameEl = arg.el.querySelector('.fc-daygrid-day-frame')
     if (!frameEl) return
 
-    // 날짜칸 클릭하면 링크이동(날짜 정보가 담긴 포스트맨에코)
     frameEl.style.cursor = 'pointer'
     frameEl.addEventListener('click', () => {
-      window.location.href = `https://postman-echo.com/get?date=${dateStr}`
+      openDetail(dateStr)
     })
 
     // 점수 정보가 있으면 아이콘표시
@@ -231,4 +286,16 @@ const calendarOptions = ref({
 .main-layout > * {
   min-width: 180px;
 }
+.panel-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000; /* 캘린더보다 위 */
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: flex-end; /* 패널 오른쪽에서 슬라이딩 되도록 */
+}
+
 </style>
