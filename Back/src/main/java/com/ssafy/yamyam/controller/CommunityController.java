@@ -26,6 +26,7 @@ public class CommunityController {
 	@PostMapping
 	public ResponseEntity<String> register(@RequestBody Community community,
 			@AuthenticationPrincipal CustomUserDetails loginUser) {
+		// 인증 체크용 출력코드, 제출 전 삭제할것
 		System.out.println("[컨트롤러] loginUser: " + loginUser);
 		System.out.println("[컨트롤러] SecurityContext: " + SecurityContextHolder.getContext().getAuthentication());
 
@@ -41,8 +42,10 @@ public class CommunityController {
 		return ResponseEntity.badRequest().body("게시글 등록 실패");
 	}
 
+//게시글 단일조회
 	@GetMapping("/{id}")
 	public ResponseEntity<Community> get(@PathVariable("id") int id) {
+		// 체크용 출력코드, 제출전 삭제할것
 		System.out.println("[게시글 단일 조회] Authentication: " + SecurityContextHolder.getContext().getAuthentication());
 		Community community = communityService.getById(id);
 		if (community != null)
@@ -50,14 +53,17 @@ public class CommunityController {
 		return ResponseEntity.notFound().build();
 	}
 
+//게시글 전체조회
 	@GetMapping
 	public ResponseEntity<List<Community>> getAll() {
 		return ResponseEntity.ok(communityService.getAll());
 	}
 
+	// 게시글 수정
 	@PutMapping("/{id}")
 	public ResponseEntity<String> modify(@PathVariable("id") int id, @RequestBody Community community,
 			@AuthenticationPrincipal CustomUserDetails loginUser) {
+		// 체크용 출력코드, 제출전 삭제할것
 		System.out.println("[컨트롤러] loginUser: " + loginUser);
 		System.out.println("[컨트롤러] SecurityContext: " + SecurityContextHolder.getContext().getAuthentication());
 
@@ -83,9 +89,11 @@ public class CommunityController {
 		return ResponseEntity.badRequest().body("게시글 수정 실패");
 	}
 
+//게시글 삭제
 	@DeleteMapping("/{id}")
 	public ResponseEntity<String> delete(@PathVariable("id") int id,
 			@AuthenticationPrincipal CustomUserDetails loginUser) {
+		// 체크용 출력코드, 제출전 삭제할것
 		System.out.println("[컨트롤러] loginUser: " + loginUser);
 		System.out.println("[컨트롤러] SecurityContext: " + SecurityContextHolder.getContext().getAuthentication());
 
@@ -108,9 +116,11 @@ public class CommunityController {
 		return ResponseEntity.badRequest().body("삭제 실패");
 	}
 
+//좋아요 달기
 	@PostMapping("/{id}/like")
 	public ResponseEntity<?> likeCommunity(@PathVariable("id") int communityId,
 			@AuthenticationPrincipal CustomUserDetails userDetails) {
+		// 체크용 출력코드, 제출전 삭제할것
 		System.out.println("[컨트롤러] userDetails: " + userDetails);
 		System.out.println("[컨트롤러] SecurityContext: " + SecurityContextHolder.getContext().getAuthentication());
 
@@ -127,7 +137,8 @@ public class CommunityController {
 		communityService.addLike(communityId, userId);
 		return ResponseEntity.ok("추천 완료");
 	}
-	//게시판 조회
+
+	// 게시판 조회
 	@GetMapping("/board")
 	public List<Community> getBoardList() {
 		return communityService.getBoardList();

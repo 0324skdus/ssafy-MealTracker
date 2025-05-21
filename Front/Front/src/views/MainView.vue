@@ -12,21 +12,29 @@
       <FullCalendar ref="calendarRef" :options="calendarOptions" />
     </main>
     <RightSidebar />
-     <!-- 식단 상세 패널 -->
-    <DietDetailPanel
-      v-if="showDetailPanel"
-      :date="selectedDate"
-      @close="showDetailPanel = false"
-      @openRegister="openRegisterFromDetail"
-    />
+     <!-- 슬라이딩 패널 wrapper (배경 역할) -->
+<div 
+  v-if="showDetailPanel || showRegisterPanel"
+  class="panel-backdrop"
+  @click.self="handlePanelBackdropClick"
+>
+  <!-- 식단 상세 패널 -->
+  <DietDetailPanel
+    v-if="showDetailPanel"
+    :date="selectedDate"
+    @close="showDetailPanel = false"
+    @openRegister="openRegisterFromDetail"
+  />
 
-    <!-- 식단 등록 패널 -->
-    <DietRegisterPanel
-      v-if="showRegisterPanel"
-      :date="registerInfo.date"
-      :mealType="registerInfo.mealType"
-      @close="showRegisterPanel = false"
-    />
+  <!-- 식단 등록 패널 -->
+  <DietRegisterPanel
+  v-if="showRegisterPanel"
+  :date="registerInfo.date"
+  :mealType="registerInfo.mealType"
+  @close="handlePanelBackdropClick"
+/>
+
+</div>
     </div>
 </template>
 
@@ -39,12 +47,15 @@ import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import DietDetailPanel from '@/components/DietDetailPanel.vue'
 import DietRegisterPanel from '@/components/DietRegisterPanel.vue'
+import { nextTick } from 'vue'
+
 
 const selectedDate = ref(null)
 const showDetailPanel = ref(false)
 
 const showRegisterPanel = ref(false)
 const registerInfo = ref({ date: '', mealType: '' })
+const detailShouldReopen = ref(false) // 상세 패널 다시 열릴지 추적하는 상태
 
 function openDetail(date) {
   selectedDate.value = date
@@ -53,6 +64,7 @@ function openDetail(date) {
 
 function openRegisterFromDetail({ date, mealType }) {
   showDetailPanel.value = false
+  detailShouldReopen.value = true // 닫고 다시 열게끔 기억해둠
   registerInfo.value = { date, mealType }
   showRegisterPanel.value = true
 }
@@ -64,9 +76,22 @@ function getLeafIcon(score) {
   return 'badLeaf.png'
 }
 
+//등록 패널이 닫힐 때 상세 패널 다시 열기 처리
+function handlePanelBackdropClick() {
+  if (showRegisterPanel.value) {
+    showRegisterPanel.value = false
+    nextTick(() => {
+      if (detailShouldReopen.value) {
+        showDetailPanel.value = true
+        detailShouldReopen.value = false
+      }
+    })
+  } else {
+    showDetailPanel.value = false
+  }
+}
 const calendarRef = ref(null) // FullCalendar 접근용 ref
 const currentTitle = ref('')  // 현재 년월 표시용
-
 const scoreMap = ref({}) // 날짜 기반 점수 맵 (API로 가져온 후 갱신됨)
 
 // 달 표시 커스텀
@@ -261,4 +286,16 @@ const calendarOptions = ref({
 .main-layout > * {
   min-width: 180px;
 }
+.panel-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000; /* 캘린더보다 위 */
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: flex-end; /* 패널 오른쪽에서 슬라이딩 되도록 */
+}
+
 </style>

@@ -1,5 +1,7 @@
 <template>
-  <div class="backdrop" @click.self="close">
+  <!-- 꼭 있어야 함 -->
+<div class="backdrop" @click.self="emit('close')">
+
     <div class="panel">
       <div class="header">
         <h2>식단 등록</h2>
@@ -39,7 +41,7 @@ function close() {
   position: absolute;
   top: 0;
   right: 0;
-  width: 420px;
+  width: 600px;
   height: 100%;
   background: #fff;
   padding: 20px;

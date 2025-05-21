@@ -3,6 +3,7 @@ package com.ssafy.yamyam.controller;
 import com.ssafy.yamyam.dto.DailyScore;
 import com.ssafy.yamyam.service.DailyScoreService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -16,7 +17,7 @@ public class DailyScoreController {
     private DailyScoreService dailyScoreService;
 
     @PostMapping("/calculate")
-    public void calculateScore(@RequestParam String userId, @RequestParam LocalDate date) {
+    public void calculateScore(@RequestParam("userId") String userId, @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         dailyScoreService.calculateAndSaveDailyScore(userId, date);
     }
 
