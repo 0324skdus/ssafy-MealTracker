@@ -3,25 +3,56 @@
     <div class="info-box">
       <h3>인기글</h3>
       <ul>
-        <li>자취하면서 잘 해먹기</li>
-        <li>유지어터 식단 추천</li>
-        <li>근성장 식단 템플릿</li>
-        <li>닭가슴살없이 근성장</li>
-        <li>시판식품으로 저염식</li>
+        <li v-for="post in popularPosts" :key="post.id">
+          <router-link :to="`/community/${post.id}`">{{ post.title }}</router-link>
+        </li>
       </ul>
     </div>
     <div class="info-box">
       <h3>최신글</h3>
       <ul>
-        <li>오늘의 점심</li>
-        <li>직장인 식단</li>
-        <li>식단 올리기 임박자</li>
-        <li>이상한 글 필터링</li>
-        <li>밀가루 줄기 3일차</li>
+        <li v-for="post in recentPosts" :key="post.id">
+          <router-link :to="`/community/${post.id}`">{{ post.title }}</router-link>
+        </li>
       </ul>
     </div>
   </aside>
 </template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+
+const popularPosts = ref([])
+const recentPosts = ref([])
+
+const fetchPosts = async () => {
+  try {
+    const token = localStorage.getItem('accessToken')
+    if (!token) {
+      console.warn('토큰 없음')
+      return
+    }
+
+    const [popularRes, recentRes] = await Promise.all([
+      axios.get('/api/community?sort=인기글', {
+        headers: { Authorization: `Bearer ${token}` }
+      }),
+      axios.get('/api/community?sort=최신글', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+    ])
+
+    popularPosts.value = popularRes.data.slice(0, 5)
+    recentPosts.value = recentRes.data.slice(0, 5)
+
+  } catch (error) {
+    console.error('사이드바 게시글 로드 실패:', error)
+  }
+}
+
+onMounted(fetchPosts)
+</script>
 
 <style scoped>
 .right-sidebar {
