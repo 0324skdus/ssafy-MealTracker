@@ -91,4 +91,9 @@ public class CommunityServiceImpl implements CommunityService {
         }
     }
 
+    @Override
+    public List<Community> getByUserId(String userId) {
+        return communityDao.selectByUserId(userId);
+    }
+
 }

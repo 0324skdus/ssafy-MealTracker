@@ -6,7 +6,7 @@ import BoardView from '@/views/BoardView.vue'
 import ProfileEdit from '@/views/ProfileEditView.vue'
 import WriteView from '@/views/WriteView.vue'
 import CommunityDetail from '@/views/CommunityDetail.vue'
-
+import MyPageView from '@/views/MyPageView.vue'
 
 const routes = [
   { path: '/', component: LoginView },
@@ -25,6 +25,7 @@ const routes = [
   component: WriteView
 },
 { path: '/community/:id', component: CommunityDetail },
+   { path: '/mypage', component: MyPageView },
 ]
 
 const router = createRouter({

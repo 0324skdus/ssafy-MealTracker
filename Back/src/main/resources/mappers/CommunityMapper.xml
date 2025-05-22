@@ -101,4 +101,19 @@
         ORDER BY created_at DESC
     </select>
 
+    <!-- 특정 유저 전체글 조회, 마이페이지용 -->
+    <select id="selectByUserId" parameterType="String" resultType="Community">
+        SELECT
+        id,
+        user_id AS userId,
+        title,
+        content,
+        like_count AS likeCount,
+        created_at AS createdAt,
+        community_type AS communityType
+        FROM community
+        WHERE user_id = #{userId}
+        ORDER BY created_at DESC
+    </select>
+
 </mapper>
