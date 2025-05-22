@@ -44,6 +44,7 @@ const showDetailPanel = ref(false)
 const nutritionTarget = ref(null)
 
 const showRegisterPanel = ref(false)
+const detailShouldReopen = ref(false)
 const registerInfo = ref({ date: '', mealType: '' })
 
 async function openDetail(date) {
