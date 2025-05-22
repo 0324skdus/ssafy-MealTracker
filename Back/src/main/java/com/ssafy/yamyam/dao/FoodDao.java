@@ -7,5 +7,5 @@ public interface FoodDao {
     Food selectById(int foodId);
     List<Food> selectAll();
     int insert(Food food);
-
+    List<Food> searchByName(String keyword);
 }
