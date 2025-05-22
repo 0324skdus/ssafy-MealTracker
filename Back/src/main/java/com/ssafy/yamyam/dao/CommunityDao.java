@@ -29,4 +29,7 @@ public interface CommunityDao {
     int decrementLikeCount(int communityId);
 
     List<Community> selectByUserId(String userId);
+
+    List<Community> selectLikedPostsByUserId(String userId);
+
 }

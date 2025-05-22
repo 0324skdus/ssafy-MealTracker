@@ -45,8 +45,16 @@
           </ul>
         </div>
 
-        <div v-else-if="selectedTab === 'liked'">
-          <p>좋아요 누른 글 (추후 연동)</p>
+        <div v-else-if="selectedTab === 'liked'" class="post-list">
+          <div v-if="myLikedPosts.length === 0">좋아요 누른 글이 없습니다.</div>
+          <ul v-else>
+            <li v-for="post in myLikedPosts" :key="post.id" class="post-item">
+              <div class="post-title" @click="goToPost(post.id)">
+                {{ post.title }}
+              </div>
+              <div class="post-meta">작성일: {{ post.createdAt }} | 좋아요: {{ post.likeCount }}</div>
+            </li>
+          </ul>
         </div>
       </div>
 
@@ -80,6 +88,7 @@ const user = ref({})
 const userName = ref('')
 const daysSinceJoined = ref(0)
 const myPosts = ref([])
+const myLikedPosts = ref([])
 
 const fetchUserInfo = async () => {
   const token = localStorage.getItem('accessToken')
@@ -118,9 +127,26 @@ const fetchMyPosts = async () => {
   }
 }
 
+const fetchLikedPosts = async () => {
+  const token = localStorage.getItem('accessToken')
+  const userId = localStorage.getItem('userId')
+  try {
+    const res = await axios.get(`/api/community/liked/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    myLikedPosts.value = res.data
+  } catch (err) {
+    console.error('좋아요 누른 글 조회 실패:', err)
+  }
+}
+
 watch(selectedTab, (newTab) => {
   if (newTab === 'written') {
     fetchMyPosts()
+  } else if (newTab === 'liked') {
+    fetchLikedPosts()
   }
 })
 
