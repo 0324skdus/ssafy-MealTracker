@@ -25,11 +25,12 @@
   @close="showDetailPanel = false"
   @openRegister="openRegisterFromDetail"
   />
-  
+  <!-- 식단 정보 자식으로 넘겨주기  -->
   <DietRegisterPanel
       v-if="showRegisterPanel"
       :date="registerInfo.date"
       :mealType="registerInfo.mealType"
+      :existingDiet="registerInfo.existingDiet" 
       @close="showRegisterPanel = false"
       @backToDetail="returnToDetailPanel"
       />
@@ -38,7 +39,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick} from 'vue'
 import axios from 'axios'
 import LeftSidebar from '@/components/LeftSidebar.vue'
 import RightSidebar from '@/components/RightSidebar.vue'
@@ -75,9 +76,9 @@ async function openDetail(date) {
   }
 }
 // 1번패널에서 2번패널
-function openRegisterFromDetail({ date, mealType }) {
+function openRegisterFromDetail({ date, mealType ,existingDiet}) {
   showDetailPanel.value = false
-  registerInfo.value = { date, mealType }
+  registerInfo.value = { date, mealType, existingDiet }
   showRegisterPanel.value = true
 }
 // 2번패널에서 1번패널 (뒤로가기 버튼)

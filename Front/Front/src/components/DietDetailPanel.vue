@@ -97,8 +97,14 @@ const groupedDietList = ref({})
 const total = ref({ kcal: 0, carbo: 0, protein: 0, fat: 0, fiber: 0, sugar: 0 })
 
 function register(mealType) {
-  emit('openRegister', { date: props.date, mealType })
+  const mealData = groupedDietList.value[mealType] || []
+  emit('openRegister', {
+    date: props.date,
+    mealType,
+    existingDiet: mealData
+  })
 }
+
 
 async function fetchDietList() {
   const userId = localStorage.getItem('userId')
