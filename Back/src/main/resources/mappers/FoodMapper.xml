@@ -20,4 +20,20 @@
         INSERT INTO food (food_name, kcal, carbo, protein, fat, saturatedfat, sugar, fiber, transfat)
         VALUES (#{foodName}, #{kcal}, #{carbo}, #{protein}, #{fat}, #{saturatedFat}, #{sugar}, #{fiber}, #{transfat})
     </insert>
+
+    <select id="searchByName" parameterType="String" resultType="Food">
+        SELECT
+        food_id AS foodId,
+        food_name AS foodName,
+        kcal,
+        carbo,
+        protein,
+        fat,
+        saturatedfat,
+        sugar,
+        fiber,
+        transfat
+        FROM food
+        WHERE food_name LIKE CONCAT('%', #{keyword}, '%')
+    </select>
 </mapper>
