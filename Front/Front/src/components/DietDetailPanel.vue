@@ -1,10 +1,10 @@
 <template>
-  <div class="backdrop" @click.self="close">
+ <div class="backdrop" @click.self="emit('close')">
     <div class="panel">
       <!-- 날짜 -->
       <div class="header">
         <h2 class="date-title">{{ date }} 식단 상세</h2>
-        <button class="close-btn" @click="close">X</button>
+        <button class="close-btn" @click="emit('close')">X</button>
       </div>
 
       <!-- 식사 등록 버튼 -->
@@ -17,56 +17,95 @@
 
       <!-- 영양성분 요약 -->
       <div class="nutrition-summary" v-if="nutritionTarget">
-        <div class="nutrient kcal">총 칼로리: {{ nutrition.kcal }} / {{ nutritionTarget.kcal }} kcal</div>
-        <div class="nutrient carb">탄수화물: {{ nutrition.carb }} / {{ nutritionTarget.carb }}g</div>
-        <div class="nutrient protein">단백질: {{ nutrition.protein }} / {{ nutritionTarget.protein }}g</div>
-        <div class="nutrient fat">지방: {{ nutrition.fat }} / {{ nutritionTarget.fat }}g</div>
-        <div class="nutrient fiber">식이섬유: {{ nutrition.fiber }} / {{ nutritionTarget.fiber }}g</div>
-        <div class="nutrient sugar">당류: {{ nutrition.sugar }} / {{ nutritionTarget.sugar }}g</div>
+        <div class="nutrient kcal">총 칼로리: {{ total.kcal }} / {{ nutritionTarget.kcal }} kcal</div>
+        <div class="nutrient carb">탄수화물: {{ total.carbo.toFixed(1) }} / {{ nutritionTarget.carb }}g</div>
+        <div class="nutrient protein">단백질: {{ total.protein.toFixed(1) }} / {{ nutritionTarget.protein }}g</div>
+        <div class="nutrient fat">지방: {{ total.fat.toFixed(1) }} / {{ nutritionTarget.fat }}g</div>
+        <div class="nutrient fiber">식이섬유: {{ total.fiber.toFixed(1) }} / {{ nutritionTarget.fiber }}g</div>
+        <div class="nutrient sugar">당류: {{ total.sugar.toFixed(1) }} / {{ nutritionTarget.sugar }}g</div>
       </div>
 
       <!-- 식단 상세 (더미 or 추후 API 연동 예정) -->
       <div class="meal-section">
-        <p><strong>아침:</strong> {{ meal.breakfast || '등록된 식단 없음' }}</p>
-        <p><strong>점심:</strong> {{ meal.lunch || '등록된 식단 없음' }}</p>
-        <p><strong>저녁:</strong> {{ meal.dinner || '등록된 식단 없음' }}</p>
-        <p><strong>간식:</strong> {{ meal.snack || '등록된 식단 없음' }}</p>
+        <div v-for="meal in ['아침', '점심', '저녁', '간식']" :key="meal">
+          <p><strong>{{ meal }}:</strong> 
+            <span v-if="groupedDietList[meal]">
+              {{ groupedDietList[meal].map(item => item.foodName).join(', ') }}
+            </span>
+            <span v-else>없음</span>
+          </p>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import { ref, watch, onMounted } from 'vue'
+import axios from 'axios'
 const props = defineProps({
   date: String,
   nutritionTarget: Object
 })
 
+const dietList = ref([])
+const groupedDietList = ref({})
+const total = ref({ kcal: 0, carbo: 0, protein: 0, fat: 0, fiber: 0, sugar: 0 })
 const emit = defineEmits(['close', 'openRegister'])
-
-const nutrition = {
-  kcal: 0,
-  carb: 0,
-  protein: 0,
-  fat: 0,
-  fiber: 0,
-  sugar: 0
-}
-
-const meal = {
-  breakfast: '',
-  lunch: '',
-  dinner: '',
-  snack: ''
-}
-
-function close() {
-  emit('close')
-}
 
 function register(mealType) {
   emit('openRegister', { date: props.date, mealType })
 }
+
+async function fetchDietList() {
+  const userId = localStorage.getItem('userId')
+  const token = localStorage.getItem('accessToken')
+  if (!userId || !props.date || !token) return
+
+  try {
+    const res = await axios.get(`/api/diet/user/${userId}/date`, {
+      params: { date: props.date },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    dietList.value = res.data
+    calculateGroupedAndTotal()
+  } catch (err) {
+    console.error('식단 조회 실패:', err)
+    dietList.value = []
+  }
+}
+
+function calculateGroupedAndTotal() {
+  const grouped = { 아침: [], 점심: [], 저녁: [], 간식: [] }
+  const sum = { kcal: 0, carbo: 0, protein: 0, fat: 0, fiber: 0, sugar: 0 }
+
+  const mealMap = {
+    breakfast: '아침',
+    lunch: '점심',
+    dinner: '저녁',
+    snack: '간식'
+  }
+
+  for (const item of dietList.value) {
+    const translated = mealMap[item.mealType]
+    if (translated) grouped[translated].push(item)
+
+    sum.kcal += Number(item.kcal) || 0
+    sum.carbo += Number(item.carbo) || 0
+    sum.protein += Number(item.protein) || 0
+    sum.fat += Number(item.fat) || 0
+    sum.fiber += Number(item.fiber) || 0
+    sum.sugar += Number(item.sugar) || 0
+  }
+
+  groupedDietList.value = grouped
+  total.value = sum
+}
+
+watch(() => props.date, fetchDietList, { immediate: true })
+onMounted(fetchDietList)
 </script>
 
 <style scoped>
@@ -80,7 +119,7 @@ function register(mealType) {
   position: absolute;
   top: 0;
   right: 0;
-  width: 420px;
+  width: 600px;
   height: 100%;
   background: #fff;
   padding: 20px;

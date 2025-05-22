@@ -172,7 +172,7 @@ public class DietServiceImpl implements DietService {
 
         return score;
     }
-
+    
     @Override
     public List<Diet> getByUserIdAndDate(String userId, LocalDate date) {
         return dietDao.selectByUserIdAndDate(userId, date);
@@ -182,8 +182,5 @@ public class DietServiceImpl implements DietService {
     public List<MonthlyDiet> getMonthlySummary(String userId, LocalDate startDate, LocalDate endDate) {
         return dietDao.selectMonthlyDietSummary(userId, startDate, endDate);
     }
-
-
-
 
 }
