@@ -25,7 +25,6 @@ public interface CommunityService {
     List<Community> getBoardList();
 
     //게시판 조회
-    List<Community> getBoardList();
 
     List<Community> getByLikeCount();
 
