@@ -130,4 +130,10 @@ public class CommunityController {
         boolean liked = communityService.toggleLike(communityId, userId);
         return ResponseEntity.ok(liked ? "좋아요 등록" : "좋아요 취소");
     }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Community>> getByUser(@PathVariable("userId") String userId) {
+        List<Community> list = communityService.getByUserId(userId);
+        return ResponseEntity.ok(list);
+    }
 }

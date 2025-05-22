@@ -30,5 +30,7 @@ public interface CommunityService {
 
 	List<Community> getByType(String type);
 
-	boolean toggleLike(int communityId, String userId);
+    boolean toggleLike(int communityId, String userId);
+
+    List<Community> getByUserId(String userId);
 }
