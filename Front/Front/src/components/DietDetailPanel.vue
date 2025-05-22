@@ -1,10 +1,15 @@
 <template>
- <div class="backdrop" @click.self="emit('close')">
+  <div class="backdrop" @click.self="emit('close')">
     <div class="panel">
       <!-- 날짜 -->
       <div class="header">
         <h2 class="date-title">{{ date }} 식단 상세</h2>
         <button class="close-btn" @click="emit('close')">X</button>
+      </div>
+
+      <!-- 식단 점수 -->
+      <div class="score-section">
+        <p><strong>오늘의 식단 점수:</strong> {{ score }}점</p>
       </div>
 
       <!-- 식사 등록 버튼 -->
@@ -17,15 +22,47 @@
 
       <!-- 영양성분 요약 -->
       <div class="nutrition-summary" v-if="nutritionTarget">
-        <div class="nutrient kcal">총 칼로리: {{ total.kcal }} / {{ nutritionTarget.kcal }} kcal</div>
-        <div class="nutrient carb">탄수화물: {{ total.carbo.toFixed(1) }} / {{ nutritionTarget.carb }}g</div>
-        <div class="nutrient protein">단백질: {{ total.protein.toFixed(1) }} / {{ nutritionTarget.protein }}g</div>
-        <div class="nutrient fat">지방: {{ total.fat.toFixed(1) }} / {{ nutritionTarget.fat }}g</div>
-        <div class="nutrient fiber">식이섬유: {{ total.fiber.toFixed(1) }} / {{ nutritionTarget.fiber }}g</div>
-        <div class="nutrient sugar">당류: {{ total.sugar.toFixed(1) }} / {{ nutritionTarget.sugar }}g</div>
+        <div
+          class="nutrient kcal"
+          :style="{ background: `linear-gradient(to right, #e76f51 ${percent.kcal}%, #eee ${percent.kcal}%)` }"
+        >
+          총 칼로리: {{ total.kcal }} / {{ nutritionTarget.kcal }} kcal
+        </div>
+        <div
+          class="nutrient carb"
+          :style="{ background: `linear-gradient(to right, #f9c74f ${percent.carbo}%, #eee ${percent.carbo}%)` }"
+        >
+          탄수화물: {{ total.carbo.toFixed(1) }} / {{ nutritionTarget.carb }}g
+        </div>
+        <div
+          class="nutrient protein"
+          :style="{ background: `linear-gradient(to right, #f9844a ${percent.protein}%, #eee ${percent.protein}%)` }"
+        >
+          단백질: {{ total.protein.toFixed(1) }} / {{ nutritionTarget.protein }}g
+        </div>
+        <div
+          class="nutrient fat"
+          :style="{ background: `linear-gradient(to right, #90be6d ${percent.fat}%, #eee ${percent.fat}%)` }"
+        >
+          지방: {{ total.fat.toFixed(1) }} / {{ nutritionTarget.fat }}g
+        </div>
+        <div
+          class="nutrient fiber"
+          :style="{ background: `linear-gradient(to right, #43aa8b ${percent.fiber}%, #eee ${percent.fiber}%)` }"
+        >
+          식이섬유: {{ total.fiber.toFixed(1) }} / {{ nutritionTarget.fiber }}g
+        </div>
+        <div
+          class="nutrient sugar"
+          :style="{ background: `linear-gradient(to right, #577590 ${percent.sugar}%, #eee ${percent.sugar}%)` }"
+        >
+          당류: {{ total.sugar.toFixed(1) }} / {{ nutritionTarget.sugar }}g
+        </div>
       </div>
 
-      <!-- 식단 상세 (더미 or 추후 API 연동 예정) -->
+      
+
+      <!-- 식단 상세 -->
       <div class="meal-section">
         <div v-for="meal in ['아침', '점심', '저녁', '간식']" :key="meal">
           <p><strong>{{ meal }}:</strong> 
@@ -36,22 +73,28 @@
           </p>
         </div>
       </div>
+
+      <!-- 공유 버튼 -->
+      <div class="bottom-buttons">
+        <button class="share-button">공유하기</button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, computed } from 'vue'
 import axios from 'axios'
+
 const props = defineProps({
   date: String,
   nutritionTarget: Object
 })
+const emit = defineEmits(['close', 'openRegister'])
 
 const dietList = ref([])
 const groupedDietList = ref({})
 const total = ref({ kcal: 0, carbo: 0, protein: 0, fat: 0, fiber: 0, sugar: 0 })
-const emit = defineEmits(['close', 'openRegister'])
 
 function register(mealType) {
   emit('openRegister', { date: props.date, mealType })
@@ -103,6 +146,27 @@ function calculateGroupedAndTotal() {
   groupedDietList.value = grouped
   total.value = sum
 }
+
+const percent = computed(() => {
+  if (!props.nutritionTarget) {
+    return { kcal: 0, carbo: 0, protein: 0, fat: 0, fiber: 0, sugar: 0 }
+  }
+  return {
+    kcal: Math.min((total.value.kcal / props.nutritionTarget.kcal) * 100, 100),
+    carbo: Math.min((total.value.carbo / props.nutritionTarget.carb) * 100, 100),
+    protein: Math.min((total.value.protein / props.nutritionTarget.protein) * 100, 100),
+    fat: Math.min((total.value.fat / props.nutritionTarget.fat) * 100, 100),
+    fiber: Math.min((total.value.fiber / props.nutritionTarget.fiber) * 100, 100),
+    sugar: Math.min((total.value.sugar / props.nutritionTarget.sugar) * 100, 100)
+  }
+})
+
+const score = computed(() => {
+  if (!props.nutritionTarget) return 0
+  const values = Object.values(percent.value)
+  const average = values.reduce((a, b) => a + b, 0) / values.length
+  return Math.round(average)
+})
 
 watch(() => props.date, fetchDietList, { immediate: true })
 onMounted(fetchDietList)
@@ -176,6 +240,7 @@ onMounted(fetchDietList)
   font-weight: bold;
   color: white;
 }
+
 .nutrient.kcal    { background-color: #e76f51; }
 .nutrient.carb    { background-color: #f9c74f; }
 .nutrient.protein { background-color: #f9844a; }
@@ -183,9 +248,37 @@ onMounted(fetchDietList)
 .nutrient.fiber   { background-color: #43aa8b; }
 .nutrient.sugar   { background-color: #577590; }
 
+.score-section {
+  margin-top: 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}
+
 .meal-section {
   margin-top: 30px;
 }
+
+.bottom-buttons {
+  margin-top: auto;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.share-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #4c8bf5;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.share-button:hover {
+  background-color: #2e6ff2;
+}
+
 @keyframes slideIn {
   from { transform: translateX(100%); }
   to { transform: translateX(0); }
