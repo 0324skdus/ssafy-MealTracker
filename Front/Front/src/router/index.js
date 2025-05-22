@@ -23,7 +23,8 @@ const routes = [
   {
   path: '/edit/:id',
   component: WriteView
-}
+},
+{ path: '/community/:id', component: CommunityDetail },
 ]
 
 const router = createRouter({
