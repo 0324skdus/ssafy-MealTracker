@@ -4,6 +4,9 @@
 
     <div class="panel">
       <div class="header">
+        <div class="left-buttons">
+          <button class="back-btn" @click="emit('backToDetail')">〈</button>
+        </div>
         <h2>식단 등록</h2>
         <p>{{ date }} - {{ mealType }}</p>
         <button class="close-btn" @click="close">X</button>

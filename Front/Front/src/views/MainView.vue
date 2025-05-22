@@ -11,21 +11,29 @@
       <FullCalendar ref="calendarRef" :options="calendarOptions" />
     </main>
     <RightSidebar />
-
-    <DietDetailPanel
-      v-if="showDetailPanel"
-      :date="selectedDate"
-      :nutritionTarget="nutritionTarget"
-      @close="showDetailPanel = false"
-      @openRegister="openRegisterFromDetail"
-    />
-
-    <DietRegisterPanel
+    <!-- 패널 백드롭 -->
+<div 
+  v-if="showDetailPanel || showRegisterPanel"
+  class="panel-backdrop"
+  @click.self="closeAllPanels">
+  
+  
+  <DietDetailPanel
+  v-if="showDetailPanel"
+  :date="selectedDate"
+  :nutritionTarget="nutritionTarget"
+  @close="showDetailPanel = false"
+  @openRegister="openRegisterFromDetail"
+  />
+  
+  <DietRegisterPanel
       v-if="showRegisterPanel"
       :date="registerInfo.date"
       :mealType="registerInfo.mealType"
       @close="showRegisterPanel = false"
-    />
+      @backToDetail="returnToDetailPanel"
+      />
+    </div>
   </div>
 </template>
 
@@ -44,7 +52,6 @@ const showDetailPanel = ref(false)
 const nutritionTarget = ref(null)
 
 const showRegisterPanel = ref(false)
-const detailShouldReopen = ref(false)
 const registerInfo = ref({ date: '', mealType: '' })
 
 async function openDetail(date) {
@@ -67,33 +74,29 @@ async function openDetail(date) {
     nutritionTarget.value = null
   }
 }
-
+// 1번패널에서 2번패널
 function openRegisterFromDetail({ date, mealType }) {
   showDetailPanel.value = false
-  detailShouldReopen.value = true // 닫고 다시 열게끔 기억해둠
   registerInfo.value = { date, mealType }
   showRegisterPanel.value = true
+}
+// 2번패널에서 1번패널 (뒤로가기 버튼)
+function returnToDetailPanel() {
+  showRegisterPanel.value = false
+  nextTick(() => {
+    showDetailPanel.value = true
+  })
+}
+// 전체 닫기 (X 버튼/배경 클릭)
+function closeAllPanels() {
+  showDetailPanel.value = false
+  showRegisterPanel.value = false
 }
 
 function getLeafIcon(score) {
   if (score >= 80) return 'healthyLeaf.png'
   if (score >= 50) return 'sosoLeaf.png'
   return 'badLeaf.png'
-}
-
-//등록 패널이 닫힐 때 상세 패널 다시 열기 처리
-function handlePanelBackdropClick() {
-  if (showRegisterPanel.value) {
-    showRegisterPanel.value = false
-    nextTick(() => {
-      if (detailShouldReopen.value) {
-        showDetailPanel.value = true
-        detailShouldReopen.value = false
-      }
-    })
-  } else {
-    showDetailPanel.value = false
-  }
 }
 const calendarRef = ref(null) // FullCalendar 접근용 ref
 const currentTitle = ref('')  // 현재 년월 표시용
