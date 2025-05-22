@@ -116,4 +116,20 @@
         ORDER BY created_at DESC
     </select>
 
+    <select id="selectLikedPostsByUserId" parameterType="String" resultType="Community">
+        SELECT
+        community.id AS id,
+        community.user_id AS userId,
+        community.title AS title,
+        community.content AS content,
+        community.like_count AS likeCount,
+        community.created_at AS createdAt,
+        community.community_type AS communityType
+        FROM community_like
+        JOIN community ON community_like.community_id = community.id
+        WHERE community_like.user_id = #{userId}
+        ORDER BY community_like.created_at DESC
+    </select>
+
+
 </mapper>

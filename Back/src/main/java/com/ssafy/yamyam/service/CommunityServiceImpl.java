@@ -96,4 +96,9 @@ public class CommunityServiceImpl implements CommunityService {
         return communityDao.selectByUserId(userId);
     }
 
+    @Override
+    public List<Community> getLikedPostsByUserId(String userId) {
+        return communityDao.selectLikedPostsByUserId(userId);
+    }
+
 }

@@ -136,4 +136,11 @@ public class CommunityController {
         List<Community> list = communityService.getByUserId(userId);
         return ResponseEntity.ok(list);
     }
+
+    // 좋아요 누른 글 모아서 볼 때
+    @GetMapping("/liked/{userId}")
+    public ResponseEntity<List<Community>> getLikedPosts(@PathVariable("userId") String userId) {
+        List<Community> likedPosts = communityService.getLikedPostsByUserId(userId);
+        return ResponseEntity.ok(likedPosts);
+    }
 }
