@@ -19,7 +19,7 @@ function logout() {
       </router-link>
     </div>
     <ul>
-      <router-link to="/main">
+      <router-link to="/mypage">
         <li>마이페이지</li>
       </router-link>
 
