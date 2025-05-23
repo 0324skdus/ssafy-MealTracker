@@ -10,11 +10,17 @@ import java.util.Map;
 
 public interface DailyScoreDao {
     void insert(DailyScore dailyScore);
+
     void update(DailyScore dailyScore);
+
     DailyScore selectByUserIdAndDate(Map<String, Object> map);
+
     List<DailyScore> selectByUserId(String userId);
 
     List<DailyScore> selectScoresByUserAndPeriod(@Param("userId") String userId,
                                                  @Param("startDate") LocalDate startDate,
                                                  @Param("endDate") LocalDate endDate);
+
+    void deleteByUserAndDate(@Param("userId") String userId, @Param("date") LocalDate date);
+
 }

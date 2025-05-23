@@ -74,14 +74,6 @@ public class DietController {
         return ResponseEntity.ok(meals);
     }
 
-    // 식단 점수 조회
-    @GetMapping("/user/{userId}/score")
-    public ResponseEntity<Integer> getScore(@PathVariable("userId")  String userId, @RequestParam("date") String dateStr) {
-
-        LocalDate date = LocalDate.parse(dateStr);
-        int score = dietService.scoring(userId, date);
-        return ResponseEntity.ok(score);
-    }
 
 	@PostMapping("/by-food")
 	public ResponseEntity<String> registerByFoodId(@RequestBody Diet diet) {

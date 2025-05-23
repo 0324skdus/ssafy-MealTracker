@@ -17,17 +17,17 @@ import java.util.Map;
 @Service
 public class DailyScoreServiceImpl implements DailyScoreService {
 
-	private final DailyScoreDao dailyScoreDao;
+    private final DailyScoreDao dailyScoreDao;
     private final DietDao dietDao;
     private final UserService userService;
     private final NutritionService nutritionService;
 
     @Autowired
     public DailyScoreServiceImpl(
-        DailyScoreDao dailyScoreDao,
-        DietDao dietDao,
-        UserService userService,
-        NutritionService nutritionService
+            DailyScoreDao dailyScoreDao,
+            DietDao dietDao,
+            UserService userService,
+            NutritionService nutritionService
     ) {
         this.dailyScoreDao = dailyScoreDao;
         this.dietDao = dietDao;
@@ -80,7 +80,7 @@ public class DailyScoreServiceImpl implements DailyScoreService {
     }
 
     private double calculateScore(String userId, LocalDate date) {
-    	User user = userService.getUserById(userId);
+        User user = userService.getUserById(userId);
         if (user == null) return -1;
 
         List<Diet> meals = dietDao.selectByUserIdAndDate(userId, date);
