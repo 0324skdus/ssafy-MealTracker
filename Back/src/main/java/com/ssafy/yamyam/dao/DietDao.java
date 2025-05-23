@@ -27,11 +27,17 @@ public interface DietDao {
 
     // 식단 삭제
     int delete(int dietId);
+
     //캘린더용 한달식단리스트 조회
     List<MonthlyDiet> selectMonthlyDietSummary(
             @Param("userId") String userId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );
+
+    // 기간에 따른 식단 조회시 사용
+    List<Diet> selectDietByUserAndPeriod(@Param("userId") String userId,
+                                         @Param("startDate") LocalDate startDate,
+                                         @Param("endDate") LocalDate endDate);
 
 }
