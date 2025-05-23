@@ -18,12 +18,9 @@ public class DietServiceImpl implements DietService {
     private final UserService userService;
     private final FoodDao foodDao;
     private final NutritionService nutritionService;
-    private final DailyScoreService dailyScoreService;
-
-    @Autowired
-    public DietServiceImpl(DietDao dietDao, UserService userService, FoodDao foodDao, NutritionService nutritionService, DailyScoreService dailyScoreService) {
     private final DailyScoreDao dailyScoreDao;
 
+    private final DailyScoreService dailyScoreService;
 
     @Autowired
     public DietServiceImpl(DietDao dietDao,
@@ -31,6 +28,7 @@ public class DietServiceImpl implements DietService {
                            FoodDao foodDao,
                            NutritionService nutritionService,
                            DailyScoreDao dailyScoreDao) {
+    public DietServiceImpl(DietDao dietDao, UserService userService, FoodDao foodDao, NutritionService nutritionService, DailyScoreService dailyScoreService) {
         this.dietDao = dietDao;
         this.userService = userService;
         this.foodDao = foodDao;
