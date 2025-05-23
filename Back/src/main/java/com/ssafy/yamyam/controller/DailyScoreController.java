@@ -30,4 +30,21 @@ public class DailyScoreController {
     public List<DailyScore> getAllScores(@PathVariable String userId) {
         return dailyScoreService.getAllScores(userId);
     }
+
+    @GetMapping("/{userId}/average")
+    public double getAverageScoreByPeriod(
+            @PathVariable("userId") String userId,
+            @RequestParam("period") String period
+    ) {
+        LocalDate end = LocalDate.now();
+        LocalDate start = switch (period) {
+            case "1W" -> end.minusWeeks(1);
+            case "1M" -> end.minusMonths(1);
+            case "3M" -> end.minusMonths(3);
+            case "6M" -> end.minusMonths(6);
+            case "1Y" -> end.minusYears(1);
+            default -> throw new IllegalArgumentException("잘못된 기간");
+        };
+        return dailyScoreService.calculateAverageScore(userId, start, end);
+    }
 }

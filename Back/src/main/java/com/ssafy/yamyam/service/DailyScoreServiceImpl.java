@@ -190,4 +190,16 @@ public class DailyScoreServiceImpl implements DailyScoreService {
     public List<DailyScore> getAllScores(String userId) {
         return dailyScoreDao.selectByUserId(userId);
     }
+
+    @Override
+    public double calculateAverageScore(String userId, LocalDate start, LocalDate end) {
+        List<DailyScore> scores = dailyScoreDao.selectScoresByUserAndPeriod(userId, start, end);
+        if (scores.isEmpty()) return 0;
+
+        double total = 0;
+        for (DailyScore score : scores) {
+            total += score.getScore();
+        }
+        return total / scores.size();
+    }
 }

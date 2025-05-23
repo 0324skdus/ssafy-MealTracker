@@ -1,9 +1,11 @@
 package com.ssafy.yamyam.controller;
 
+import com.ssafy.yamyam.dao.DailyScoreDao;
 import com.ssafy.yamyam.dao.FoodDao;
 import com.ssafy.yamyam.dto.Diet;
 import com.ssafy.yamyam.dto.Food;
 import com.ssafy.yamyam.dto.MonthlyDiet;
+import com.ssafy.yamyam.service.DailyScoreService;
 import com.ssafy.yamyam.service.DietService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,7 +22,6 @@ public class DietController {
     private final DietService dietService;
 
 	private final FoodDao foodDao;
-
 	@Autowired
 	public DietController(DietService dietService, FoodDao foodDao) {
 	    this.dietService = dietService;
@@ -137,6 +138,7 @@ public class DietController {
 	    List<MonthlyDiet> result = dietService.getMonthlySummary(userId, startDate, endDate);
 	    return ResponseEntity.ok(result);
 	}
+
 
 
 }

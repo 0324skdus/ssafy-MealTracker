@@ -1,11 +1,9 @@
 package com.ssafy.yamyam.service;
 
+import com.ssafy.yamyam.dao.DailyScoreDao;
 import com.ssafy.yamyam.dao.DietDao;
 import com.ssafy.yamyam.dao.FoodDao;
-import com.ssafy.yamyam.dto.Diet;
-import com.ssafy.yamyam.dto.Food;
-import com.ssafy.yamyam.dto.MonthlyDiet;
-import com.ssafy.yamyam.dto.User;
+import com.ssafy.yamyam.dto.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,11 +22,21 @@ public class DietServiceImpl implements DietService {
 
     @Autowired
     public DietServiceImpl(DietDao dietDao, UserService userService, FoodDao foodDao, NutritionService nutritionService, DailyScoreService dailyScoreService) {
+    private final DailyScoreDao dailyScoreDao;
+
+
+    @Autowired
+    public DietServiceImpl(DietDao dietDao,
+                           UserService userService,
+                           FoodDao foodDao,
+                           NutritionService nutritionService,
+                           DailyScoreDao dailyScoreDao) {
         this.dietDao = dietDao;
         this.userService = userService;
         this.foodDao = foodDao;
         this.nutritionService = nutritionService;
         this.dailyScoreService = dailyScoreService;
+        this.dailyScoreDao = dailyScoreDao;
     }
 
     @Override
@@ -185,15 +193,50 @@ public class DietServiceImpl implements DietService {
 
         return score;
     }
-    
+
     @Override
     public List<Diet> getByUserIdAndDate(String userId, LocalDate date) {
         return dietDao.selectByUserIdAndDate(userId, date);
     }
+
     //캘린더용 한달식단 조회
     @Override
     public List<MonthlyDiet> getMonthlySummary(String userId, LocalDate startDate, LocalDate endDate) {
         return dietDao.selectMonthlyDietSummary(userId, startDate, endDate);
+    }
+
+    public DailyNutrition calculateAverageNutrition(String userId, LocalDate start, LocalDate end) {
+        List<Diet> diets = dietDao.selectDietByUserAndPeriod(userId, start, end);
+        double kcal = 0, carbo = 0, protein = 0, fat = 0, fiber = 0, sugar = 0, transfat = 0;
+
+        for (Diet d : diets) {
+            kcal += d.getKcal();
+            carbo += d.getCarbo();
+            protein += d.getProtein();
+            fat += d.getFat();
+            fiber += d.getFiber();
+            sugar += d.getSugar();
+            transfat += d.getTransfat();
+        }
+
+        int count = diets.size() == 0 ? 1 : diets.size();
+        return new DailyNutrition(
+                kcal / count,
+                carbo / count,
+                protein / count,
+                fat / count,
+                fiber / count,
+                sugar / count,
+                transfat/ count
+
+        );
+    }
+
+    public double calculateAverageScore(String userId, LocalDate start, LocalDate end) {
+        List<DailyScore> scores = dailyScoreDao.selectScoresByUserAndPeriod(userId, start, end);
+        if (scores.isEmpty()) return 0;
+        double total = scores.stream().mapToDouble(DailyScore::getScore).sum();
+        return total / scores.size();
     }
 
 }
