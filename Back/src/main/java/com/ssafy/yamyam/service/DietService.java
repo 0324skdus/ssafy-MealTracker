@@ -35,4 +35,6 @@ public interface DietService {
     List<MonthlyDiet> getMonthlySummary(String userId, LocalDate startDate, LocalDate endDate);
 
     public DailyNutrition calculateAverageNutrition(String userId, LocalDate start, LocalDate end);
+
+    public Diet registerAndReturn(Diet diet);
 }

@@ -6,14 +6,16 @@
 <mapper namespace="com.ssafy.yamyam.dao.DietDao">
 
     <!-- 식단 등록 -->
-    <insert id="insert" parameterType="com.ssafy.yamyam.dto.Diet">
+    <insert id="insert"
+            parameterType="com.ssafy.yamyam.dto.Diet"
+            useGeneratedKeys="true"
+            keyProperty="dietId">
         INSERT INTO diet (
         user_id, meal_type, food_id, food_name,
         kcal, carbo, protein, fat,
         saturatedfat, sugar, fiber, transfat,
         date
-        )
-        VALUES (
+        ) VALUES (
         #{userId}, #{mealType}, #{foodId}, #{foodName},
         #{kcal}, #{carbo}, #{protein}, #{fat},
         #{saturatedFat}, #{sugar}, #{fiber}, #{transfat},

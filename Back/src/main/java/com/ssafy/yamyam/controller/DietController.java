@@ -54,13 +54,15 @@ public class DietController {
     }
 
     // 식단 삭제
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable("id") int id) {
-        boolean result = dietService.remove(id);
-        if (result)
-            return ResponseEntity.ok("삭제 완료");
-        return ResponseEntity.notFound().build();
-    }
+	@DeleteMapping("/{id}")
+	public ResponseEntity<String> delete(@PathVariable("id") int id) {
+		boolean result = dietService.remove(id);
+		if (result) {
+			return ResponseEntity.ok("삭제 완료");
+		} else {
+			return ResponseEntity.notFound().build();
+		}
+	}
 
     // 날짜별 식단 조회
     @GetMapping("/user/{userId}/date")
