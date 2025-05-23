@@ -75,5 +75,12 @@
         GROUP BY date
     </select>
 
+    <select id="selectDietByUserAndPeriod" resultType="com.ssafy.yamyam.dto.Diet">
+        SELECT *
+        FROM diet
+        WHERE user_id = #{userId}
+        AND date BETWEEN #{startDate} AND #{endDate}
+    </select>
+
 
 </mapper>

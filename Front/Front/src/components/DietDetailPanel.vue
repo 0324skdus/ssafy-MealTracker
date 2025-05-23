@@ -22,45 +22,28 @@
 
       <!-- 영양성분 요약 -->
       <div class="nutrition-summary" v-if="nutritionTarget">
-        <div
-          class="nutrient kcal"
-          :style="{ background: `linear-gradient(to right, #e76f51 ${percent.kcal}%, #eee ${percent.kcal}%)` }"
-        >
+        <div class="nutrient kcal" :style="{ background: `linear-gradient(to right, #e76f51 ${percent.kcal}%, #eee ${percent.kcal}%)` }">
           총 칼로리: {{ total.kcal }} / {{ nutritionTarget.kcal }} kcal
         </div>
-        <div
-          class="nutrient carb"
-          :style="{ background: `linear-gradient(to right, #f9c74f ${percent.carbo}%, #eee ${percent.carbo}%)` }"
-        >
+        <div class="nutrient carb" :style="{ background: `linear-gradient(to right, #f9c74f ${percent.carbo}%, #eee ${percent.carbo}%)` }">
           탄수화물: {{ total.carbo.toFixed(1) }} / {{ nutritionTarget.carb }}g
         </div>
-        <div
-          class="nutrient protein"
-          :style="{ background: `linear-gradient(to right, #f9844a ${percent.protein}%, #eee ${percent.protein}%)` }"
-        >
+        <div class="nutrient protein" :style="{ background: `linear-gradient(to right, #f9844a ${percent.protein}%, #eee ${percent.protein}%)` }">
           단백질: {{ total.protein.toFixed(1) }} / {{ nutritionTarget.protein }}g
         </div>
-        <div
-          class="nutrient fat"
-          :style="{ background: `linear-gradient(to right, #90be6d ${percent.fat}%, #eee ${percent.fat}%)` }"
-        >
+        <div class="nutrient fat" :style="{ background: `linear-gradient(to right, #90be6d ${percent.fat}%, #eee ${percent.fat}%)` }">
           지방: {{ total.fat.toFixed(1) }} / {{ nutritionTarget.fat }}g
         </div>
-        <div
-          class="nutrient fiber"
-          :style="{ background: `linear-gradient(to right, #43aa8b ${percent.fiber}%, #eee ${percent.fiber}%)` }"
-        >
+        <div class="nutrient fiber" :style="{ background: `linear-gradient(to right, #43aa8b ${percent.fiber}%, #eee ${percent.fiber}%)` }">
           식이섬유: {{ total.fiber.toFixed(1) }} / {{ nutritionTarget.fiber }}g
         </div>
-        <div
-          class="nutrient sugar"
-          :style="{ background: `linear-gradient(to right, #577590 ${percent.sugar}%, #eee ${percent.sugar}%)` }"
-        >
+        <div class="nutrient sugar" :style="{ background: `linear-gradient(to right, #577590 ${percent.sugar}%, #eee ${percent.sugar}%)` }">
           당류: {{ total.sugar.toFixed(1) }} / {{ nutritionTarget.sugar }}g
         </div>
+        <div class="nutrient transfat" :style="{ background: `linear-gradient(to right, #d62828 ${percent.transfat}%, #eee ${percent.transfat}%)` }">
+          트랜스지방: {{ total.transfat.toFixed(1) }} / {{ nutritionTarget.transfat }}g
+        </div>
       </div>
-
-      
 
       <!-- 식단 상세 -->
       <div class="meal-section">
@@ -94,7 +77,7 @@ const emit = defineEmits(['close', 'openRegister'])
 
 const dietList = ref([])
 const groupedDietList = ref({})
-const total = ref({ kcal: 0, carbo: 0, protein: 0, fat: 0, fiber: 0, sugar: 0 })
+const total = ref({ kcal: 0, carbo: 0, protein: 0, fat: 0, fiber: 0, sugar: 0, transfat: 0 })
 
 function register(mealType) {
   const mealData = groupedDietList.value[mealType] || []
@@ -104,7 +87,6 @@ function register(mealType) {
     existingDiet: mealData
   })
 }
-
 
 async function fetchDietList() {
   const userId = localStorage.getItem('userId')
@@ -128,7 +110,7 @@ async function fetchDietList() {
 
 function calculateGroupedAndTotal() {
   const grouped = { 아침: [], 점심: [], 저녁: [], 간식: [] }
-  const sum = { kcal: 0, carbo: 0, protein: 0, fat: 0, fiber: 0, sugar: 0 }
+  const sum = { kcal: 0, carbo: 0, protein: 0, fat: 0, fiber: 0, sugar: 0, transfat: 0 }
 
   const mealMap = {
     breakfast: '아침',
@@ -147,6 +129,7 @@ function calculateGroupedAndTotal() {
     sum.fat += Number(item.fat) || 0
     sum.fiber += Number(item.fiber) || 0
     sum.sugar += Number(item.sugar) || 0
+    sum.transfat += Number(item.transfat) || 0
   }
 
   groupedDietList.value = grouped
@@ -155,7 +138,7 @@ function calculateGroupedAndTotal() {
 
 const percent = computed(() => {
   if (!props.nutritionTarget) {
-    return { kcal: 0, carbo: 0, protein: 0, fat: 0, fiber: 0, sugar: 0 }
+    return { kcal: 0, carbo: 0, protein: 0, fat: 0, fiber: 0, sugar: 0, transfat: 0 }
   }
   return {
     kcal: Math.min((total.value.kcal / props.nutritionTarget.kcal) * 100, 100),
@@ -163,7 +146,8 @@ const percent = computed(() => {
     protein: Math.min((total.value.protein / props.nutritionTarget.protein) * 100, 100),
     fat: Math.min((total.value.fat / props.nutritionTarget.fat) * 100, 100),
     fiber: Math.min((total.value.fiber / props.nutritionTarget.fiber) * 100, 100),
-    sugar: Math.min((total.value.sugar / props.nutritionTarget.sugar) * 100, 100)
+    sugar: Math.min((total.value.sugar / props.nutritionTarget.sugar) * 100, 100),
+    transfat: Math.min((total.value.transfat / props.nutritionTarget.transfat) * 100, 100)
   }
 })
 
@@ -246,13 +230,13 @@ onMounted(fetchDietList)
   font-weight: bold;
   color: white;
 }
-
 .nutrient.kcal    { background-color: #e76f51; }
 .nutrient.carb    { background-color: #f9c74f; }
 .nutrient.protein { background-color: #f9844a; }
 .nutrient.fat     { background-color: #90be6d; }
 .nutrient.fiber   { background-color: #43aa8b; }
 .nutrient.sugar   { background-color: #577590; }
+.nutrient.transfat { background-color: #d62828; }
 
 .score-section {
   margin-top: 20px;

@@ -9,4 +9,6 @@ public interface DailyScoreService {
     void calculateAndSaveDailyScore(String userId, LocalDate date);
     DailyScore getDailyScore(String userId, LocalDate date);
     List<DailyScore> getAllScores(String userId);
+
+    double calculateAverageScore(String userId, LocalDate start, LocalDate end);
 }

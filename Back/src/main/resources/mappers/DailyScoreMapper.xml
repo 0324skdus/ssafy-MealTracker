@@ -40,4 +40,11 @@
         ORDER BY date DESC
     </select>
 
+    <select id="selectScoresByUserAndPeriod" resultType="com.ssafy.yamyam.dto.DailyScore">
+        SELECT *
+        FROM daily_score
+        WHERE user_id = #{userId}
+        AND date BETWEEN #{startDate} AND #{endDate}
+    </select>
+
 </mapper>
