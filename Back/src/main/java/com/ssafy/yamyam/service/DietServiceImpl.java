@@ -20,6 +20,7 @@ public class DietServiceImpl implements DietService {
     private final NutritionService nutritionService;
     private final DailyScoreDao dailyScoreDao;
 
+    private final DailyScoreService dailyScoreService;
 
     @Autowired
     public DietServiceImpl(DietDao dietDao,
@@ -27,10 +28,12 @@ public class DietServiceImpl implements DietService {
                            FoodDao foodDao,
                            NutritionService nutritionService,
                            DailyScoreDao dailyScoreDao) {
+    public DietServiceImpl(DietDao dietDao, UserService userService, FoodDao foodDao, NutritionService nutritionService, DailyScoreService dailyScoreService) {
         this.dietDao = dietDao;
         this.userService = userService;
         this.foodDao = foodDao;
         this.nutritionService = nutritionService;
+        this.dailyScoreService = dailyScoreService;
         this.dailyScoreDao = dailyScoreDao;
     }
 
@@ -40,26 +43,37 @@ public class DietServiceImpl implements DietService {
     }
 
     @Override
-    public boolean registerByFoodId(String userId, String mealType, int foodId, LocalDate date) {
+    public boolean registerByFoodId(String userId, String mealType, int foodId, LocalDate date, double weight) {
         Food food = foodDao.selectById(foodId);
         if (food == null) return false;
+        
+        double factor = (weight > 0) ? weight / 100.0 : 1.0;
 
         Diet diet = new Diet();
         diet.setUserId(userId);
         diet.setFoodId(foodId);
         diet.setMealType(mealType);
         diet.setFoodName(food.getFoodName());
-        diet.setKcal(food.getKcal());
-        diet.setCarbo(food.getCarbo());
-        diet.setProtein(food.getProtein());
-        diet.setFat(food.getFat());
-        diet.setSugar(food.getSugar());
-        diet.setFiber(food.getFiber());
-        diet.setTransfat(food.getTransfat());
-        diet.setSaturatedFat(food.getSaturatedFat());
+        diet.setKcal(food.getKcal() * factor);
+        diet.setCarbo(food.getCarbo() * factor);
+        diet.setProtein(food.getProtein() * factor);
+        diet.setFat(food.getFat() * factor);
+        diet.setSugar(food.getSugar() * factor);
+        diet.setFiber(food.getFiber() * factor);
+        diet.setTransfat(food.getTransfat() * factor);
+        diet.setSaturatedFat(food.getSaturatedFat() * factor);
         diet.setDate(date);
+        diet.setWeight(weight); // 저장은 안하는 계산용 무게
 
-        return dietDao.insert(diet) > 0;
+        boolean inserted = dietDao.insert(diet) > 0;
+        System.out.println("[DEBUG] inserted = " + inserted);
+        if (inserted) {
+            // 식단 등록 성공한 경우 점수 자동 계산
+        	System.out.println("[DEBUG] diet 등록 성공, 점수 계산 시작: " + userId + ", " + date);
+        	dailyScoreService.calculateAndSaveDailyScore(userId, date);
+        }
+
+        return inserted;
     }
 
     @Override

@@ -9,7 +9,7 @@
 
       <!-- 식단 점수 -->
       <div class="score-section">
-        <p><strong>오늘의 식단 점수:</strong> {{ score }}점</p>
+        <p><strong>오늘의 식단 점수:</strong> {{ props.score }}점</p>
       </div>
 
       <!-- 식사 등록 버튼 -->
@@ -46,17 +46,35 @@
       </div>
 
       <!-- 식단 상세 -->
-      <div class="meal-section">
-        <div v-for="meal in ['아침', '점심', '저녁', '간식']" :key="meal">
-          <p><strong>{{ meal }}:</strong> 
-            <span v-if="groupedDietList[meal]">
-              {{ groupedDietList[meal].map(item => item.foodName).join(', ') }}
-            </span>
-            <span v-else>없음</span>
-          </p>
-        </div>
-      </div>
+<div class="meal-section">
+  <p>아침:</p>
+  <ul>
+    <li v-for="(item, idx) in breakfastList" :key="idx">
+      {{ item.foodName }} - {{ item.kcal }} kcal
+    </li>
+  </ul>
 
+  <p>점심:</p>
+  <ul>
+    <li v-for="(item, idx) in lunchList" :key="idx">
+      {{ item.foodName }} - {{ item.kcal }} kcal
+    </li>
+  </ul>
+
+  <p>저녁:</p>
+  <ul>
+    <li v-for="(item, idx) in dinnerList" :key="idx">
+      {{ item.foodName }} - {{ item.kcal }} kcal
+    </li>
+  </ul>
+
+  <p>간식:</p>
+  <ul>
+    <li v-for="(item, idx) in snackList" :key="idx">
+      {{ item.foodName }} - {{ item.kcal }} kcal
+    </li>
+  </ul>
+</div>
       <!-- 공유 버튼 -->
       <div class="bottom-buttons">
         <button class="share-button">공유하기</button>
@@ -71,13 +89,29 @@ import axios from 'axios'
 
 const props = defineProps({
   date: String,
-  nutritionTarget: Object
+  nutritionTarget: Object,
+  dietList: Array,
+  score: Number 
 })
 const emit = defineEmits(['close', 'openRegister'])
-
-const dietList = ref([])
 const groupedDietList = ref({})
 const total = ref({ kcal: 0, carbo: 0, protein: 0, fat: 0, fiber: 0, sugar: 0, transfat: 0 })
+
+const breakfastList = computed(() =>
+  groupedDietList.value['아침'] || []
+)
+
+const lunchList = computed(() =>
+  groupedDietList.value['점심'] || []
+)
+
+const dinnerList = computed(() =>
+  groupedDietList.value['저녁'] || []
+)
+
+const snackList = computed(() =>
+  groupedDietList.value['간식'] || []
+)
 
 function register(mealType) {
   const mealData = groupedDietList.value[mealType] || []
@@ -100,15 +134,16 @@ async function fetchDietList() {
         Authorization: `Bearer ${token}`
       }
     })
-    dietList.value = res.data
-    calculateGroupedAndTotal()
+       const fetchedList = res.data
+    calculateGroupedAndTotal(fetchedList)
+
   } catch (err) {
     console.error('식단 조회 실패:', err)
-    dietList.value = []
+    calculateGroupedAndTotal([]) // 빈 리스트로 초기화
   }
 }
 
-function calculateGroupedAndTotal() {
+function calculateGroupedAndTotal(fetchedList) {
   const grouped = { 아침: [], 점심: [], 저녁: [], 간식: [] }
   const sum = { kcal: 0, carbo: 0, protein: 0, fat: 0, fiber: 0, sugar: 0, transfat: 0 }
 
@@ -119,7 +154,7 @@ function calculateGroupedAndTotal() {
     snack: '간식'
   }
 
-  for (const item of dietList.value) {
+  for (const item of fetchedList) {
     const translated = mealMap[item.mealType]
     if (translated) grouped[translated].push(item)
 
