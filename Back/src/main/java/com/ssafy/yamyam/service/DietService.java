@@ -29,7 +29,7 @@ public interface DietService {
     // 식단 점수 채점? 주기?
     int scoring(String userId,LocalDate date);
 
-    public boolean registerByFoodId(String userId, String mealType, int foodId, LocalDate date);
+    public boolean registerByFoodId(String userId, String mealType, int foodId, LocalDate date,double weight);
 
     List<MonthlyDiet> getMonthlySummary(String userId, LocalDate startDate, LocalDate endDate);
 }
