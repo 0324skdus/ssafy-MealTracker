@@ -1,7 +1,5 @@
 <template>
-  <!-- 꼭 있어야 함 -->
-<div class="backdrop" @click.self="emit('close')">
-
+  <div class="backdrop" @click.self="emit('close')">
     <div class="panel">
       <div class="header">
         <div class="left-buttons">
@@ -12,47 +10,55 @@
         <button class="close-btn" @click="close">X</button>
       </div>
 
-      <!-- 여기에 식품 검색창, 식단 추가 기능, 영양소 합산, 등록 버튼 등이 들어갈 예정 -->
-        <div class="diet-register-panel">
-    <!-- 1. 검색 영역 -->
-    <div class="search-bar">
-    <input v-model="keyword" placeholder="식품명을 입력하세요" @keyup.enter="onSearch" />
-    <button @click="onSearch">검색</button>
-  </div>
+      <div class="diet-register-panel">
+        <!-- 1. 검색 영역 -->
+        <div class="search-bar">
+          <input v-model="keyword" placeholder="식품명을 입력하세요" @keyup.enter="onSearch" />
+          <button @click="onSearch">검색</button>
+        </div>
 
-    <!-- 2. 검색 결과 리스트 -->
-    <SearchResultList
-      :foodList="foodList"
-      @selectFood="handleSelectFood"
-    />
+        <!-- 2. 검색 결과 리스트 -->
+        <SearchResultList
+          :foodList="foodList"
+          @selectFood="handleSelectFood"
+        />
 
-    <!-- 3. 선택된 식품 정보 + 섭취량 입력 -->
-    <SelectedFoodInfo
-      v-if="selectedFood"
-      :food="selectedFood"
-      @addDiet="handleAddDiet"
-    />
+        <!-- 3. 선택된 식품 정보 -->
+        <SelectedFoodInfo
+          v-if="selectedFood"
+          :food="selectedFood"
+          @addDiet="handleAddDiet"
+        />
 
-    <!-- 4. 미리보기 리스트 -->
-    <DietPreviewList
-      :dietList="dietList"
-      @remove="handleRemoveDiet"
-    />
-    <!-- 식단이 전혀 없을 경우 안내 문구 -->
-<div v-if="dietList.length === 0 && !selectedFood">
-  <p style="margin-top: 20px; color: #888;">등록된 식단이 없습니다.</p>
-</div>
+        <!-- 4. 미리보기 리스트 -->
+        <DietPreviewList
+          :dietList="dietList"
+          @remove="handleRemoveDiet"
+          @deleted="fetchDietList"
+        />
 
-    <!-- 5. 최종 등록 버튼 -->
-    <div class="register-button" v-if="dietList.length > 0">
-      <button @click="handleRegisterDiet">등록 완료</button>
-    </div>
-  </div>
+        <!-- 등록된 식단이 없을 때 -->
+        <div v-if="dietList.length === 0 && !selectedFood">
+          <p style="margin-top: 20px; color: #888;">등록된 식단이 없습니다.</p>
+        </div>
+
+        <!-- 5. 최종 등록 버튼 -->
+        <div class="register-button" v-if="dietList.length > 0">
+          <button @click="handleRegisterDiet">등록 완료</button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+
+import SearchResultList from './SearchResultList.vue'
+import SelectedFoodInfo from './SelectedFoodInfo.vue'
+import DietPreviewList from './DietPreviewList.vue'
+
 const props = defineProps({
   date: String,
   mealType: String,
@@ -61,79 +67,84 @@ const props = defineProps({
     default: () => []
   }
 })
-onMounted(() => {
-  dietList.value = props.existingDiet.map(item => ({
-    ...item,
-    name: item.foodName || item.name,
-    weight: item.weight || 0
-  }))
-})
 
-import { ref, onMounted } from 'vue'
+const emit = defineEmits(['close', 'backToDetail'])
 
-// 임포트할 컴포넌트 껍데기들
-import SearchResultList from './SearchResultList.vue'
-import SelectedFoodInfo from './SelectedFoodInfo.vue'
-import DietPreviewList from './DietPreviewList.vue'
-// 상태
-const emit = defineEmits(['close','backToDetail'])
-const foodList = ref([]) // 검색 결과 식품 리스트
-const selectedFood = ref(null) // 선택된 식품
-const dietList = ref([]) // 현재 등록할 식단 목록
+const foodList = ref([])
+const selectedFood = ref(null)
+const dietList = ref([])
 const keyword = ref('')
 
+const mealTypeMap = {
+  아침: 'breakfast',
+  점심: 'lunch',
+  저녁: 'dinner',
+  간식: 'snack'
+}
 
-function onSearch() {
+const onSearch = () => {
   if (keyword.value.trim()) {
     handleSearch(keyword.value.trim())
   }
 }
 
-function handleSearch(keyword) {
-  //채울부분분
+const handleSearch = async (keyword) => {
   console.log('검색어:', keyword)
-
-  // 더미
-  foodList.value = [
-    {
-      id: 1,
-      name: '고구마',
-      kcal: 130,
-      carbo: 30,
-      protein: 2,
-      fat: 0.2
-    },
-    {
-      id: 2,
-      name: '닭가슴살',
-      kcal: 110,
-      carbo: 1,
-      protein: 23,
-      fat: 1.5
-    }
-  ]
+  try {
+    const res = await axios.get('/api/food/search', {
+      params: { keyword }
+    })
+    foodList.value = res.data
+  } catch (err) {
+    console.error('음식 검색 실패:', err)
+    foodList.value = []
+  }
 }
 
-function handleSelectFood(food) {
+const handleSelectFood = (food) => {
   selectedFood.value = food
 }
 
-function handleAddDiet(dietItem) {
+const handleAddDiet = (dietItem) => {
   dietList.value.push(dietItem)
 }
 
-function handleRemoveDiet(index) {
+const handleRemoveDiet = (index) => {
   dietList.value.splice(index, 1)
 }
 
-function handleRegisterDiet() {
-  //채울부분분
+const handleRegisterDiet = () => {
   console.log('등록 요청:', dietList.value)
 }
 
-function close() {
+const close = () => {
   emit('close')
 }
+
+const fetchDietList = async () => {
+  const token = localStorage.getItem('accessToken')
+  const userId = localStorage.getItem('userId')
+
+  if (!userId || !props.date || !props.mealType || !token) return
+
+  try {
+    const res = await axios.get(`/api/diet/user/${userId}/date`, {
+      params: { date: props.date },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    const mealKey = mealTypeMap[props.mealType]
+    dietList.value = res.data.filter(d => d.mealType === mealKey)
+  } catch (err) {
+    console.error('식단 재조회 실패', err)
+  }
+}
+
+onMounted(() => {
+  fetchDietList()
+})
 </script>
 
 <style scoped>
@@ -167,10 +178,6 @@ function close() {
   border: none;
   font-size: 20px;
   cursor: pointer;
-}
-.content {
-  flex-grow: 1;
-  margin-top: 20px;
 }
 .register-button {
   text-align: center;
