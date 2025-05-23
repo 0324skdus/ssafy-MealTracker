@@ -34,6 +34,7 @@
       :existingDiet="registerInfo.existingDiet" 
       @close="showRegisterPanel = false"
       @backToDetail="returnToDetailPanel"
+      @refreshMonthlyData="fetchMonthlyData"
       />
     </div>
   </div>
@@ -190,18 +191,21 @@ const calendarOptions = ref({
       openDetail(dateStr)
     })
 
-    if (info) {
-      const wrapper = document.createElement('div')
-      wrapper.classList.add('custom-cell')
-      wrapper.innerHTML = `
-        <img src='/${getLeafIcon(info.score)}' class='icon-img leaf'/>
-        <div class='bottom-row'>
-          <img src='/carrot.png' class='icon-img carrotBody'/>
-          <div class='kcal-text'>${info.kcal} kcal</div>
-        </div>
-      `
-      frameEl.appendChild(wrapper)
-    }
+    const old = frameEl.querySelector('.custom-cell')
+if (old) frameEl.removeChild(old)
+
+if (info) {
+  const wrapper = document.createElement('div')
+  wrapper.classList.add('custom-cell')
+  wrapper.innerHTML = `
+    <img src='/${getLeafIcon(info.score)}' class='icon-img leaf'/>
+    <div class='bottom-row'>
+      <img src='/carrot.png' class='icon-img carrotBody'/>
+      <div class='kcal-text'>${info.kcal} kcal</div>
+    </div>
+  `
+  frameEl.appendChild(wrapper)
+}
   }
 })
 </script>

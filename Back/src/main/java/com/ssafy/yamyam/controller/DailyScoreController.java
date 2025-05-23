@@ -16,6 +16,8 @@ public class DailyScoreController {
     @Autowired
     private DailyScoreService dailyScoreService;
 
+
+
     @PostMapping("/calculate")
     public void calculateScore(@RequestParam("userId") String userId, @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         dailyScoreService.calculateAndSaveDailyScore(userId, date);

@@ -47,4 +47,9 @@
         AND date BETWEEN #{startDate} AND #{endDate}
     </select>
 
+    <delete id="deleteByUserAndDate" parameterType="map">
+        DELETE FROM daily_score
+        WHERE user_id = #{userId} AND date = #{date}
+    </delete>
+
 </mapper>

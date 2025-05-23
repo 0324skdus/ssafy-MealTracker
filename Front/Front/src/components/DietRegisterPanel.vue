@@ -68,7 +68,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['close', 'backToDetail'])
+const emit = defineEmits(['close', 'backToDetail', 'refreshMonthlyData'])
 
 const foodList = ref([])
 const selectedFood = ref(null)
@@ -89,7 +89,6 @@ const onSearch = () => {
 }
 
 const handleSearch = async (keyword) => {
-  console.log('검색어:', keyword)
   try {
     const res = await axios.get('/api/food/search', {
       params: { keyword }
@@ -137,6 +136,10 @@ const fetchDietList = async () => {
 
     const mealKey = mealTypeMap[props.mealType]
     dietList.value = res.data.filter(d => d.mealType === mealKey)
+
+    // ✅ 삭제 후 MainView 달력 갱신
+    emit('refreshMonthlyData')
+
   } catch (err) {
     console.error('식단 재조회 실패', err)
   }

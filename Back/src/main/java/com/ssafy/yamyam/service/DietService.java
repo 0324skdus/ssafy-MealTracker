@@ -28,7 +28,6 @@ public interface DietService {
     boolean remove(int id);
 
     // 식단 점수 채점? 주기?
-    int scoring(String userId,LocalDate date);
 
     public boolean registerByFoodId(String userId, String mealType, int foodId, LocalDate date,double weight);
 
