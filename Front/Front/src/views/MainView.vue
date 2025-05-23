@@ -22,6 +22,7 @@
   v-if="showDetailPanel"
   :date="selectedDate"
   :nutritionTarget="nutritionTarget"
+  :score="scoreMap[selectedDate]?.score ?? 0" 
   @close="showDetailPanel = false"
   @openRegister="openRegisterFromDetail"
   />
@@ -57,7 +58,11 @@ const registerInfo = ref({ date: '', mealType: '' })
 
 async function openDetail(date) {
   selectedDate.value = date
+    console.log("[DEBUG] selectedDate:", selectedDate.value)
+  console.log("[DEBUG] scoreMap keys:", Object.keys(scoreMap.value))
+  console.log("[DEBUG] matched score:", scoreMap.value[selectedDate.value]?.score)
   showDetailPanel.value = true
+  await nextTick()
 
   const userId = localStorage.getItem('userId')
   const token = localStorage.getItem('accessToken') // 추가
