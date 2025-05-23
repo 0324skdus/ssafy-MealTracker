@@ -225,7 +225,6 @@ public class DietServiceImpl implements DietService {
 
     public Diet registerAndReturn(Diet diet) {
         dietDao.insert(diet);
-        // 이 시점에서 diet.getDietId() → DB에서 자동 생성된 값이 담김
         return diet;
     }
 }
