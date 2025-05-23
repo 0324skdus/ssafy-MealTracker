@@ -5,75 +5,77 @@
 
 <mapper namespace="com.ssafy.yamyam.dao.DietDao">
 
-    <!-- 식단 등록 -->
-    <insert id="insert" parameterType="com.ssafy.yamyam.dto.Diet">
-        INSERT INTO diet (
-        user_id, meal_type, food_id, food_name,
-        kcal, carbo, protein, fat,
-        saturatedfat, sugar, fiber, transfat,
-        date
-        )
-        VALUES (
-        #{userId}, #{mealType}, #{foodId}, #{foodName},
-        #{kcal}, #{carbo}, #{protein}, #{fat},
-        #{saturatedFat}, #{sugar}, #{fiber}, #{transfat},
-        #{date}
-        )
-    </insert>
+	<!-- 식단 등록 -->
+	<insert id="insert" parameterType="com.ssafy.yamyam.dto.Diet">
+		INSERT INTO diet (
+		user_id, meal_type, food_id, food_name,
+		kcal, carbo, protein, fat,
+		saturatedfat, sugar, fiber, transfat,
+		date
+		)
+		VALUES (
+		#{userId}, #{mealType}, #{foodId}, #{foodName},
+		#{kcal}, #{carbo}, #{protein}, #{fat},
+		#{saturatedFat}, #{sugar}, #{fiber}, #{transfat},
+		#{date}
+		)
+	</insert>
 
-    <!-- 식단 단일 조회 -->
-    <select id="selectById" parameterType="int" resultType="com.ssafy.yamyam.dto.Diet">
-        SELECT * FROM diet WHERE diet_id = #{dietId}
-    </select>
+	<!-- 식단 단일 조회 -->
+	<select id="selectById" parameterType="int"
+		resultType="com.ssafy.yamyam.dto.Diet">
+		SELECT * FROM diet WHERE diet_id = #{dietId}
+	</select>
 
-    <!-- 사용자 전체 식단 조회 -->
-    <select id="selectByUserId" parameterType="String" resultType="com.ssafy.yamyam.dto.Diet">
-        SELECT * FROM diet WHERE user_id = #{userId}
-    </select>
+	<!-- 사용자 전체 식단 조회 -->
+	<select id="selectByUserId" parameterType="String"
+		resultType="com.ssafy.yamyam.dto.Diet">
+		SELECT * FROM diet WHERE user_id = #{userId}
+	</select>
 
-    <!-- 사용자 + 날짜 기준 식단 조회 -->
-    <select id="selectByUserIdAndDate" resultType="com.ssafy.yamyam.dto.Diet">
-        SELECT * FROM diet
-        WHERE user_id = #{userId} AND date = #{date}
-    </select>
+	<!-- 사용자 + 날짜 기준 식단 조회 -->
+	<select id="selectByUserIdAndDate"
+		resultType="com.ssafy.yamyam.dto.Diet">
+		SELECT * FROM diet
+		WHERE user_id = #{userId} AND date = #{date}
+	</select>
 
-    <!-- 식단 수정 -->
-    <update id="update" parameterType="com.ssafy.yamyam.dto.Diet">
-        UPDATE diet SET
-        meal_type = #{mealType},
-        food_id = #{foodId},
-        food_name = #{foodName},
-        kcal = #{kcal},
-        carbo = #{carbo},
-        protein = #{protein},
-        fat = #{fat},
-        saturatedfat = #{saturatedFat},
-        sugar = #{sugar},
-        fiber = #{fiber},
-        transfat = #{transfat},
-        date = #{date}
+	<!-- 식단 수정 -->
+	<update id="update" parameterType="com.ssafy.yamyam.dto.Diet">
+		UPDATE diet SET
+		meal_type = #{mealType},
+		food_id = #{foodId},
+		food_name = #{foodName},
+		kcal = #{kcal},
+		carbo = #{carbo},
+		protein = #{protein},
+		fat = #{fat},
+		saturatedfat = #{saturatedFat},
+		sugar = #{sugar},
+		fiber = #{fiber},
+		transfat = #{transfat},
+		date = #{date}
 
-        WHERE diet_id = #{dietId}
-    </update>
+		WHERE diet_id = #{dietId}
+	</update>
 
-    <!-- 식단 삭제 -->
-    <delete id="delete" parameterType="int">
-        DELETE FROM diet WHERE diet_id = #{dietId}
-    </delete>
-    
+	<!-- 식단 삭제 -->
+	<delete id="delete" parameterType="int">
+		DELETE FROM diet WHERE diet_id = #{dietId}
+	</delete>
 
-    
-
-    <select id="selectMonthlyDietSummary" resultType="com.ssafy.yamyam.dto.MonthlyDiet">
-        SELECT
-        date,
-        MAX(score) AS score,
-        SUM(kcal) AS totalKcal
-        FROM diet
-        WHERE user_id = #{userId}
-        AND date BETWEEN #{startDate} AND #{endDate}
-        GROUP BY date
-    </select>
+	<!-- 캘린더용 한달 식단 정보 긁어오기(날짜,스코어,칼로리합) -->
+	<select id="selectMonthlyDietSummary"
+		resultType="com.ssafy.yamyam.dto.MonthlyDiet">
+		SELECT
+		date,
+		score,
+		total_kcal AS totalKcal
+		FROM daily_score
+		WHERE user_id = #{userId}
+		AND date BETWEEN #{startDate} AND #{endDate}
+		ORDER BY date
+	</select>
 
     <select id="selectDietByUserAndPeriod" resultType="com.ssafy.yamyam.dto.Diet">
         SELECT *
