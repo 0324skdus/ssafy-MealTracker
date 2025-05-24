@@ -13,11 +13,15 @@ public class CommunityServiceImpl implements CommunityService {
 
     private final CommunityDao communityDao;
     private final CommunityLikeDao communityLikeDao;
+    private final NotificationService notificationService;
 
     @Autowired
-    public CommunityServiceImpl(CommunityDao communityDao,CommunityLikeDao communityLikeDao) {
+    public CommunityServiceImpl(CommunityDao communityDao,
+                                CommunityLikeDao communityLikeDao,
+                                NotificationService notificationService) {
         this.communityDao = communityDao;
         this.communityLikeDao = communityLikeDao;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -44,6 +48,7 @@ public class CommunityServiceImpl implements CommunityService {
     public boolean remove(int id) {
         return communityDao.delete(id) > 0;
     }
+
     //좋아요 기능
     @Override
     public boolean hasUserLiked(int communityId, String userId) {
@@ -58,6 +63,7 @@ public class CommunityServiceImpl implements CommunityService {
         communityLikeDao.insert(communityId, userId);
         communityDao.incrementLikeCount(communityId); // like_count 컬럼 필요
     }
+
     //게시판 조회
     public List<Community> getBoardList() {
         return communityDao.selectBoardList();
@@ -81,13 +87,22 @@ public class CommunityServiceImpl implements CommunityService {
     @Override
     public boolean toggleLike(int communityId, String userId) {
         if (communityLikeDao.hasUserLiked(communityId, userId)) {
-            communityDao.decrementLikeCount(communityId); // 좋아요 수 감소
-            communityLikeDao.removeLike(communityId, userId); // 좋아요 기록 삭제
-            return false; // 좋아요 취소됨
+            communityDao.decrementLikeCount(communityId);
+            communityLikeDao.removeLike(communityId, userId);
+            return false;
         } else {
-            communityDao.incrementLikeCount(communityId); // 좋아요 수 증가
-            communityLikeDao.addLike(communityId, userId); // 좋아요 기록 추가
-            return true; // 좋아요 등록됨
+            communityDao.incrementLikeCount(communityId);
+            communityLikeDao.addLike(communityId, userId);
+
+            Community post = communityDao.selectById(communityId);
+            String receiverId = post.getUserId();
+            String postTitle = post.getTitle();
+
+            if (!receiverId.equals(userId)) {
+                notificationService.sendLikeNotification(receiverId, userId, postTitle, communityId);
+            }
+
+            return true;
         }
     }
 

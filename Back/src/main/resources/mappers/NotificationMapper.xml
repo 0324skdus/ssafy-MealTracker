@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.yamyam.dao.NotificationDao">
+
+    <insert id="insertNotification" parameterType="com.ssafy.yamyam.dto.Notification">
+        INSERT INTO notification (
+        receiver_id,
+        sender_id,
+        content,
+        community_id,
+        is_read,
+        created_at
+        )
+        VALUES (
+        #{receiverId},
+        #{senderId},
+        #{content},
+        #{communityId},
+        #{isRead},
+        #{createdAt}
+        )
+    </insert>
+
+    <select id="selectNotificationsByReceiverId" parameterType="string" resultType="com.ssafy.yamyam.dto.Notification">
+        SELECT
+        id,
+        receiver_id,
+        sender_id,
+        content,
+        community_id,
+        is_read,
+        created_at
+        FROM notification
+        WHERE receiver_id = #{receiverId}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="countUnreadNotifications" parameterType="string" resultType="int">
+        SELECT COUNT(*) FROM notification
+        WHERE receiver_id = #{receiverId}
+        AND is_read = false
+    </select>
+
+    <update id="markAsRead" parameterType="long">
+        UPDATE notification
+        SET is_read = true
+        WHERE id = #{notificationId}
+    </update>
+
+    <delete id="deleteNotification" parameterType="long">
+        DELETE FROM notification
+        WHERE id = #{notificationId}
+    </delete>
+
+    <update id="markAllAsRead" parameterType="string">
+        UPDATE notification
+        SET is_read = true
+        WHERE receiver_id = #{receiverId} AND is_read = false
+    </update>
+
+</mapper>

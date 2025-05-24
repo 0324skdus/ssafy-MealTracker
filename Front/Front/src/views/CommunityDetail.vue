@@ -26,11 +26,11 @@
           </div>
         </div>
 
-        <!-- 댓글 -->
+        <!-- 댓글 영역 -->
         <div class="comment-section">
           <h3 class="comment-title">댓글</h3>
 
-          <!-- 입력창 -->
+          <!-- 댓글 입력 -->
           <div class="comment-input-box">
             <textarea
               v-model="newComment"
@@ -52,7 +52,7 @@
             </div>
           </div>
 
-          <!-- 목록 -->
+          <!-- 댓글 목록 -->
           <ul class="comment-list">
             <li v-for="comment in comments" :key="comment.id" class="comment-item">
               <div class="comment-meta">
@@ -60,20 +60,23 @@
                 <span class="comment-date">{{ formatDate(comment.createdAt) }}</span>
               </div>
 
-              <div v-if="editingCommentId === comment.id" class="comment-edit-box">
-                <textarea v-model="editingContent" rows="3" class="comment-edit-textarea"></textarea>
-                <div class="comment-edit-actions">
-                  <button class="comment-edit-confirm-btn" @click="confirmEdit(comment.id)">수정 완료</button>
-                  <button class="comment-edit-cancel-btn" @click="cancelEdit">취소</button>
-                </div>
-              </div>
-
-              <div v-else class="comment-content">
-                <template v-if="!comment.secret || isMyComment(comment)">
-                  {{ comment.content }}
+              <div class="comment-content">
+                <template v-if="editingCommentId === comment.id">
+                  <div class="comment-edit-box">
+                    <textarea v-model="editingContent" rows="3" class="comment-edit-textarea"></textarea>
+                    <div class="comment-edit-actions">
+                      <button class="comment-edit-confirm-btn" @click="confirmEdit(comment.id)">수정 완료</button>
+                      <button class="comment-edit-cancel-btn" @click="cancelEdit">취소</button>
+                    </div>
+                  </div>
                 </template>
                 <template v-else>
-                  🔒 비밀댓글입니다.
+                  <template v-if="!comment.secret || isMyComment(comment)">
+                    <div>{{ comment.content }}</div>
+                  </template>
+                  <template v-else>
+                    <div>🔒 비밀댓글입니다.</div>
+                  </template>
                 </template>
               </div>
 
@@ -216,6 +219,42 @@ const confirmEdit = async (commentId) => {
     await fetchComments()
   } catch (err) {
     alert('댓글 수정에 실패했습니다.')
+  }
+}
+
+const likePost = async () => {
+  const token = localStorage.getItem('accessToken')
+  try {
+    const res = await axios.post(`/api/community/${postId}/like`, {}, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    alert(res.data)
+    await fetchPost()
+  } catch (err) {
+    alert('좋아요 처리에 실패했습니다.')
+  }
+}
+
+const goToEdit = () => {
+  router.push(`/edit/${postId}`)
+}
+
+const deletePost = async () => {
+  if (!confirm('해당 게시물을 삭제하시겠습니까?')) return
+
+  const token = localStorage.getItem('accessToken')
+  try {
+    await axios.delete(`/api/community/${postId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    alert('게시글이 삭제되었습니다.')
+    router.push('/board')
+  } catch (err) {
+    alert('게시글 삭제에 실패했습니다.')
   }
 }
 
