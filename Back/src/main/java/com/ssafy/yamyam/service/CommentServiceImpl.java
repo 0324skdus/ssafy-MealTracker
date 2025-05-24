@@ -41,4 +41,9 @@ public class CommentServiceImpl implements CommentService {
     public Comment findById(int id) {
         return commentDao.selectById(id);
     }
+
+    @Override
+    public List<Comment> getByUserId(String userId) {
+        return commentDao.selectByUserId(userId);
+    }
 }

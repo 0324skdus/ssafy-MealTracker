@@ -89,4 +89,21 @@ public class CommentController {
                 ? ResponseEntity.ok("삭제 완료")
                 : ResponseEntity.badRequest().body("삭제 실패");
     }
+
+    // 내가 쓴 댓글 조회용
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Comment>> getByUser(@PathVariable("userId") String userId,
+                                                   @AuthenticationPrincipal CustomUserDetails loginUser) {
+        if (loginUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        if (!loginUser.getUserId().equals(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        List<Comment> comments = commentService.getByUserId(userId);
+        return ResponseEntity.ok(comments);
+    }
+    
 }

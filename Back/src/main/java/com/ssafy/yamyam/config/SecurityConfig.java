@@ -44,6 +44,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/nutrition/**").authenticated()
 						.requestMatchers("/api/community").authenticated()
                         .requestMatchers("/api/community/**").authenticated()
+						.requestMatchers("/api/comment/user/**").authenticated()
 						.requestMatchers("/api/score/**").authenticated()
 						.requestMatchers("/api/diet/**").authenticated()
                         .anyRequest().authenticated()
