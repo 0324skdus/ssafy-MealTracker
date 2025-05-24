@@ -16,4 +16,6 @@ public interface CommentDao {
     int delete(int id);
 
     Comment selectById(int id);
+
+    List<Comment> selectByUserId(String userId);
 }

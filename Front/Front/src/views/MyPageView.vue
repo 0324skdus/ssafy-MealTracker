@@ -56,6 +56,18 @@
             </li>
           </ul>
         </div>
+
+        <div v-else-if="selectedTab === 'comments'" class="post-list">
+          <div v-if="myComments.length === 0">작성한 댓글이 없습니다.</div>
+          <ul v-else>
+            <li v-for="comment in myComments" :key="comment.id" class="post-item">
+              <div class="post-title" @click="goToPost(comment.communityId)">
+                {{ comment.content }}
+              </div>
+              <div class="post-meta">작성일: {{ comment.createdAt }}</div>
+            </li>
+          </ul>
+        </div>
       </div>
 
       <div v-if="selectedTab === 'info'" class="edit-wrapper">
@@ -81,7 +93,8 @@ const tabs = [
   { key: 'info', label: '내 신체정보' },
   { key: 'stat', label: '내 식단 통계' },
   { key: 'written', label: '내가 쓴 글' },
-  { key: 'liked', label: '좋아요 누른 글' }
+  { key: 'liked', label: '좋아요 누른 글' },
+  { key: 'comments', label: '내가 쓴 댓글' }
 ]
 
 const selectedTab = ref('info')
@@ -90,15 +103,14 @@ const userName = ref('')
 const daysSinceJoined = ref(0)
 const myPosts = ref([])
 const myLikedPosts = ref([])
+const myComments = ref([])
 
 const fetchUserInfo = async () => {
   const token = localStorage.getItem('accessToken')
   const userId = localStorage.getItem('userId')
   try {
     const res = await axios.get(`/api/user/${userId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+      headers: { Authorization: `Bearer ${token}` }
     })
     user.value = res.data
     userName.value = res.data.name
@@ -118,9 +130,7 @@ const fetchMyPosts = async () => {
   const userId = localStorage.getItem('userId')
   try {
     const res = await axios.get(`/api/community/user/${userId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+      headers: { Authorization: `Bearer ${token}` }
     })
     myPosts.value = res.data
   } catch (err) {
@@ -133,13 +143,24 @@ const fetchLikedPosts = async () => {
   const userId = localStorage.getItem('userId')
   try {
     const res = await axios.get(`/api/community/liked/${userId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+      headers: { Authorization: `Bearer ${token}` }
     })
     myLikedPosts.value = res.data
   } catch (err) {
     console.error('좋아요 누른 글 조회 실패:', err)
+  }
+}
+
+const fetchMyComments = async () => {
+  const token = localStorage.getItem('accessToken')
+  const userId = localStorage.getItem('userId')
+  try {
+    const res = await axios.get(`/api/comment/user/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    myComments.value = res.data
+  } catch (err) {
+    console.error('내 댓글 조회 실패:', err)
   }
 }
 
@@ -148,6 +169,8 @@ watch(selectedTab, (newTab) => {
     fetchMyPosts()
   } else if (newTab === 'liked') {
     fetchLikedPosts()
+  } else if (newTab === 'comments') {
+    fetchMyComments()
   }
 })
 
@@ -177,6 +200,7 @@ onMounted(fetchUserInfo)
 </script>
 
 <style scoped>
+/* 기존 스타일 유지 */
 .main-layout {
   display: flex;
 }
