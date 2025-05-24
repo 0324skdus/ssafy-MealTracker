@@ -1,4 +1,4 @@
-<!-- SelectedFoodInfo.vue -->
+<!-- 식단등록페이지에서 등록할 식단의 상세정보를 확인하고 무게를 정하는 섹션입니다 -->
 <template>
   <div class="selected-food-info">
     <h4>{{ food.name }} (100g 기준)</h4>
@@ -6,7 +6,7 @@
       {{ food.kcal }} kcal / 탄: {{ food.carbo }} / 단: {{ food.protein }} / 지: {{ food.fat }}
     </p>
 
-    <label>
+    <label class="weight-input">
       섭취량(g):
       <input type="number" v-model.number="weight" min="1" />
     </label>
@@ -38,6 +38,7 @@ const calc = (val) => ((val * weight.value) / 100).toFixed(1)
 function addDiet() {
   if (weight.value <= 0) return
   emit('addDiet', {
+    id: props.food.foodId, // 명시적으로 id로 지정
     ...props.food,
     weight: weight.value,
     kcal: +calc(props.food.kcal),
@@ -67,5 +68,28 @@ button {
   color: white;
   border: none;
   border-radius: 4px;
+}
+/* 섭취량 입력창 강조용 */
+.weight-input {
+  display: block;
+  font-weight: bold;
+  margin: 12px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.weight-input input {
+  margin-left: 8px;
+  padding: 6px 10px;
+  font-size: 16px;
+  border: 2px solid #ff9800;
+  border-radius: 6px;
+  width: 100px;
+  transition: 0.2s;
+}
+.weight-input input:focus {
+  outline: none;
+  border-color: #f57c00;
+  box-shadow: 0 0 5px rgba(255, 152, 0, 0.5);
 }
 </style>
