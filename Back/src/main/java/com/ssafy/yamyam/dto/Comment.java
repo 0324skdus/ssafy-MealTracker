@@ -10,6 +10,16 @@ public class Comment {
     private String content;
     private LocalDateTime createdAt;
 
+    private boolean secret;
+
+    public boolean isSecret() {
+        return secret;
+    }
+
+    public void setSecret(boolean secret) {
+        this.secret = secret;
+    }
+
     public Comment() {}
 
     public int getId() {
@@ -52,12 +62,12 @@ public class Comment {
         this.createdAt = createdAt;
     }
 
-    public Comment(int id, int communityId, String userId, String content, LocalDateTime createdAt) {
+    public Comment(int id, int communityId, String userId, String content, LocalDateTime createdAt, boolean secret) {
         this.id = id;
         this.communityId = communityId;
         this.userId = userId;
         this.content = content;
         this.createdAt = createdAt;
+        this.secret = secret;
     }
-
 }

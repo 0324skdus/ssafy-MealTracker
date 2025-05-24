@@ -30,7 +30,7 @@ public class CommentController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
 
-        comment.setUserId(loginUser.getUserId()); // String → int 변환
+        comment.setUserId(loginUser.getUserId());
         boolean result = commentService.register(comment);
         return result
                 ? ResponseEntity.ok("댓글 등록 성공")
@@ -39,7 +39,7 @@ public class CommentController {
 
     // 특정 게시글의 댓글 전체 조회
     @GetMapping("/post/{communityId}")
-    public ResponseEntity<List<Comment>> getByCommunity(@PathVariable int communityId) {
+    public ResponseEntity<List<Comment>> getByCommunity(@PathVariable("communityId") int communityId) {
         return ResponseEntity.ok(commentService.getByCommunityId(communityId));
     }
 
@@ -60,7 +60,7 @@ public class CommentController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("본인만 수정할 수 있습니다.");
         }
 
-        comment.setUserId(original.getUserId()); // 작성자 ID 유지
+        comment.setUserId(original.getUserId());
         boolean result = commentService.modify(comment);
         return result
                 ? ResponseEntity.ok("댓글 수정 성공")
@@ -69,7 +69,7 @@ public class CommentController {
 
     // 댓글 삭제
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable int id,
+    public ResponseEntity<String> delete(@PathVariable("id") int id,
                                          @AuthenticationPrincipal CustomUserDetails loginUser) {
         if (loginUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");

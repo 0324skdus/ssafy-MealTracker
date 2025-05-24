@@ -6,8 +6,8 @@
 <mapper namespace="com.ssafy.yamyam.dao.CommentDao">
 
     <insert id="insert" parameterType="com.ssafy.yamyam.dto.Comment">
-        INSERT INTO comment (community_id, user_id, content, created_at)
-        VALUES (#{communityId}, #{userId}, #{content}, NOW())
+        INSERT INTO comment (community_id, user_id, content, created_at, secret)
+        VALUES (#{communityId}, #{userId}, #{content}, NOW(), #{secret})
     </insert>
 
     <select id="selectByCommunityId" parameterType="int" resultType="com.ssafy.yamyam.dto.Comment">
@@ -25,7 +25,6 @@
         DELETE FROM comment WHERE id = #{id}
     </delete>
 
-    <!-- 마이페이지 내가 쓴 댓글 조회용 -->
     <select id="selectById" parameterType="int" resultType="com.ssafy.yamyam.dto.Comment">
         SELECT * FROM comment WHERE id = #{id}
     </select>
