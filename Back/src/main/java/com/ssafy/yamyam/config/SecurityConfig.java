@@ -47,6 +47,8 @@ public class SecurityConfig {
 						.requestMatchers("/api/comment/user/**").authenticated()
 						.requestMatchers("/api/score/**").authenticated()
 						.requestMatchers("/api/diet/**").authenticated()
+						//검색할때 토큰요구안하게추가
+						.requestMatchers("/api/food/search").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userService),

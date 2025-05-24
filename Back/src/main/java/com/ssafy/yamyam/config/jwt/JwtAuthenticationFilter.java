@@ -36,7 +36,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if ((uri.equals("/api/user") && request.getMethod().equals("POST")) ||
                 uri.startsWith("/api/user/check-id") ||
                 uri.startsWith("/api/user/exists") ||
-                uri.startsWith("/api/auth")) {
+                uri.startsWith("/api/auth") ||
+                //검색기능 제외
+                uri.startsWith("/api/food/search")) {
             filterChain.doFilter(request, response);
             return;
         }
