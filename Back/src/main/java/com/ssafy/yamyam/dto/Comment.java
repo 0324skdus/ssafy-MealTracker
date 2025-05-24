@@ -6,7 +6,7 @@ public class Comment {
 
     private int id;
     private int communityId; // 외래키
-    private int userId;
+    private String userId;
     private String content;
     private LocalDateTime createdAt;
 
@@ -28,11 +28,11 @@ public class Comment {
         this.communityId = communityId;
     }
 
-    public int getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
@@ -52,7 +52,7 @@ public class Comment {
         this.createdAt = createdAt;
     }
 
-    public Comment(int id, int communityId, int userId, String content, LocalDateTime createdAt) {
+    public Comment(int id, int communityId, String userId, String content, LocalDateTime createdAt) {
         this.id = id;
         this.communityId = communityId;
         this.userId = userId;

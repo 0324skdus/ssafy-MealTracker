@@ -17,7 +17,7 @@ import axios from 'axios'
 const props = defineProps({
   dietList: Array
 })
-const emit = defineEmits(['deleted']) // ⬅ 삭제 후 상위에 알림용 emit
+const emit = defineEmits(['deleted']) 
 
 const localList = ref([...props.dietList])
 

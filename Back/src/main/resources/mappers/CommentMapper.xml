@@ -25,4 +25,9 @@
         DELETE FROM comment WHERE id = #{id}
     </delete>
 
+    <!-- 마이페이지 내가 쓴 댓글 조회용 -->
+    <select id="selectById" parameterType="int" resultType="com.ssafy.yamyam.dto.Comment">
+        SELECT * FROM comment WHERE id = #{id}
+    </select>
+
 </mapper>
