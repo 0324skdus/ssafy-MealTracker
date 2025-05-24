@@ -13,4 +13,5 @@ public interface CommentService {
 
     boolean remove(int id);
 
+    Comment findById(int id);
 }

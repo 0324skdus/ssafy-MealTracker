@@ -137,7 +137,7 @@ const fetchDietList = async () => {
     const mealKey = mealTypeMap[props.mealType]
     dietList.value = res.data.filter(d => d.mealType === mealKey)
 
-    // ✅ 삭제 후 MainView 달력 갱신
+    
     emit('refreshMonthlyData')
 
   } catch (err) {

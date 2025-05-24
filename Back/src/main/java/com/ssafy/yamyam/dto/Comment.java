@@ -6,9 +6,19 @@ public class Comment {
 
     private int id;
     private int communityId; // 외래키
-    private int userId;
+    private String userId;
     private String content;
     private LocalDateTime createdAt;
+
+    private boolean secret;
+
+    public boolean isSecret() {
+        return secret;
+    }
+
+    public void setSecret(boolean secret) {
+        this.secret = secret;
+    }
 
     public Comment() {}
 
@@ -28,11 +38,11 @@ public class Comment {
         this.communityId = communityId;
     }
 
-    public int getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
@@ -52,12 +62,12 @@ public class Comment {
         this.createdAt = createdAt;
     }
 
-    public Comment(int id, int communityId, int userId, String content, LocalDateTime createdAt) {
+    public Comment(int id, int communityId, String userId, String content, LocalDateTime createdAt, boolean secret) {
         this.id = id;
         this.communityId = communityId;
         this.userId = userId;
         this.content = content;
         this.createdAt = createdAt;
+        this.secret = secret;
     }
-
 }
