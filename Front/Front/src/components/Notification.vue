@@ -4,6 +4,7 @@
       <strong>알림</strong>
       <div class="header-buttons">
         <button class="mark-read-btn" @click="markAllAsRead">전체읽음</button>
+        <button class="delete-all-btn" @click="deleteAllNotifications">전체삭제</button>
         <button class="close-btn" @click="handleClose">X</button>
       </div>
     </div>
@@ -12,7 +13,7 @@
       <li
         v-for="noti in notifications"
         :key="noti.id"
-        class="notification-item"
+        :class="['notification-item', noti.isRead ? 'read' : '']"
       >
         <div class="noti-content" @click="handleClick(noti)">
           <div class="content">{{ noti.content }}</div>
@@ -25,7 +26,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 
@@ -43,7 +44,14 @@ async function fetchNotifications() {
         Authorization: `Bearer ${token}`
       }
     })
-    notifications.value = res.data
+
+    // 백엔드에서 read로 내려옴 → isRead로 수동 변환
+    notifications.value = res.data.map(noti => ({
+      ...noti,
+      isRead: noti.read === true || noti.read === 1 || noti.read === "1"
+    }))
+
+    console.log('✅ 알림 상태 확인:', JSON.parse(JSON.stringify(notifications.value)))
   } catch (e) {
     console.error('알림 불러오기 실패:', e)
   }
@@ -55,7 +63,7 @@ function formatTime(dateTimeStr) {
   return date.toLocaleString()
 }
 
-// 알림 클릭 (읽음 처리 + 이동 + 뱃지 감소)
+// 알림 클릭 시 읽음 처리 + 이동
 async function handleClick(noti) {
   if (!noti.communityId) return
 
@@ -70,6 +78,7 @@ async function handleClick(noti) {
       n.id === noti.id ? { ...n, isRead: true } : n
     )
 
+    await nextTick()
     emit('update-count')
     emit('close')
     router.push(`/community/${noti.communityId}`)
@@ -78,7 +87,7 @@ async function handleClick(noti) {
   }
 }
 
-// 알림 단건 삭제
+// 단일 삭제
 async function deleteNotification(id) {
   try {
     await axios.delete(`http://localhost:8080/api/notification/${id}`, {
@@ -87,6 +96,8 @@ async function deleteNotification(id) {
       }
     })
     notifications.value = notifications.value.filter(n => n.id !== id)
+
+    await nextTick()
     emit('update-count')
   } catch (e) {
     console.error('알림 삭제 실패:', e)
@@ -101,10 +112,28 @@ async function markAllAsRead() {
         Authorization: `Bearer ${token}`
       }
     })
-    notifications.value = []
+
+    await fetchNotifications()
+    await nextTick()
     emit('update-count')
   } catch (e) {
     console.error('전체 읽음 실패:', e)
+  }
+}
+
+// 전체삭제
+async function deleteAllNotifications() {
+  try {
+    await axios.delete('http://localhost:8080/api/notification/all', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    notifications.value = []
+    await nextTick()
+    emit('update-count')
+  } catch (e) {
+    console.error('전체 삭제 실패:', e)
   }
 }
 
@@ -112,6 +141,7 @@ async function markAllAsRead() {
 function handleClose() {
   emit('close')
 }
+
 onMounted(fetchNotifications)
 </script>
 
@@ -143,6 +173,7 @@ onMounted(fetchNotifications)
 }
 
 .mark-read-btn,
+.delete-all-btn,
 .close-btn,
 .delete-btn {
   background: none;
@@ -154,6 +185,12 @@ onMounted(fetchNotifications)
 
 .mark-read-btn {
   color: #007bff;
+}
+.delete-all-btn {
+  color: #dc2626;
+}
+.close-btn {
+  color: black;
 }
 
 .notification-item {
@@ -176,12 +213,24 @@ onMounted(fetchNotifications)
 
 .content {
   font-size: 14px;
+  font-weight: bold;
+  color: #000;
 }
 
 .time {
   font-size: 12px;
-  color: gray;
+  color: #666;
   margin-top: 4px;
+}
+
+/* 읽은 알림은 회색 + 일반체 */
+.notification-item.read .content {
+  font-weight: normal;
+  color: #999;
+}
+
+.notification-item.read .time {
+  color: #bbb;
 }
 
 .empty {

@@ -31,12 +31,13 @@
         sender_id,
         content,
         community_id,
-        is_read,
+        is_read AS isRead,
         created_at
         FROM notification
         WHERE receiver_id = #{receiverId}
         ORDER BY created_at DESC
     </select>
+
 
     <select id="countUnreadNotifications" parameterType="string" resultType="int">
         SELECT COUNT(*) FROM notification
@@ -60,5 +61,10 @@
         SET is_read = true
         WHERE receiver_id = #{receiverId} AND is_read = false
     </update>
+
+    <delete id="deleteAllByUserId" parameterType="string">
+        DELETE FROM notification
+        WHERE receiver_id = #{userId}
+    </delete>
 
 </mapper>

@@ -76,4 +76,9 @@ public class NotificationServiceImpl implements NotificationService {
     public void markAllAsRead(String receiverId) {
         notificationDao.markAllAsRead(receiverId);
     }
+
+    @Override
+    public void deleteAllByUserId(String userId) {
+        notificationDao.deleteAllByUserId(userId);
+    }
 }

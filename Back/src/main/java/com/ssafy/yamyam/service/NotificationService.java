@@ -19,4 +19,6 @@ public interface NotificationService {
     void deleteNotification(Long notificationId);
 
     void markAllAsRead(String receiverId);
+
+    void deleteAllByUserId(String userId);
 }

@@ -8,11 +8,15 @@
         <span class="calendar-title">{{ currentTitle }}</span>
         <button class="nav-btn" @click="nextMonth">»</button>
 
-        <!-- 🔔 알림 벨 아이콘 -->
+        <!-- 알림 벨 아이콘 -->
         <div class="notification-bell" @click="toggleNotificationPanel">
           <img src="/bell.png" class="bell-icon" />
           <span v-if="unreadCount > 0" class="noti-dot">{{ unreadCount }}</span>
-          <Notification v-if="showNotificationDropdown" @close="showNotificationDropdown = false" />
+          <Notification 
+            v-if="showNotificationDropdown" 
+            @close="showNotificationDropdown = false" 
+            @update-count="fetchUnreadCount" 
+          />
         </div>
       </div>
 
