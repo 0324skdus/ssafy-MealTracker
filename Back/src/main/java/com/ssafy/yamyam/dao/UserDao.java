@@ -25,10 +25,14 @@ public interface UserDao {
     // 로그인 기능
 
     User login(@Param("userId") String userId, @Param("userPassword") String userPassword);
-    //아이디/비번찾기
+    //아이디찾기용(이름,이메일)
     String findUserIdByNameAndEmail(@Param("name") String name, @Param("email") String email);
+    //비번찾기용(이름,아이디,이메일)
     User findUserByAllInfo(@Param("userId") String userId, @Param("name") String name, @Param("email") String email);
     void updatePassword(@Param("userId") String userId, @Param("password") String password);
+    void updateName(@Param("userId") String userId, @Param("name") String name);
+    void updateEmail(@Param("userId") String userId, @Param("email") String email);
+    void updateUserId(@Param("userId") String userId, @Param("newUserId") String newUserId);
 
     int countByUserId(String userId);
 }

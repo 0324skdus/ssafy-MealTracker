@@ -9,6 +9,7 @@ import CommunityDetail from '@/views/CommunityDetail.vue'
 import MyPageView from '@/views/MyPageView.vue'
 import FindIdView from '@/views/FindIdView.vue'
 import FindPasswordView from '@/views/FindPasswordView.vue'
+import UserInfoEdit from '@/views/UserInfoEditView.vue'
 
 const routes = [
   { path: '/', component: LoginView },
@@ -22,6 +23,7 @@ const routes = [
   { path: '/mypage', component: MyPageView },
   { path: '/find-id', component: FindIdView },
   { path: '/find-password', component: FindPasswordView },
+  { path: '/userInfo-edit', component: UserInfoEdit }
 ]
 
 const router = createRouter({

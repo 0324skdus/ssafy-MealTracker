@@ -28,6 +28,15 @@
           <p><strong>목표:</strong> {{ convertSpecialNote(user.specialNote) }}</p>
           <p><strong>활동량:</strong> {{ convertActivityLevel(user.activityLevel) }}</p>
         </div>
+<!-- 회원정보 탭 -->
+        <div v-else-if="selectedTab === 'profile'" class="info-tab">
+          <p><strong>아이디:</strong> {{ user.userId }}</p>
+          <p><strong>이름:</strong> {{ user.name }}</p>
+          <p><strong>이메일:</strong> {{ user.email }}</p>
+          <div class="edit-wrapper">
+            <button class="edit-button" @click="goToEditUserInfo">회원정보 수정</button>
+          </div>
+        </div>
 
         <div v-else-if="selectedTab === 'stat'">
           <StatisticsPanel />
@@ -91,6 +100,7 @@ const router = useRouter()
 
 const tabs = [
   { key: 'info', label: '내 신체정보' },
+  { key: 'profile', label: '회원정보' },
   { key: 'stat', label: '내 식단 통계' },
   { key: 'written', label: '내가 쓴 글' },
   { key: 'liked', label: '좋아요 누른 글' },
@@ -176,6 +186,9 @@ watch(selectedTab, (newTab) => {
 
 const goToEditProfile = () => {
   router.push('/profile-edit')
+}
+const goToEditUserInfo = () => {
+  router.push('/userInfo-edit')
 }
 
 const goToPost = (postId) => {

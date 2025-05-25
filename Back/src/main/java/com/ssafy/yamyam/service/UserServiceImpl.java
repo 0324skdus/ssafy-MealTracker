@@ -2,6 +2,7 @@ package com.ssafy.yamyam.service;
 
 import com.ssafy.yamyam.dao.UserDao;
 import com.ssafy.yamyam.dto.User;
+import com.ssafy.yamyam.dto.UserProfileUpdateRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -67,6 +68,7 @@ public class UserServiceImpl implements UserService {
         return userDao.findUserIdByNameAndEmail(name, email);
     }
 
+    //임시비번 발급전 리셋
     @Override
     public String resetPassword(String userId, String name, String email) {
         User user = userDao.findUserByAllInfo(userId, name, email);
@@ -76,7 +78,7 @@ public class UserServiceImpl implements UserService {
         userDao.updatePassword(userId, tempPw);
         return tempPw;
     }
-
+//임시비번 발급
     private String generateTempPassword(int length) {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         StringBuilder sb = new StringBuilder();
@@ -85,6 +87,23 @@ public class UserServiceImpl implements UserService {
             sb.append(chars.charAt(rnd.nextInt(chars.length())));
         }
         return sb.toString();
+    }
+    //회원정보 수정
+    @Override
+    public void updateProfile(UserProfileUpdateRequest req) {
+        String userId = req.getUserId();
+        if (req.getName() != null) {
+            userDao.updateName(userId, req.getName());
+        }
+        if (req.getEmail() != null) {
+            userDao.updateEmail(userId, req.getEmail());
+        }
+        if (req.getPassword() != null) {
+            userDao.updatePassword(userId, req.getPassword());
+        }
+        if (req.getNewUserId() != null) {
+            userDao.updateUserId(userId, req.getNewUserId());
+        }
     }
 
     @Override

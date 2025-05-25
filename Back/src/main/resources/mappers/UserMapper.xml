@@ -59,6 +59,7 @@
 	<select id="countByUserId" parameterType="String" resultType="int">
 		SELECT COUNT(*) FROM user WHERE user_id = #{userId}
 	</select>
+
 <!--아이디,비번찾기-->
 	<select id="findUserIdByNameAndEmail" resultType="string">
 		SELECT user_id FROM user
@@ -70,8 +71,20 @@
 		WHERE user_id = #{userId} AND name = #{name} AND email = #{email}
 	</select>
 
+<!--회원정보 수정-->
 	<update id="updatePassword">
 		UPDATE user SET password = #{password} WHERE user_id = #{userId}
+	</update>
+	<update id="updateName">
+		UPDATE user SET name = #{name} WHERE user_id = #{userId}
+	</update>
+
+	<update id="updateEmail">
+		UPDATE user SET email = #{email} WHERE user_id = #{userId}
+	</update>
+
+	<update id="updateUserId">
+		UPDATE user SET user_id = #{newUserId} WHERE user_id = #{userId}
 	</update>
 
 </mapper>
