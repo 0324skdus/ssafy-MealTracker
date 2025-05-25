@@ -283,6 +283,8 @@ onMounted(async () => {
 <style scoped>
 .main-layout {
   display: flex;
+  min-height: 100vh;        /* ← 핵심 변경 */
+  align-items: stretch;      /* ← 사이드바 하단 고정 */
 }
 .content-area {
   flex: 1;

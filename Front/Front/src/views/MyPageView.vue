@@ -200,9 +200,10 @@ onMounted(fetchUserInfo)
 </script>
 
 <style scoped>
-/* 기존 스타일 유지 */
 .main-layout {
   display: flex;
+  min-height: 100vh; 
+  align-items: stretch;
 }
 
 .mypage-container {
