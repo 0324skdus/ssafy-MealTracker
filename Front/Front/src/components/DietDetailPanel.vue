@@ -9,7 +9,7 @@
 
       <!-- 식단 점수 -->
       <div class="score-section">
-        <p><strong>오늘의 식단 점수:</strong> {{ props.score }}점</p>
+        <p><strong>오늘의 식단 점수:</strong> {{ score }}점</p>
       </div>
 
       <!-- 식사 등록 버튼 -->
@@ -45,39 +45,40 @@
         </div>
       </div>
 
-      <!-- 식단 상세, 여기 너무 날것상태라 나중에 꾸며볼게요 -->
-<div class="meal-section">
-  <p>아침</p>
-  <ul>
-    <li v-for="(item, idx) in breakfastList" :key="idx">
-      {{ item.foodName }} - {{ item.kcal }} kcal
-    </li>
-  </ul>
+      <!-- 식단 상세 -->
+      <div class="meal-section">
+        <p>아침</p>
+        <ul>
+          <li v-for="(item, idx) in breakfastList" :key="idx">
+            {{ item.foodName }} - {{ item.kcal }} kcal
+          </li>
+        </ul>
 
-  <p>점심</p>
-  <ul>
-    <li v-for="(item, idx) in lunchList" :key="idx">
-      {{ item.foodName }} - {{ item.kcal }} kcal
-    </li>
-  </ul>
+        <p>점심</p>
+        <ul>
+          <li v-for="(item, idx) in lunchList" :key="idx">
+            {{ item.foodName }} - {{ item.kcal }} kcal
+          </li>
+        </ul>
 
-  <p>저녁</p>
-  <ul>
-    <li v-for="(item, idx) in dinnerList" :key="idx">
-      {{ item.foodName }} - {{ item.kcal }} kcal
-    </li>
-  </ul>
+        <p>저녁</p>
+        <ul>
+          <li v-for="(item, idx) in dinnerList" :key="idx">
+            {{ item.foodName }} - {{ item.kcal }} kcal
+          </li>
+        </ul>
 
-  <p>간식</p>
-  <ul>
-    <li v-for="(item, idx) in snackList" :key="idx">
-      {{ item.foodName }} - {{ item.kcal }} kcal
-    </li>
-  </ul>
-</div>
+        <p>간식</p>
+        <ul>
+          <li v-for="(item, idx) in snackList" :key="idx">
+            {{ item.foodName }} - {{ item.kcal }} kcal
+          </li>
+        </ul>
+      </div>
+
       <!-- 공유 버튼 -->
       <div class="bottom-buttons">
-        <button class="share-button">공유하기</button>
+        <button class="share-button" @click="shareToCommunity">공유하기</button>
       </div>
     </div>
   </div>
@@ -86,32 +87,25 @@
 <script setup>
 import { ref, watch, onMounted, computed } from 'vue'
 import axios from 'axios'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
   date: String,
   nutritionTarget: Object,
   dietList: Array,
-  score: Number 
+  score: Number
 })
+
 const emit = defineEmits(['close', 'openRegister'])
+const router = useRouter()
+
 const groupedDietList = ref({})
 const total = ref({ kcal: 0, carbo: 0, protein: 0, fat: 0, fiber: 0, sugar: 0, transfat: 0 })
 
-const breakfastList = computed(() =>
-  groupedDietList.value['아침'] || []
-)
-
-const lunchList = computed(() =>
-  groupedDietList.value['점심'] || []
-)
-
-const dinnerList = computed(() =>
-  groupedDietList.value['저녁'] || []
-)
-
-const snackList = computed(() =>
-  groupedDietList.value['간식'] || []
-)
+const breakfastList = computed(() => groupedDietList.value['아침'] || [])
+const lunchList = computed(() => groupedDietList.value['점심'] || [])
+const dinnerList = computed(() => groupedDietList.value['저녁'] || [])
+const snackList = computed(() => groupedDietList.value['간식'] || [])
 
 function register(mealType) {
   const mealData = groupedDietList.value[mealType] || []
@@ -134,12 +128,10 @@ async function fetchDietList() {
         Authorization: `Bearer ${token}`
       }
     })
-       const fetchedList = res.data
-    calculateGroupedAndTotal(fetchedList)
-
+    calculateGroupedAndTotal(res.data)
   } catch (err) {
     console.error('식단 조회 실패:', err)
-    calculateGroupedAndTotal([]) // 빈 리스트로 초기화
+    calculateGroupedAndTotal([])
   }
 }
 
@@ -147,12 +139,7 @@ function calculateGroupedAndTotal(fetchedList) {
   const grouped = { 아침: [], 점심: [], 저녁: [], 간식: [] }
   const sum = { kcal: 0, carbo: 0, protein: 0, fat: 0, fiber: 0, sugar: 0, transfat: 0 }
 
-  const mealMap = {
-    breakfast: '아침',
-    lunch: '점심',
-    dinner: '저녁',
-    snack: '간식'
-  }
+  const mealMap = { breakfast: '아침', lunch: '점심', dinner: '저녁', snack: '간식' }
 
   for (const item of fetchedList) {
     const translated = mealMap[item.mealType]
@@ -192,6 +179,67 @@ const score = computed(() => {
   const average = values.reduce((a, b) => a + b, 0) / values.length
   return Math.round(average)
 })
+
+async function shareToCommunity() {
+  const token = localStorage.getItem('accessToken')
+  if (!token) {
+    alert("로그인이 필요합니다.")
+    return
+  }
+
+  const title = prompt("공유할 게시글 제목을 입력해주세요:")
+  if (!title || title.trim() === "") {
+    alert("제목을 입력해주세요.")
+    return
+  }
+
+  const formatMealList = (name, list) =>
+    list.length ? `🍽️ [${name}]\n` + list.map(i => `- ${i.foodName} (${i.kcal} kcal)`).join('\n') + '\n\n' : ''
+
+const content =
+  `📅 ${props.date} 식단 공유\n` +
+  `🥗 식단 점수: ${score.value}점\n\n` +
+  formatMealList("아침", breakfastList.value) +
+  formatMealList("점심", lunchList.value) +
+  formatMealList("저녁", dinnerList.value) +
+  formatMealList("간식", snackList.value) +
+  `📊 [영양소 섭취 요약]\n` +
+  `- 칼로리: ${total.value.kcal.toFixed(1)} / ${props.nutritionTarget.kcal.toFixed(0)} kcal\n` +
+  `- 탄수화물: ${total.value.carbo.toFixed(1)} / ${props.nutritionTarget.carb.toFixed(0)}g\n` +
+  `- 단백질: ${total.value.protein.toFixed(1)} / ${props.nutritionTarget.protein.toFixed(0)}g\n` +
+  `- 지방: ${total.value.fat.toFixed(1)} / ${props.nutritionTarget.fat.toFixed(0)}g\n` +
+  `- 식이섬유: ${total.value.fiber.toFixed(1)} / ${props.nutritionTarget.fiber.toFixed(0)}g\n` +
+  `- 당류: ${total.value.sugar.toFixed(1)} / ${props.nutritionTarget.sugar.toFixed(0)}g\n` +
+  `- 트랜스지방: ${total.value.transfat.toFixed(1)} / ${props.nutritionTarget.transfat.toFixed(0)}g`
+
+
+  try {
+    const res = await axios.post('/api/community', {
+      title: title,
+      content: content,
+      communityType: "식단 게시판"
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    alert("등록이 완료되었습니다.")
+if (confirm("해당 게시글로 이동하시겠습니까?")) {
+  const token = localStorage.getItem('accessToken')
+  const latestRes = await axios.get('/api/community?sort=최신글', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+  const newId = latestRes.data[0].id
+  router.push(`/community/${newId}`)
+}
+  } catch (err) {
+    console.error("공유 실패:", err)
+    alert("게시글 공유에 실패했습니다.")
+  }
+}
 
 watch(() => props.date, fetchDietList, { immediate: true })
 onMounted(fetchDietList)
