@@ -18,6 +18,9 @@ public interface UserService {
     User getUserInfo(String userId);
 
     User login(String userId, String userPassword);
+    //아이디/비번찾기
+    String findUserId(String name, String email);
+    String resetPassword(String userId, String name, String email);
 
 
     boolean isUserIdExists(String userId);
