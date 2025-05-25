@@ -181,7 +181,11 @@ async function shareToCommunity() {
   }
 
   const title = prompt("공유할 게시글 제목을 입력해주세요:")
-  if (!title || title.trim() === "") {
+
+  if (title === null) {
+  return
+  }
+  if (title.trim() === "") {
     alert("제목을 입력해주세요.")
     return
   }
