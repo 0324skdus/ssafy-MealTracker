@@ -11,21 +11,13 @@ import MyPageView from '@/views/MyPageView.vue'
 const routes = [
   { path: '/', component: LoginView },
   { path: '/signup', component: SignUpView },
-  { path: '/main', component: MainView },//메인페이지(캘린더) 링크
-  { path: '/board',component: BoardView },
+  { path: '/main', component: MainView },
+  { path: '/board', component: BoardView },
   { path: '/profile-edit', component: ProfileEdit },
-   { path: '/write', component: WriteView },
-    {
-    path: '/community/:id',
-    name: 'CommunityDetail',
-    component: CommunityDetail
-  },
-  {
-  path: '/edit/:id',
-  component: WriteView
-},
-{ path: '/community/:id', component: CommunityDetail },
-   { path: '/mypage', component: MyPageView },
+  { path: '/write', component: WriteView },
+  { path: '/edit/:id', component: WriteView },
+  { path: '/community/:id', name: 'CommunityDetail', component: CommunityDetail },
+  { path: '/mypage', component: MyPageView }
 ]
 
 const router = createRouter({

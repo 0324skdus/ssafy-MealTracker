@@ -13,6 +13,13 @@ public class CommentServiceImpl implements CommentService {
     private final CommentDao commentDao;
 
     @Autowired
+    private CommunityService communityService;
+
+    @Autowired
+    private NotificationService notificationService;
+
+
+    @Autowired
     public CommentServiceImpl(CommentDao commentDao) {
         this.commentDao = commentDao;
     }

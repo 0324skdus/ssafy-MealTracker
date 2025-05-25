@@ -2,7 +2,10 @@ package com.ssafy.yamyam.controller;
 
 import com.ssafy.yamyam.config.jwt.CustomUserDetails;
 import com.ssafy.yamyam.dto.Comment;
+import com.ssafy.yamyam.dto.Community;
 import com.ssafy.yamyam.service.CommentService;
+import com.ssafy.yamyam.service.CommunityService;
+import com.ssafy.yamyam.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,13 +19,18 @@ import java.util.List;
 public class CommentController {
 
     private final CommentService commentService;
+    private final CommunityService communityService;
+    private final NotificationService notificationService;
 
     @Autowired
-    public CommentController(CommentService commentService) {
+    public CommentController(CommentService commentService,
+                             CommunityService communityService,
+                             NotificationService notificationService) {
         this.commentService = commentService;
+        this.communityService = communityService;
+        this.notificationService = notificationService;
     }
 
-    // 댓글 등록
     @PostMapping
     public ResponseEntity<String> register(@RequestBody Comment comment,
                                            @AuthenticationPrincipal CustomUserDetails loginUser) {
@@ -30,8 +38,20 @@ public class CommentController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
 
-        comment.setUserId(loginUser.getUserId());
+        String senderId = loginUser.getUserId();
+        comment.setUserId(senderId);
         boolean result = commentService.register(comment);
+
+        if (result) {
+            Community post = communityService.getById(comment.getCommunityId());
+            String receiverId = post.getUserId();
+            String postTitle = post.getTitle();
+
+            if (!receiverId.equals(senderId)) {
+                notificationService.sendCommentNotification(receiverId, senderId, postTitle,comment.getCommunityId());
+            }
+        }
+
         return result
                 ? ResponseEntity.ok("댓글 등록 성공")
                 : ResponseEntity.badRequest().body("댓글 등록 실패");
@@ -105,5 +125,5 @@ public class CommentController {
         List<Comment> comments = commentService.getByUserId(userId);
         return ResponseEntity.ok(comments);
     }
-    
+
 }
