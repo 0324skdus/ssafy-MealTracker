@@ -42,6 +42,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/user/exists/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/nutrition/**").authenticated()
+						.requestMatchers(HttpMethod.PUT, "/api/user/profile/update").authenticated()
 						.requestMatchers("/api/community").authenticated()
                         .requestMatchers("/api/community/**").authenticated()
 						.requestMatchers("/api/comment/user/**").authenticated()
@@ -49,7 +50,7 @@ public class SecurityConfig {
 						.requestMatchers("/api/diet/**").authenticated()
 						.requestMatchers("/api/notification/**").authenticated()
 						.requestMatchers("/api/food/search").permitAll()
-						.requestMatchers("api/find/**").permitAll()
+						.requestMatchers("/api/find/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userService),

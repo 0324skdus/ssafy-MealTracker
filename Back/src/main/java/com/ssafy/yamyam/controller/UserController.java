@@ -1,10 +1,13 @@
 package com.ssafy.yamyam.controller;
 
+import com.ssafy.yamyam.config.jwt.CustomUserDetails;
 import com.ssafy.yamyam.dto.User;
 import com.ssafy.yamyam.config.jwt.JwtUtil;
+import com.ssafy.yamyam.dto.UserProfileUpdateRequest;
 import com.ssafy.yamyam.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -88,4 +91,18 @@ public class UserController {
             return ResponseEntity.ok("사용 가능한 아이디입니다.");
         }
     }
+    //신체정보 제외한 회원정보 업데이트
+    @PutMapping("/profile/update")
+    public ResponseEntity<String> updateProfile(
+            @RequestBody UserProfileUpdateRequest req,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        if (userDetails == null || !userDetails.getUsername().equals(req.getUserId())) {
+            return ResponseEntity.status(403).body("본인만 수정 가능합니다.");
+        }
+
+        userService.updateProfile(req);
+        return ResponseEntity.ok("회원 정보가 변경되었습니다.");
+    }
+
 }
