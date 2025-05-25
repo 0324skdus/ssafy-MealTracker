@@ -25,7 +25,7 @@ public class Diet {
     public Diet() {
     }
 
-    public Diet(int dietId, String userId, String mealType, String foodName, int foodId, int score, double kcal, double carbo, double protein, double fat, double sugar, double fiber, double transfat, double saturatedFat, LocalDate date, double weight) {
+    public Diet(int dietId, String userId, String mealType, String foodName, int foodId, int score, double kcal, double carbo, double protein, double fat, double sugar, double fiber, double transfat, double saturatedFat, LocalDate date) {
         this.dietId = dietId;
         this.userId = userId;
         this.mealType = mealType;
@@ -41,7 +41,6 @@ public class Diet {
         this.transfat = transfat;
         this.saturatedFat = saturatedFat;
         this.date = date;
-        this.weight = weight;
     }
 
     public int getScore() {

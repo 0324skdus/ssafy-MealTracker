@@ -48,6 +48,7 @@ public class SecurityConfig {
 						.requestMatchers("/api/score/**").authenticated()
 						.requestMatchers("/api/diet/**").authenticated()
 						.requestMatchers("/api/notification/**").authenticated()
+						.requestMatchers("/api/food/search").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userService),
