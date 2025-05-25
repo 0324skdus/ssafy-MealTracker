@@ -7,6 +7,8 @@ import ProfileEdit from '@/views/ProfileEditView.vue'
 import WriteView from '@/views/WriteView.vue'
 import CommunityDetail from '@/views/CommunityDetail.vue'
 import MyPageView from '@/views/MyPageView.vue'
+import FindIdView from '@/views/FindIdView.vue'
+import FindPasswordView from '@/views/FindPasswordView.vue'
 
 const routes = [
   { path: '/', component: LoginView },
@@ -17,7 +19,9 @@ const routes = [
   { path: '/write', component: WriteView },
   { path: '/edit/:id', component: WriteView },
   { path: '/community/:id', name: 'CommunityDetail', component: CommunityDetail },
-  { path: '/mypage', component: MyPageView }
+  { path: '/mypage', component: MyPageView },
+  { path: '/find-id', component: FindIdView },
+  { path: '/find-password', component: FindPasswordView },
 ]
 
 const router = createRouter({

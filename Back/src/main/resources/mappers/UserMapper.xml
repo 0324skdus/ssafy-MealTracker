@@ -59,5 +59,19 @@
 	<select id="countByUserId" parameterType="String" resultType="int">
 		SELECT COUNT(*) FROM user WHERE user_id = #{userId}
 	</select>
+<!--아이디,비번찾기-->
+	<select id="findUserIdByNameAndEmail" resultType="string">
+		SELECT user_id FROM user
+		WHERE name = #{name} AND email = #{email}
+	</select>
+
+	<select id="findUserByAllInfo" resultType="com.ssafy.yamyam.dto.User">
+		SELECT * FROM user
+		WHERE user_id = #{userId} AND name = #{name} AND email = #{email}
+	</select>
+
+	<update id="updatePassword">
+		UPDATE user SET password = #{password} WHERE user_id = #{userId}
+	</update>
 
 </mapper>

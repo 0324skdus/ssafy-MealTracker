@@ -39,8 +39,8 @@
       <!-- 개별 링크 버튼들 -->
       <div class="link-group">
         <router-link to="/signup" class="link-button">회원가입</router-link>
-        <button class="link-button">아이디 찾기</button>
-        <button class="link-button">비밀번호 찾기</button>
+        <router-link to="/find-id" class="link-button">아이디 찾기</router-link>
+        <router-link to="/find-password" class="link-button">비밀번호 찾기</router-link>
       </div>
 
     </div>
