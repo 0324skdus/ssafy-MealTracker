@@ -9,16 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class NutritionServiceImpl implements NutritionService {
 
     private final UserDao userDao;
     private final DietDao dietDao;
+
     @Autowired
     public NutritionServiceImpl(UserDao userDao, DietDao dietDao) {
         this.userDao = userDao;
@@ -32,7 +30,7 @@ public class NutritionServiceImpl implements NutritionService {
             throw new IllegalArgumentException("사용자 정보를 찾을 수 없습니다.");
         }
 
-        // BMR 계산 (Harris-Benedict)
+        // 1. BMR 계산 (Harris-Benedict)
         double bmr;
         if ("M".equals(user.getGender())) {
             bmr = 66.47 + (13.75 * user.getWeight()) + (5.003 * user.getHeight()) - (6.755 * user.getAge());
@@ -40,7 +38,7 @@ public class NutritionServiceImpl implements NutritionService {
             bmr = 655.1 + (9.563 * user.getWeight()) + (1.850 * user.getHeight()) - (4.676 * user.getAge());
         }
 
-        // 활동지수 적용
+        // 2. 활동지수 적용
         double activityFactor = switch (user.getActivityLevel()) {
             case "L" -> 1.2;
             case "M" -> 1.55;
@@ -50,42 +48,76 @@ public class NutritionServiceImpl implements NutritionService {
 
         double tdee = bmr * activityFactor;
 
-        // 목표별 탄단지 비율 설정
-        double carbRatio, proteinRatio, fatRatio;
-        switch (user.getSpecialNote()) {
-            case "체중감량" -> {
-                carbRatio = 0.4;
-                proteinRatio = 0.3;
-                fatRatio = 0.3;
-            }
-            case "근육량 증가" -> {
-                carbRatio = 0.4;
-                proteinRatio = 0.35;
-                fatRatio = 0.25;
-            }
-            default -> { // 유지 or 기타
-                carbRatio = 0.5;
-                proteinRatio = 0.2;
-                fatRatio = 0.3;
-            }
+        // 3. 목표에 따른 보정된 총 섭취 kcal
+        double totalKcal = tdee;
+        if ("근육량 증가".equals(user.getSpecialNote())) {
+            totalKcal += 400; // +350~470kcal 범위 중간값
         }
 
-        // 영양소(g) 계산
-        double kcal = tdee;
-        double carb = kcal * carbRatio / 4;
-        double protein = kcal * proteinRatio / 4;
-        double fat = kcal * fatRatio / 9;
+        // 4. 단백질 g/kg 기준 계산
+        double proteinPerKg;
+        if ("체중감량".equals(user.getSpecialNote())) {
+            proteinPerKg = switch (user.getActivityLevel()) {
+                case "L" -> 1.6;
+                case "M" -> 1.8;
+                case "H" -> 2.2;
+                default -> 1.6;
+            };
+        } else if ("근육량 증가".equals(user.getSpecialNote())) {
+            proteinPerKg = switch (user.getActivityLevel()) {
+                case "L" -> 1.6;
+                case "M" -> 1.65;
+                case "H" -> 1.7;
+                default -> 1.6;
+            };
+        } else { // 체중유지
+            proteinPerKg = switch (user.getActivityLevel()) {
+                case "L" -> 1.4;
+                case "M" -> 1.5;
+                case "H" -> 1.6;
+                default -> 1.4;
+            };
+        }
+        double protein = proteinPerKg * user.getWeight();
+        double proteinKcal = protein * 4;
 
-        // 식이섬유 (남: 25g, 여: 20g)
+        // 5. 지방 % 기준 계산
+        double fatRatio;
+        if ("체중감량".equals(user.getSpecialNote())) {
+            fatRatio = 0.25;
+        } else if ("근육량 증가".equals(user.getSpecialNote())) {
+            fatRatio = 0.20;
+        } else {
+            fatRatio = 0.27; // 유지: 중간값
+        }
+        double fatKcal = totalKcal * fatRatio;
+        double fat = fatKcal / 9;
+
+        // 6. 탄수화물: 나머지 kcal 사용, 최소 보장
+        double remainingKcal = totalKcal - (proteinKcal + fatKcal);
+        double carb = remainingKcal / 4;
+
+        // 최소 탄수화물 g/kg 보장
+        double minCarbPerKg = switch (user.getSpecialNote()) {
+            case "체중감량" -> 3.0;
+            case "근육량 증가" -> switch (user.getActivityLevel()) {
+                case "L" -> 5.0;
+                case "M" -> 6.0;
+                case "H" -> 7.0;
+                default -> 5.0;
+            };
+            default -> 4.5; // 유지
+        };
+        double minCarb = user.getWeight() * minCarbPerKg;
+        if (carb < minCarb) carb = minCarb;
+
+        // 7. 기타
         double fiber = "M".equals(user.getGender()) ? 25 : 20;
-
-        // 당류: 10~20% 제한 → 평균 15% 기준, clamp 50g
-        double sugar = Math.min(kcal * 0.15 / 4, 50);
-
-        double transfat = kcal * 0.01 / 9;
+        double sugar = Math.min(totalKcal * 0.15 / 4, 50);
+        double transfat = totalKcal * 0.01 / 9;
 
         return new DailyNutrition(
-                Math.round(kcal),
+                Math.round(totalKcal),
                 Math.round(carb),
                 Math.round(protein),
                 Math.round(fat),
@@ -102,7 +134,6 @@ public class NutritionServiceImpl implements NutritionService {
             return new DailyNutrition(0, 0, 0, 0, 0, 0, 0);
         }
 
-        // 날짜별로 그룹핑
         Map<LocalDate, List<Diet>> groupedByDate = new HashMap<>();
         for (Diet diet : diets) {
             groupedByDate
@@ -110,7 +141,6 @@ public class NutritionServiceImpl implements NutritionService {
                     .add(diet);
         }
 
-        // 하루 단위 총합 누적
         double totalKcal = 0, totalCarb = 0, totalProtein = 0, totalFat = 0;
         double totalFiber = 0, totalSugar = 0, totalTransfat = 0;
         int dayCount = groupedByDate.size();
@@ -138,7 +168,6 @@ public class NutritionServiceImpl implements NutritionService {
             totalTransfat += dayTransfat;
         }
 
-        // 날짜 수로 나눈 하루 평균
         return new DailyNutrition(
                 Math.round(totalKcal / dayCount),
                 Math.round(totalCarb / dayCount),
@@ -149,5 +178,4 @@ public class NutritionServiceImpl implements NutritionService {
                 Math.round(totalTransfat / dayCount)
         );
     }
-
 }

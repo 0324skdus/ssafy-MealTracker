@@ -2,6 +2,7 @@ package com.ssafy.yamyam.service;
 
 import com.ssafy.yamyam.dao.DailyScoreDao;
 import com.ssafy.yamyam.dao.DietDao;
+import com.ssafy.yamyam.dto.DailyNutrition;
 import com.ssafy.yamyam.dto.DailyScore;
 import com.ssafy.yamyam.dto.Diet;
 import com.ssafy.yamyam.dto.User;
@@ -86,96 +87,68 @@ public class DailyScoreServiceImpl implements DailyScoreService {
         List<Diet> meals = dietDao.selectByUserIdAndDate(userId, date);
         if (meals == null || meals.isEmpty()) return 0;
 
-        double recommendedCalories = nutritionService.calculateNutritionTargets(user.getUserId()).getKcal();
+        DailyNutrition target = nutritionService.calculateNutritionTargets(userId);
 
-        String goal = user.getSpecialNote(); // "체중감량", "체중유지", "근육량증가"
-
-        double totalCal = 0, totalCarb = 0, totalProtein = 0, totalFat = 0;
-        double totalSugar = 0, totalFiber = 0, totalTransFat = 0, totalSaturatedFat = 0;
+        // 실제 섭취량 누적
+        double actualKcal = 0, actualCarb = 0, actualProtein = 0, actualFat = 0;
+        double actualFiber = 0, actualSugar = 0, actualTransFat = 0, actualSaturatedFat = 0;
 
         for (Diet meal : meals) {
-            totalCal += meal.getKcal();
-            totalCarb += meal.getCarbo();
-            totalProtein += meal.getProtein();
-            totalFat += meal.getFat();
-            totalSugar += meal.getSugar();
-            totalFiber += meal.getFiber();
-            totalTransFat += meal.getTransfat();
-            totalSaturatedFat += meal.getSaturatedFat();
+            actualKcal += meal.getKcal();
+            actualCarb += meal.getCarbo();
+            actualProtein += meal.getProtein();
+            actualFat += meal.getFat();
+            actualSugar += meal.getSugar();
+            actualFiber += meal.getFiber();
+            actualTransFat += meal.getTransfat();
+            actualSaturatedFat += meal.getSaturatedFat();
         }
 
-        int score = 0;
-        double totalMacro = totalCarb + totalProtein + totalFat;
-        double carbRatio = totalMacro > 0 ? (totalCarb / totalMacro) * 100 : 0;
-        double proteinRatio = totalMacro > 0 ? (totalProtein / totalMacro) * 100 : 0;
-        double fatRatio = totalMacro > 0 ? (totalFat / totalMacro) * 100 : 0;
+        // 기준값
+        double targetKcal = target.getKcal();
+        double targetCarb = target.getCarb();
+        double targetProtein = target.getProtein();
+        double targetFat = target.getFat();
+        double targetFiber = target.getFiber();
+        double targetTransFat = target.getTransfat(); // 기준값은 사용 안하고, 계산식 기준 사용
+        double targetSaturatedFat = targetKcal * 0.10 / 9;  // 포화지방 기준
 
-        switch (goal) {
-            case "체중감량" -> {
-                if (totalCal >= recommendedCalories * 0.8 && totalCal <= recommendedCalories * 0.9)
-                    score += 30;
-                if (proteinRatio >= 25) score += 10;
-                if (totalSugar <= 25) score += 10;
-                if (fatRatio <= 25) score += 10;
-                if (totalSaturatedFat <= 10) score += 10;
-                if (totalFiber >= 20) score += 10;
-                break;
-            }
-            case "체중유지" -> {
-                if (totalCal >= recommendedCalories * 0.9 && totalCal <= recommendedCalories * 1.1)
-                    score += 30;
+        // 점수 계산
+        int kcalScore = scoreByRatio(actualKcal, targetKcal);
+        int carbScore = scoreByRatio(actualCarb, targetCarb);
+        int proteinScore = scoreByRatio(actualProtein, targetProtein);
+        int fatScore = scoreByRatio(actualFat, targetFat);
+        int fiberScore = scoreByRatio(actualFiber, targetFiber);
+        int saturatedFatScore = reverseScoreByRatio(actualSaturatedFat, targetSaturatedFat);
+        int transFatScore = reverseScoreByRatio(actualTransFat, targetKcal * 0.01 / 9);
 
-                int balanceCount = 0;
-                if (carbRatio >= 50 && carbRatio <= 60) balanceCount++;
-                if (proteinRatio >= 20 && proteinRatio <= 25) balanceCount++;
-                if (fatRatio >= 15 && fatRatio <= 25) balanceCount++;
-                if (balanceCount == 3) score += 30;
-                else if (balanceCount == 2) score += 20;
-                else if (balanceCount == 1) score += 10;
+        // 가중 평균 계산 (총합 1.0)
+        double finalScore =
+                kcalScore * 0.15 +
+                        carbScore * 0.20 +
+                        proteinScore * 0.25 +
+                        fatScore * 0.15 +
+                        fiberScore * 0.10 +
+                        saturatedFatScore * 0.10 +
+                        transFatScore * 0.05;
 
-                if (totalTransFat == 0) score += 20;
-                else if (totalTransFat <= 0.5) score += 10;
+        return Math.round(finalScore);
+    }
 
-                if (totalSaturatedFat <= 15) score += 10;
-                if (totalSugar <= 50) score += 10;
-                if (totalFiber >= 20) score += 10;
-                else if (totalFiber >= 10) score += 5;
-                break;
-            }
-            case "근육량증가" -> {
-                if (totalCal >= recommendedCalories * 1.1 && totalCal <= recommendedCalories * 1.2)
-                    score += 30;
-                if (proteinRatio >= 30) score += 20;
-                if (carbRatio >= 40) score += 10;
-                if (fatRatio <= 25) score += 10;
-                if (totalSaturatedFat <= 20) score += 5;
-                if (totalFiber >= 20) score += 10;
-                break;
-            }
-            default -> {
-                if (totalCal >= recommendedCalories * 0.9 && totalCal <= recommendedCalories * 1.1)
-                    score += 30;
+    private int scoreByRatio(double actual, double target) {
+        if (target == 0) return 100;
+        double ratio = actual / target;
+        if (ratio >= 0.9 && ratio <= 1.1) return 100;
+        if ((ratio >= 0.8 && ratio < 0.9) || (ratio > 1.1 && ratio <= 1.2)) return 80;
+        if ((ratio >= 0.6 && ratio < 0.8) || (ratio > 1.2 && ratio <= 1.4)) return 60;
+        return 40;
+    }
 
-                int balanceCount = 0;
-                if (carbRatio >= 50 && carbRatio <= 60) balanceCount++;
-                if (proteinRatio >= 20 && proteinRatio <= 25) balanceCount++;
-                if (fatRatio >= 15 && fatRatio <= 25) balanceCount++;
-                if (balanceCount == 3) score += 30;
-                else if (balanceCount == 2) score += 20;
-                else if (balanceCount == 1) score += 10;
-
-                if (totalTransFat == 0) score += 20;
-                else if (totalTransFat <= 0.5) score += 10;
-
-                if (totalSaturatedFat <= 15) score += 10;
-                if (totalSugar <= 50) score += 10;
-                if (totalFiber >= 20) score += 10;
-                else if (totalFiber >= 10) score += 5;
-                break;
-            }
-        }
-
-        return score;
+    private int reverseScoreByRatio(double actual, double maxAllowed) {
+        if (actual <= maxAllowed * 0.8) return 100;
+        if (actual <= maxAllowed) return 80;
+        if (actual <= maxAllowed * 1.2) return 60;
+        return 40;
     }
 
     @Override
