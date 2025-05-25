@@ -21,4 +21,10 @@ public class FoodServiceImpl implements FoodService {
     public List<Food> searchByName(String keyword) {
         return foodDao.searchByName(keyword);
     }
+
+    // 직접 등록
+    @Override
+    public int registerManualFood(Food food) {
+        return foodDao.insert(food);
+    }
 }

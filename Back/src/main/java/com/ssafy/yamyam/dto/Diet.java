@@ -7,7 +7,7 @@ public class Diet {
     private String userId;
     private String mealType; // 아침/점심/저녁
     private String foodName;
-    private int foodId;
+    private Integer foodId;
     private int score;
     private transient double weight; //MyBatis insert 대상에서 제외, 매핑오류방지
 
@@ -25,7 +25,7 @@ public class Diet {
     public Diet() {
     }
 
-    public Diet(int dietId, String userId, String mealType, String foodName, int foodId, int score, double kcal, double carbo, double protein, double fat, double sugar, double fiber, double transfat, double saturatedFat, LocalDate date) {
+    public Diet(int dietId, String userId, String mealType, String foodName, Integer foodId, int score, double kcal, double carbo, double protein, double fat, double sugar, double fiber, double transfat, double saturatedFat, LocalDate date) {
         this.dietId = dietId;
         this.userId = userId;
         this.mealType = mealType;
@@ -155,11 +155,11 @@ public class Diet {
         this.date = date;
     }
 
-    public int getFoodId() {
+    public Integer getFoodId() {
         return foodId;
     }
 
-    public void setFoodId(int foodId) {
+    public void setFoodId(Integer foodId) {
         this.foodId = foodId;
     }
     public double getWeight() {

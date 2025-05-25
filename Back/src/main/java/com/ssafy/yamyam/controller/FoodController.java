@@ -24,4 +24,15 @@ public class FoodController {
         List<Food> foods = foodService.searchByName(keyword);
         return ResponseEntity.ok(foods);
     }
+
+    // 직접등록
+    @PostMapping("/manual")
+    public ResponseEntity<String> registerManualFood(@RequestBody Food food) {
+        int result = foodService.registerManualFood(food);
+        if (result > 0) {
+            return ResponseEntity.ok("음식이 성공적으로 등록되었습니다.");
+        } else {
+            return ResponseEntity.status(500).body("음식 등록 실패");
+        }
+    }
 }

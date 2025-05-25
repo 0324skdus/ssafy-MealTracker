@@ -40,7 +40,11 @@ public class DietServiceImpl implements DietService {
 
     @Override
     public boolean register(Diet diet) {
-        return dietDao.insert(diet) > 0;
+        boolean result = dietDao.insert(diet) > 0;
+        if (result) {
+            dailyScoreService.calculateAndSaveDailyScore(diet.getUserId(), diet.getDate());
+        }
+        return result;
     }
 
     @Override

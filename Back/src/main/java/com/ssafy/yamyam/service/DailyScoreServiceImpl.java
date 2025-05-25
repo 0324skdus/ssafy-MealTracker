@@ -2,11 +2,10 @@ package com.ssafy.yamyam.service;
 
 import com.ssafy.yamyam.dao.DailyScoreDao;
 import com.ssafy.yamyam.dao.DietDao;
-import com.ssafy.yamyam.dto.DailyNutrition;
 import com.ssafy.yamyam.dto.DailyScore;
 import com.ssafy.yamyam.dto.Diet;
 import com.ssafy.yamyam.dto.User;
-
+import com.ssafy.yamyam.dto.DailyNutrition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -77,7 +76,8 @@ public class DailyScoreServiceImpl implements DailyScoreService {
             dailyScoreDao.insert(dailyScore);
         } else {
             dailyScoreDao.update(dailyScore);
-        }System.out.println("[점수 계산 호출] userId=" + userId + ", date=" + date);
+        }
+        System.out.println("[점수 계산 호출] userId=" + userId + ", date=" + date);
     }
 
     private double calculateScore(String userId, LocalDate date) {
@@ -89,7 +89,6 @@ public class DailyScoreServiceImpl implements DailyScoreService {
 
         DailyNutrition target = nutritionService.calculateNutritionTargets(userId);
 
-        // 실제 섭취량 누적
         double actualKcal = 0, actualCarb = 0, actualProtein = 0, actualFat = 0;
         double actualFiber = 0, actualSugar = 0, actualTransFat = 0, actualSaturatedFat = 0;
 
@@ -104,16 +103,14 @@ public class DailyScoreServiceImpl implements DailyScoreService {
             actualSaturatedFat += meal.getSaturatedFat();
         }
 
-        // 기준값
         double targetKcal = target.getKcal();
         double targetCarb = target.getCarb();
         double targetProtein = target.getProtein();
         double targetFat = target.getFat();
         double targetFiber = target.getFiber();
-        double targetTransFat = target.getTransfat(); // 기준값은 사용 안하고, 계산식 기준 사용
-        double targetSaturatedFat = targetKcal * 0.10 / 9;  // 포화지방 기준
+        double targetTransFat = target.getTransfat();
+        double targetSaturatedFat = targetKcal * 0.10 / 9;
 
-        // 점수 계산
         int kcalScore = scoreByRatio(actualKcal, targetKcal);
         int carbScore = scoreByRatio(actualCarb, targetCarb);
         int proteinScore = scoreByRatio(actualProtein, targetProtein);
@@ -122,7 +119,6 @@ public class DailyScoreServiceImpl implements DailyScoreService {
         int saturatedFatScore = reverseScoreByRatio(actualSaturatedFat, targetSaturatedFat);
         int transFatScore = reverseScoreByRatio(actualTransFat, targetKcal * 0.01 / 9);
 
-        // 가중 평균 계산 (총합 1.0)
         double finalScore =
                 kcalScore * 0.15 +
                         carbScore * 0.20 +
@@ -138,17 +134,22 @@ public class DailyScoreServiceImpl implements DailyScoreService {
     private int scoreByRatio(double actual, double target) {
         if (target == 0) return 100;
         double ratio = actual / target;
+
         if (ratio >= 0.9 && ratio <= 1.1) return 100;
         if ((ratio >= 0.8 && ratio < 0.9) || (ratio > 1.1 && ratio <= 1.2)) return 80;
         if ((ratio >= 0.6 && ratio < 0.8) || (ratio > 1.2 && ratio <= 1.4)) return 60;
-        return 40;
+        if ((ratio >= 0.4 && ratio < 0.6) || (ratio > 1.4 && ratio <= 1.7)) return 40;
+        if ((ratio >= 0.2 && ratio < 0.4) || (ratio > 1.7 && ratio <= 2.0)) return 20;
+        return 0;
     }
 
     private int reverseScoreByRatio(double actual, double maxAllowed) {
+        if (actual == 0) return 100;
         if (actual <= maxAllowed * 0.8) return 100;
         if (actual <= maxAllowed) return 80;
         if (actual <= maxAllowed * 1.2) return 60;
-        return 40;
+        if (actual <= maxAllowed * 1.5) return 40;
+        return 0;
     }
 
     @Override

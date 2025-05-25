@@ -6,4 +6,7 @@ import java.util.List;
 
 public interface FoodService {
     List<Food> searchByName(String keyword);
+
+    // 직접등록
+    int registerManualFood(Food food);
 }
