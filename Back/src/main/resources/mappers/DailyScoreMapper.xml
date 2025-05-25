@@ -52,4 +52,12 @@
         WHERE user_id = #{userId} AND date = #{date}
     </delete>
 
+    <select id="findScoresByUserAndPeriod" resultType="com.ssafy.yamyam.dto.DailyScore">
+        SELECT *
+        FROM daily_score
+        WHERE user_id = #{userId}
+        AND date BETWEEN #{start} AND #{end}
+        ORDER BY date ASC
+    </select>
+
 </mapper>

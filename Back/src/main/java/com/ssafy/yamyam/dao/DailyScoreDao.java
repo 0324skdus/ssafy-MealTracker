@@ -23,4 +23,7 @@ public interface DailyScoreDao {
 
     void deleteByUserAndDate(@Param("userId") String userId, @Param("date") LocalDate date);
 
+    List<DailyScore> findScoresByUserAndPeriod(@Param("userId") String userId,
+                                               @Param("start") LocalDate start,
+                                               @Param("end") LocalDate end);
 }

@@ -182,4 +182,9 @@ public class DailyScoreServiceImpl implements DailyScoreService {
 
         return count == 0 ? 0 : total / count;
     }
+
+    @Override
+    public List<DailyScore> getScoreHistory(String userId, LocalDate start, LocalDate end) {
+        return dailyScoreDao.findScoresByUserAndPeriod(userId, start, end);
+    }
 }

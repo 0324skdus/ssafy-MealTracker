@@ -11,4 +11,6 @@ public interface DailyScoreService {
     List<DailyScore> getAllScores(String userId);
 
     double calculateAverageScore(String userId, LocalDate start, LocalDate end);
+
+    List<DailyScore> getScoreHistory(String userId, LocalDate start, LocalDate end);
 }
