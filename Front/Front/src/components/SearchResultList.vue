@@ -1,4 +1,5 @@
 <template>
+  <!-- 등록페이지에서 검색어 입력시 연관검색어를 보여주는 컴포넌트입니다 -->
   <div class="search-result-list">
     <div v-if="foodList.length > 0">
       <div
@@ -12,9 +13,6 @@
         </div>
         <button @click="() => emit('selectFood', food)">선택</button>
       </div>
-    </div>
-    <div v-else>
-      <p>검색 결과가 없습니다.</p>
     </div>
   </div>
 </template>

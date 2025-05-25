@@ -45,30 +45,30 @@
         </div>
       </div>
 
-      <!-- 식단 상세 -->
+      <!-- 식단 상세, 여기 너무 날것상태라 나중에 꾸며볼게요 -->
 <div class="meal-section">
-  <p>아침:</p>
+  <p>아침</p>
   <ul>
     <li v-for="(item, idx) in breakfastList" :key="idx">
       {{ item.foodName }} - {{ item.kcal }} kcal
     </li>
   </ul>
 
-  <p>점심:</p>
+  <p>점심</p>
   <ul>
     <li v-for="(item, idx) in lunchList" :key="idx">
       {{ item.foodName }} - {{ item.kcal }} kcal
     </li>
   </ul>
 
-  <p>저녁:</p>
+  <p>저녁</p>
   <ul>
     <li v-for="(item, idx) in dinnerList" :key="idx">
       {{ item.foodName }} - {{ item.kcal }} kcal
     </li>
   </ul>
 
-  <p>간식:</p>
+  <p>간식</p>
   <ul>
     <li v-for="(item, idx) in snackList" :key="idx">
       {{ item.foodName }} - {{ item.kcal }} kcal
