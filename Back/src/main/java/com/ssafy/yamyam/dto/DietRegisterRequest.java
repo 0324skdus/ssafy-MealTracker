@@ -17,6 +17,9 @@ public class DietRegisterRequest {
         this.weight = weight;
     }
 
+    public DietRegisterRequest() {
+    }
+
     public String getUserId() {
         return userId;
     }
