@@ -197,9 +197,15 @@ public class DailyScoreServiceImpl implements DailyScoreService {
         if (scores.isEmpty()) return 0;
 
         double total = 0;
+        int count = 0;
+
         for (DailyScore score : scores) {
-            total += score.getScore();
+            if (score.getScore() > 0) {
+                total += score.getScore();
+                count++;
+            }
         }
-        return total / scores.size();
+
+        return count == 0 ? 0 : total / count;
     }
 }
