@@ -7,9 +7,9 @@
         <button class="close-btn" @click="emit('close')">X</button>
       </div>
 
-      <!-- 식단 점수 -->
+      <!-- 진짜 점수 표시 -->
       <div class="score-section">
-        <p><strong>오늘의 식단 점수:</strong> {{ score }}점</p>
+        <p><strong>오늘의 식단 점수:</strong> {{ props.score }}점</p>
       </div>
 
       <!-- 식사 등록 버튼 -->
@@ -173,13 +173,6 @@ const percent = computed(() => {
   }
 })
 
-const score = computed(() => {
-  if (!props.nutritionTarget) return 0
-  const values = Object.values(percent.value)
-  const average = values.reduce((a, b) => a + b, 0) / values.length
-  return Math.round(average)
-})
-
 async function shareToCommunity() {
   const token = localStorage.getItem('accessToken')
   if (!token) {
@@ -196,27 +189,26 @@ async function shareToCommunity() {
   const formatMealList = (name, list) =>
     list.length ? `🍽️ [${name}]\n` + list.map(i => `- ${i.foodName} (${i.kcal} kcal)`).join('\n') + '\n\n' : ''
 
-const content =
-  `📅 ${props.date} 식단 공유\n` +
-  `🥗 식단 점수: ${score.value}점\n\n` +
-  formatMealList("아침", breakfastList.value) +
-  formatMealList("점심", lunchList.value) +
-  formatMealList("저녁", dinnerList.value) +
-  formatMealList("간식", snackList.value) +
-  `📊 [영양소 섭취 요약]\n` +
-  `- 칼로리: ${total.value.kcal.toFixed(1)} / ${props.nutritionTarget.kcal.toFixed(0)} kcal\n` +
-  `- 탄수화물: ${total.value.carbo.toFixed(1)} / ${props.nutritionTarget.carb.toFixed(0)}g\n` +
-  `- 단백질: ${total.value.protein.toFixed(1)} / ${props.nutritionTarget.protein.toFixed(0)}g\n` +
-  `- 지방: ${total.value.fat.toFixed(1)} / ${props.nutritionTarget.fat.toFixed(0)}g\n` +
-  `- 식이섬유: ${total.value.fiber.toFixed(1)} / ${props.nutritionTarget.fiber.toFixed(0)}g\n` +
-  `- 당류: ${total.value.sugar.toFixed(1)} / ${props.nutritionTarget.sugar.toFixed(0)}g\n` +
-  `- 트랜스지방: ${total.value.transfat.toFixed(1)} / ${props.nutritionTarget.transfat.toFixed(0)}g`
-
+  const content =
+    `📅 ${props.date} 식단 공유\n` +
+    `🥗 식단 점수: ${props.score}점\n\n` +
+    formatMealList("아침", breakfastList.value) +
+    formatMealList("점심", lunchList.value) +
+    formatMealList("저녁", dinnerList.value) +
+    formatMealList("간식", snackList.value) +
+    `📊 [영양소 섭취 요약]\n` +
+    `- 칼로리: ${total.value.kcal.toFixed(1)} / ${props.nutritionTarget.kcal.toFixed(0)} kcal\n` +
+    `- 탄수화물: ${total.value.carbo.toFixed(1)} / ${props.nutritionTarget.carb.toFixed(0)}g\n` +
+    `- 단백질: ${total.value.protein.toFixed(1)} / ${props.nutritionTarget.protein.toFixed(0)}g\n` +
+    `- 지방: ${total.value.fat.toFixed(1)} / ${props.nutritionTarget.fat.toFixed(0)}g\n` +
+    `- 식이섬유: ${total.value.fiber.toFixed(1)} / ${props.nutritionTarget.fiber.toFixed(0)}g\n` +
+    `- 당류: ${total.value.sugar.toFixed(1)} / ${props.nutritionTarget.sugar.toFixed(0)}g\n` +
+    `- 트랜스지방: ${total.value.transfat.toFixed(1)} / ${props.nutritionTarget.transfat.toFixed(0)}g`
 
   try {
     const res = await axios.post('/api/community', {
-      title: title,
-      content: content,
+      title,
+      content,
       communityType: "식단 게시판"
     }, {
       headers: {
@@ -225,16 +217,13 @@ const content =
     })
 
     alert("등록이 완료되었습니다.")
-if (confirm("해당 게시글로 이동하시겠습니까?")) {
-  const token = localStorage.getItem('accessToken')
-  const latestRes = await axios.get('/api/community?sort=최신글', {
-    headers: {
-      Authorization: `Bearer ${token}`
+    if (confirm("해당 게시글로 이동하시겠습니까?")) {
+      const latestRes = await axios.get('/api/community?sort=최신글', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      const newId = latestRes.data[0].id
+      router.push(`/community/${newId}`)
     }
-  })
-  const newId = latestRes.data[0].id
-  router.push(`/community/${newId}`)
-}
   } catch (err) {
     console.error("공유 실패:", err)
     alert("게시글 공유에 실패했습니다.")

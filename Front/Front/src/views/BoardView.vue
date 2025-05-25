@@ -21,8 +21,8 @@
         <div class="board-list">
           <div class="board-item" v-for="post in pagedPosts" :key="post.id">
             <router-link :to="`/community/${post.id}`" class="title" :title="post.title">
-  {{ post.title }}
-</router-link>
+              {{ post.title }}
+            </router-link>
             <span class="likes">❤️ {{ post.likeCount }}</span>
             <span class="writer">{{ maskUsername(post.userId) }}</span>
             <span class="date">{{ formatDate(post.createdAt) }}</span>
@@ -128,6 +128,8 @@ function formatDate(dateString) {
 <style scoped>
 .main-layout {
   display: flex;
+  min-height: 100vh; 
+  align-items: stretch; 
 }
 .content-area {
   flex: 1;

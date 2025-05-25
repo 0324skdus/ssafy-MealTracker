@@ -39,6 +39,7 @@ function logout() {
   width: 200px;
   background-color: #c7eeb0;
   padding: 20px;
+  min-height: 100vh;
 }
 .logo-box {
   margin-bottom: 16px;

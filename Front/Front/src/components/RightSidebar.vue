@@ -62,6 +62,7 @@ onMounted(fetchPosts)
   display: flex;
   flex-direction: column;
   gap: 20px;
+  min-height: 100vh;
 }
 
 .info-box h3 {

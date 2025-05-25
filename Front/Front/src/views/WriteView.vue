@@ -142,7 +142,8 @@ export default {
 <style scoped>
 .main-layout {
   display: flex;
-  min-height: 100vh;
+  min-height: 100vh; 
+  align-items: stretch;
 }
 
 .content-area {

@@ -236,7 +236,8 @@ const calendarOptions = ref({
 <style>
 .main-layout {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;       
+  align-items: stretch;     
 }
 
 .calendar-area {
