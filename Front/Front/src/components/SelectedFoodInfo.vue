@@ -1,7 +1,9 @@
 <!-- 식단등록페이지에서 등록할 식단의 상세정보를 확인하고 무게를 정하는 섹션입니다 -->
 <template>
   <div class="selected-food-info">
-    <h4>{{ food.name }} (100g 기준)</h4>
+    <b>
+      <h4>{{ food.foodName }} (100g 기준)</h4>
+    </b>
     <p>
       {{ food.kcal }} kcal / 탄: {{ food.carbo }} / 단: {{ food.protein }} / 지: {{ food.fat }}
     </p>
@@ -84,7 +86,7 @@ button {
   font-size: 16px;
   border: 2px solid #ff9800;
   border-radius: 6px;
-  width: 100px;
+  width: 80px;
   transition: 0.2s;
 }
 .weight-input input:focus {

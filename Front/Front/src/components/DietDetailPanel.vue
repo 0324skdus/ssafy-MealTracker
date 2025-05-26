@@ -18,25 +18,25 @@
       </div>
 
       <div class="nutrition-summary" v-if="nutritionTarget">
-        <div class="nutrient kcal" :style="{ background: `linear-gradient(to right, #e76f51 ${percent.kcal}%, #eee ${percent.kcal}%)` }">
+        <div class="nutrient kcal" :style="{ background: `linear-gradient(to right, #e76f51 ${percent.kcal}%, #d6d7da ${percent.kcal}%)` }">
           총 칼로리: {{ total.kcal }} / {{ nutritionTarget.kcal }} kcal
         </div>
-        <div class="nutrient carb" :style="{ background: `linear-gradient(to right, #f9c74f ${percent.carbo}%, #eee ${percent.carbo}%)` }">
+        <div class="nutrient carb" :style="{ background: `linear-gradient(to right, #f9c74f ${percent.carbo}%, #d6d7da ${percent.carbo}%)` }">
           탄수화물: {{ total.carbo.toFixed(1) }} / {{ nutritionTarget.carb }}g
         </div>
-        <div class="nutrient protein" :style="{ background: `linear-gradient(to right, #f9844a ${percent.protein}%, #eee ${percent.protein}%)` }">
+        <div class="nutrient protein" :style="{ background: `linear-gradient(to right, #f9844a ${percent.protein}%, #d6d7da ${percent.protein}%)` }">
           단백질: {{ total.protein.toFixed(1) }} / {{ nutritionTarget.protein }}g
         </div>
-        <div class="nutrient fat" :style="{ background: `linear-gradient(to right, #90be6d ${percent.fat}%, #eee ${percent.fat}%)` }">
+        <div class="nutrient fat" :style="{ background: `linear-gradient(to right, #90be6d ${percent.fat}%, #d6d7da ${percent.fat}%)` }">
           지방: {{ total.fat.toFixed(1) }} / {{ nutritionTarget.fat }}g
         </div>
-        <div class="nutrient fiber" :style="{ background: `linear-gradient(to right, #43aa8b ${percent.fiber}%, #eee ${percent.fiber}%)` }">
+        <div class="nutrient fiber" :style="{ background: `linear-gradient(to right, #43aa8b ${percent.fiber}%, #d6d7da ${percent.fiber}%)` }">
           식이섬유: {{ total.fiber.toFixed(1) }} / {{ nutritionTarget.fiber }}g
         </div>
-        <div class="nutrient sugar" :style="{ background: `linear-gradient(to right, #577590 ${percent.sugar}%, #eee ${percent.sugar}%)` }">
+        <div class="nutrient sugar" :style="{ background: `linear-gradient(to right, #577590 ${percent.sugar}%, #d6d7da ${percent.sugar}%)` }">
           당류: {{ total.sugar.toFixed(1) }} / {{ nutritionTarget.sugar }}g
         </div>
-        <div class="nutrient transfat" :style="{ background: `linear-gradient(to right, #d62828 ${percent.transfat}%, #eee ${percent.transfat}%)` }">
+        <div class="nutrient transfat" :style="{ background: `linear-gradient(to right, #d62828 ${percent.transfat}%, #d6d7da ${percent.transfat}%)` }">
           트랜스지방: {{ total.transfat.toFixed(1) }} / {{ nutritionTarget.transfat }}g
         </div>
       </div>
@@ -333,6 +333,37 @@ watch(() => props.date, fetchDietList, { immediate: true })
 .meal-section {
   margin-top: 30px;
 }
+.meal-section p {
+  font-weight: bold;
+  margin-top: 20px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #eee;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.meal-section p[data-type="아침"]::before { content: "🍳"; }
+.meal-section p[data-type="점심"]::before { content: "🍛"; }
+.meal-section p[data-type="저녁"]::before { content: "🍽️"; }
+.meal-section p[data-type="간식"]::before { content: "🍩"; }
+
+.meal-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px 0;
+}
+.meal-section li {
+  background: #d6d7da;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
 .bottom-buttons {
   margin-top: auto;
   display: flex;

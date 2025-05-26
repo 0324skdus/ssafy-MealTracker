@@ -57,7 +57,7 @@ onMounted(fetchPosts)
 <style scoped>
 .right-sidebar {
   width: 250px;
-  background-color: #c7eeb0;
+
   padding: 20px;
   display: flex;
   flex-direction: column;
