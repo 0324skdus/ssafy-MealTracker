@@ -35,16 +35,37 @@
       </div>
     </div>
 
-    <!-- 그래프 보기 (추후 구현) -->
-    <div v-else>
-      <p>그래프는 추후 구현 예정입니다.</p>
+    <!-- 그래프 보기 -->
+    <div v-else class="graph-view">
+      <Line :data="chartData" :options="chartOptions" />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import axios from 'axios'
+import { Line } from 'vue-chartjs'
+import {
+  Chart as ChartJS,
+  Title,
+  Tooltip,
+  Legend,
+  LineElement,
+  CategoryScale,
+  LinearScale,
+  PointElement
+} from 'chart.js'
+
+ChartJS.register(
+  Title,
+  Tooltip,
+  Legend,
+  LineElement,
+  CategoryScale,
+  LinearScale,
+  PointElement
+)
 
 const userId = localStorage.getItem('userId')
 const token = localStorage.getItem('accessToken')
@@ -61,26 +82,13 @@ const periodOptions = [
 ]
 
 const nutrition = ref({
-  kcal: 0,
-  carbo: 0,
-  protein: 0,
-  fat: 0,
-  fiber: 0,
-  sugar: 0,
-  transfat: 0
+  kcal: 0, carb: 0, protein: 0, fat: 0, fiber: 0, sugar: 0, transfat: 0
 })
-
 const targetNutrition = ref({
-  kcal: 2000,
-  carbo: 250,
-  protein: 100,
-  fat: 60,
-  fiber: 25,
-  sugar: 50,
-  transfat: 2
+  kcal: 0, carb: 0, protein: 0, fat: 0, fiber: 0, sugar: 0, transfat: 0
 })
-
 const averageScore = ref(0)
+const scoreHistory = ref([])
 
 const nutrientLabels = {
   kcal: '칼로리 (kcal)',
@@ -92,7 +100,7 @@ const nutrientLabels = {
   transfat: '트랜스지방 (g)'
 }
 
-const fetchData = async () => {
+const fetchAverageData = async () => {
   try {
     const [nutritionRes, scoreRes, targetRes] = await Promise.all([
       axios.get(`/api/nutrition/average`, {
@@ -112,13 +120,27 @@ const fetchData = async () => {
     averageScore.value = scoreRes.data
     targetNutrition.value = targetRes.data
   } catch (err) {
-    console.error('식단 통계 조회 실패:', err)
+    console.error('평균치 조회 실패:', err)
+  }
+}
+
+const fetchScoreHistory = async () => {
+  try {
+    const res = await axios.get(`/api/score/${userId}/history`, {
+      params: { period: selectedPeriod.value },
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    scoreHistory.value = res.data
+  } catch (err) {
+    console.error('점수 이력 조회 실패:', err)
+    scoreHistory.value = []
   }
 }
 
 const changePeriod = (period) => {
   selectedPeriod.value = period
-  fetchData()
+  if (viewMode.value === 'average') fetchAverageData()
+  else fetchScoreHistory()
 }
 
 const getBarWidth = (key, value) => {
@@ -127,7 +149,40 @@ const getBarWidth = (key, value) => {
   return Math.min((value / target) * 100, 100)
 }
 
-onMounted(fetchData)
+const chartData = computed(() => ({
+  labels: scoreHistory.value.map(item => item.date),
+  datasets: [{
+    label: '일별 식단 점수',
+    data: scoreHistory.value.map(item => item.score),
+    borderColor: '#4caf50',
+    backgroundColor: 'rgba(76, 175, 80, 0.2)',
+    tension: 0.3,
+    fill: true,
+  }]
+}))
+
+const chartOptions = {
+  responsive: true,
+  plugins: {
+    legend: { display: false },
+    tooltip: { enabled: true }
+  },
+  scales: {
+    y: {
+      beginAtZero: true,
+      max: 100
+    }
+  }
+}
+
+onMounted(() => {
+  fetchAverageData()
+})
+
+watch(viewMode, (mode) => {
+  if (mode === 'graph') fetchScoreHistory()
+  else fetchAverageData()
+})
 </script>
 
 <style scoped>

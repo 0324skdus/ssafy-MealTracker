@@ -5,11 +5,11 @@ import java.time.LocalDate;
 public class DietRegisterRequest {
     private String userId;
     private String mealType;
-    private int foodId;
+    private Integer foodId;
     private LocalDate date;
-    private double weight; // 계산용
+    private double weight;
 
-    public DietRegisterRequest(String userId, String mealType, int foodId, LocalDate date, double weight) {
+    public DietRegisterRequest(String userId, String mealType, Integer foodId, LocalDate date, double weight) {
         this.userId = userId;
         this.mealType = mealType;
         this.foodId = foodId;
@@ -36,11 +36,11 @@ public class DietRegisterRequest {
         this.mealType = mealType;
     }
 
-    public int getFoodId() {
+    public Integer getFoodId() {
         return foodId;
     }
 
-    public void setFoodId(int foodId) {
+    public void setFoodId(Integer foodId) {
         this.foodId = foodId;
     }
 
@@ -60,4 +60,3 @@ public class DietRegisterRequest {
         this.weight = weight;
     }
 }
-

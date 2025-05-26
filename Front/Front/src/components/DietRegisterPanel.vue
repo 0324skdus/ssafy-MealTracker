@@ -5,7 +5,6 @@
         <div class="left-buttons">
           <button class="back-btn" @click="emit('backToDetail')">〈</button>
         </div>
-        <!-- 식단등록 페이지입니다 -->
         <h2>식단 등록</h2>
         <p>{{ date }} - {{ mealType }}</p>
         <button class="close-btn" @click="close">X</button>
@@ -16,15 +15,45 @@
         <div class="search-bar">
           <input v-model="keyword" placeholder="식품명을 입력하세요" @keyup.enter="onSearch" />
           <button @click="onSearch">검색</button>
+          <button class="manual-button" @click="showManualForm = !showManualForm">직접 입력</button>
           <ul v-if="autoCompleteResults.length" class="autocomplete-list">
-            <li
-              v-for="item in autoCompleteResults"
-              :key="item.id"
-              @click="handleSelectFood(item)">
+            <li v-for="item in autoCompleteResults" :key="item.id" @click="handleSelectFood(item)">
               {{ item.foodName }}
             </li>
           </ul>
         </div>
+
+        <!-- 직접 입력 폼 -->
+       <div v-if="showManualForm" class="manual-form">
+  <label>음식명</label>
+  <input v-model="manualForm.name" placeholder="예: 삶은계란" />
+
+  <label>칼로리 (kcal)</label>
+  <input v-model.number="manualForm.kcal" />
+
+  <label>탄수화물 (g)</label>
+  <input v-model.number="manualForm.carbo" />
+
+  <label>단백질 (g)</label>
+  <input v-model.number="manualForm.protein" />
+
+  <label>지방 (g)</label>
+  <input v-model.number="manualForm.fat" />
+
+  <label>당류 (g)</label>
+  <input v-model.number="manualForm.sugar" />
+
+  <label>식이섬유 (g)</label>
+  <input v-model.number="manualForm.fiber" />
+
+  <label>트랜스지방 (g)</label>
+  <input v-model.number="manualForm.transfat" />
+
+  <label>포화지방 (g)</label>
+  <input v-model.number="manualForm.saturatedFat" />
+
+  <button class="manual-add-button" @click="handleAddManualFood">추가</button>
+</div>
 
         <!-- 검색 결과 -->
         <SearchResultList :foodList="foodList" @selectFood="handleSelectFood" />
@@ -32,26 +61,22 @@
         <!-- 선택된 식품 정보 -->
         <SelectedFoodInfo v-if="selectedFood" :food="selectedFood" @addDiet="handleAddDiet" />
 
-        <!-- 등록 예정 식단 목록 (로컬) -->
+        <!-- 등록 예정 식단 목록 -->
         <div class="section-card pending">
-        <DietPreviewList :dietList="newDietList" @remove="(i) => newDietList.splice(i, 1)" />
-          <!-- 등록 버튼 -->
+          <DietPreviewList :dietList="newDietList" @remove="(i) => newDietList.splice(i, 1)" />
           <div class="register-button" v-if="newDietList.length > 0">
             <button @click="handleRegisterDiet">등록 완료</button>
           </div>
         </div>
-        
-          
-        <!-- 현재 서버 등록된 식단 목록 -->
-        <div class="section-card registered">
-           <RegisteredDietList :dietList="dietList" @deleted="(i) => dietList.splice(i, 1)" />
-         </div>
 
-        <!-- 등록된 식단이 없을 때 -->
+        <!-- 현재 등록된 식단 목록 -->
+        <div class="section-card registered">
+          <RegisteredDietList :dietList="dietList" @deleted="(i) => dietList.splice(i, 1)" />
+        </div>
+
         <div v-if="dietList.length === 0 && !selectedFood">
           <p style="margin-top: 20px; color: #888;">등록된 식단이 없습니다.</p>
         </div>
-
       </div>
     </div>
   </div>
@@ -77,8 +102,21 @@ const keyword = ref('')
 const foodList = ref([])
 const autoCompleteResults = ref([])
 const selectedFood = ref(null)
-const dietList = ref([])        // 기존 등록된 식단
-const newDietList = ref([])     // 새로 추가한 등록 예정 식단
+const dietList = ref([])
+const newDietList = ref([])
+
+const showManualForm = ref(false)
+const manualForm = ref({
+  name: '',
+  kcal: 0,
+  carbo: 0,
+  protein: 0,
+  fat: 0,
+  sugar: 0,
+  fiber: 0,
+  transfat: 0,
+  saturatedFat: 0
+})
 
 const mealTypeMap = {
   아침: 'breakfast',
@@ -87,11 +125,8 @@ const mealTypeMap = {
   간식: 'snack'
 }
 
-// 검색
 const onSearch = () => {
-  if (keyword.value.trim()) {
-    handleSearch(keyword.value.trim())
-  }
+  if (keyword.value.trim()) handleSearch(keyword.value.trim())
 }
 
 const handleSearch = async (keyword) => {
@@ -104,7 +139,6 @@ const handleSearch = async (keyword) => {
   }
 }
 
-// 자동완성
 const handleAutoComplete = async () => {
   const trimmed = keyword.value.trim()
   if (!trimmed) return (autoCompleteResults.value = [])
@@ -118,18 +152,38 @@ const handleAutoComplete = async () => {
 }
 watch(keyword, handleAutoComplete)
 
-// 선택 식품
 const handleSelectFood = (food) => {
   selectedFood.value = food
   autoCompleteResults.value = []
 }
 
-// 새 식단 추가
 const handleAddDiet = (dietItem) => {
   newDietList.value.push(dietItem)
 }
 
-// 등록
+const handleAddManualFood = () => {
+  if (!manualForm.value.name || manualForm.value.kcal <= 0) {
+    alert('음식명과 칼로리를 입력하세요.')
+    return
+  }
+  newDietList.value.push({
+    ...manualForm.value,
+    foodName: manualForm.value.name
+  })
+  manualForm.value = {
+    name: '',
+    kcal: 0,
+    carbo: 0,
+    protein: 0,
+    fat: 0,
+    sugar: 0,
+    fiber: 0,
+    transfat: 0,
+    saturatedFat: 0
+  }
+  showManualForm.value = false
+}
+
 const handleRegisterDiet = async () => {
   const token = localStorage.getItem('accessToken')
   const userId = localStorage.getItem('userId')
@@ -164,7 +218,6 @@ const handleRegisterDiet = async () => {
   }
 }
 
-// 기존 식단 조회
 const fetchDietList = async () => {
   const token = localStorage.getItem('accessToken')
   const userId = localStorage.getItem('userId')
@@ -186,7 +239,6 @@ const close = () => emit('close')
 
 onMounted(fetchDietList)
 </script>
-
 
 <style scoped>
 .backdrop {
@@ -230,7 +282,25 @@ onMounted(fetchDietList)
   gap: 8px;
   position: relative;
 }
-/* 등록예정/등록식단 구분섹션 */
+.manual-button {
+  background-color: #2196f3;
+}
+.manual-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.manual-form label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 4px;
+}
+.manual-add-button {
+  grid-column: span 2;
+  background-color: #ff9800;
+}
 .section-card {
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -239,12 +309,11 @@ onMounted(fetchDietList)
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 .section-card.pending {
-  background-color: #fff8e1; /* 연노랑 */
+  background-color: #fff8e1;
 }
 .section-card.registered {
-  background-color: #e3f2fd; /* 연파랑 */
+  background-color: #e3f2fd;
 }
-/* 자동완성 css */
 .autocomplete-list {
   position: absolute;
   top: 40px;
