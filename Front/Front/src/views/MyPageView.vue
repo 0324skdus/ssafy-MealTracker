@@ -1,4 +1,3 @@
-
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -174,8 +173,11 @@ const handleDelete = async () => {
           <p><strong>목표:</strong> {{ convertSpecialNote(user.specialNote) }}</p>
           <p><strong>활동량:</strong> {{ convertActivityLevel(user.activityLevel) }}</p>
           <p><strong>기초대사량:</strong> {{ bmrText }}</p>
+          <div v-if="selectedTab === 'info'" class="edit-wrapper">
+            <button class="edit-button" @click="goToEditProfile">회원정보 수정</button>
+          </div>
         </div>
-
+        
         <div v-else-if="selectedTab === 'profile'" class="info-tab">
           <p><strong>아이디:</strong> {{ user.userId }}</p>
           <p><strong>이름:</strong> {{ user.name }}</p>
@@ -223,9 +225,6 @@ const handleDelete = async () => {
         </div>
       </div>
 
-      <div v-if="selectedTab === 'info'" class="edit-wrapper">
-        <button class="edit-button" @click="goToEditProfile">회원정보 수정</button>
-      </div>
     </div>
     <RightSidebar />
   </div>
@@ -277,22 +276,29 @@ const handleDelete = async () => {
 }
 .edit-wrapper {
   margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
 }
-
-.edit-button {
-  background-color: #86efac;
-  border: none;
+.edit-button,
+.delete-button {
   padding: 10px 16px;
   border-radius: 8px;
   cursor: pointer;
+  min-width: 130px;
+  font-size: 14px;
 }
-
+.edit-button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+}
 .edit-button:hover {
-  background-color: #ffb74c;
-  color: #666;
+  background-color: #4ade80;
+  color: #444;
 }
 .delete-button {
-  background-color: #f87171;
+  background-color: #ff9800;
   border: none;
   color: white;
 }
