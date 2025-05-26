@@ -165,6 +165,7 @@ onMounted(fetchNotifications)
   padding: 10px;
   border-bottom: 1px solid #eee;
   background: #f8f8f8;
+  font-size: 16px;
 }
 
 .header-buttons {

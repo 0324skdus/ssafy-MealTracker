@@ -9,7 +9,6 @@
       </div>
 
       <!-- 아이디 찾기 -->
-      <h2>아이디 찾기</h2>
       <input v-model="name" placeholder="이름" class="input-box" />
       <input v-model="email" placeholder="이메일" class="input-box" />
 
