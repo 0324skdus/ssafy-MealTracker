@@ -128,7 +128,7 @@ public class CommunityController {
 
         String userId = userDetails.getUserId();
         boolean liked = communityService.toggleLike(communityId, userId);
-        return ResponseEntity.ok(liked ? "좋아요 등록" : "좋아요 취소");
+        return ResponseEntity.ok(liked ? "좋아요!" : "좋아요 취소!");
     }
 
     // 내가 쓴 글 모아서 보기

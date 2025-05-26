@@ -149,7 +149,8 @@ public class DietServiceImpl implements DietService {
                 fat / count,
                 fiber / count,
                 sugar / count,
-                transfat / count
+                transfat / count,
+                0  // bmr은 평균에 포함되지 않으므로 기본값
         );
     }
 

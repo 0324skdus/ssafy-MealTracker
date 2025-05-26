@@ -8,16 +8,17 @@ public class DailyNutrition {
     private double fiber;
     private double sugar;
     private double transfat;
+    private double bmr;
+
+
     public DailyNutrition() {}
 
-    public DailyNutrition(double kcal, double carb, double protein, double fat, double fiber, double sugar, double transfat) {
-        this.kcal = kcal;
-        this.carb = carb;
-        this.protein = protein;
-        this.fat = fat;
-        this.fiber = fiber;
-        this.sugar = sugar;
-        this.transfat = transfat;
+    public double getBmr() {
+        return bmr;
+    }
+
+    public void setBmr(double bmr) {
+        this.bmr = bmr;
     }
 
     public double getKcal() {
@@ -74,5 +75,16 @@ public class DailyNutrition {
 
     public void setTransfat(double transfat) {
         this.transfat = transfat;
+    }
+
+    public DailyNutrition(double kcal, double carb, double protein, double fat, double fiber, double sugar, double transfat, double bmr) {
+        this.kcal = kcal;
+        this.carb = carb;
+        this.protein = protein;
+        this.fat = fat;
+        this.fiber = fiber;
+        this.sugar = sugar;
+        this.transfat = transfat;
+        this.bmr = bmr;
     }
 }
