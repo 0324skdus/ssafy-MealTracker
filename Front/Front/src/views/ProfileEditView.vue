@@ -47,6 +47,16 @@
           <label><input type="radio" value="근육량 증가" v-model="user.specialNote" /> 근육량을 늘리고 싶습니다</label>
         </div>
 
+        <div class="column-box">
+  <label class="label">기초대사량 (kcal)</label>
+  <input
+    v-model="user.customBmr"
+    type="number"
+    class="input-box no-spin"
+    placeholder="입력하지 않으면 자동 계산됩니다."
+  />
+</div>
+
         <div class="button-center">
           <button @click="submitUpdate" class="submit-button">수정 완료</button>
         </div>
@@ -68,7 +78,8 @@ const user = ref({
   weight: 0,
   age: 0,
   specialNote: '',
-  activityLevel: ''
+  activityLevel: '',
+  customBmr: null  
 })
 
 import { useRouter } from 'vue-router'

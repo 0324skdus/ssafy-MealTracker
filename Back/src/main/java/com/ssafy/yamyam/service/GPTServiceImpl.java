@@ -34,17 +34,14 @@ public class GPTServiceImpl implements GPTService {
             return "해당 날짜의 식단 정보가 없습니다.";
         }
 
-        // ✅ 총 섭취 영양소: 너의 NutritionServiceImpl 기준대로 호출
         DailyNutrition sum = calculateTotalNutrition(meals);
 
-        // ✅ 권장 섭취 영양소
         DailyNutrition target = nutritionService.calculateNutritionTargets(userId);
 
         String prompt = buildPrompt(userId, date, sum, target, meals);
         return openAIUtil.callChatGPT(prompt);
     }
 
-    // 너의 NutritionServiceImpl에는 총합 계산용 별도 메서드가 없어서 여기서 임시로 계산
     private DailyNutrition calculateTotalNutrition(List<Diet> meals) {
         double kcal = 0, carb = 0, protein = 0, fat = 0;
         double fiber = 0, sugar = 0, transfat = 0;
@@ -59,16 +56,20 @@ public class GPTServiceImpl implements GPTService {
             transfat += d.getTransfat();
         }
 
+        int count = meals.size() == 0 ? 1 : meals.size();
+
         return new DailyNutrition(
-                Math.round(kcal),
-                Math.round(carb),
-                Math.round(protein),
-                Math.round(fat),
-                Math.round(fiber),
-                Math.round(sugar),
-                Math.round(transfat)
+                kcal / count,
+                carb / count,
+                protein / count,
+                fat / count,
+                fiber / count,
+                sugar / count,
+                transfat / count,
+                0  // bmr은 GPT에서 안 쓰므로 0으로 대체
         );
     }
+
 
     private String buildPrompt(String userId, LocalDate date, DailyNutrition sum,
                                DailyNutrition target, List<Diet> meals) {
@@ -120,7 +121,8 @@ public class GPTServiceImpl implements GPTService {
                 .append("6. 내가 먹은 음식 중 바꾸면 좋은 음식이 있다면 어떤 걸 대체해서 바꿔보면 좋을지 구체적으로 제안해주세요.\n")
                 .append("7. 쿠팡 링크는 반드시 'https://www.coupang.com/...' 형태의 전체 URL로 출력해주세요. 'coupang.com' 식의 도메인만 주지 마세요.\n" +
                         "8. 특정 카테고리 링크(예: /categories/xxxxx)는 사용하지 마세요.  \n" +
-                        "항상 https://www.coupang.com/np/search?q=식품명 형식의 검색 링크만 추천해주세요.");
+                        "항상 https://www.coupang.com/np/search?q=식품명 형식의 검색 링크만 추천해주세요\n" +
+                        "그리고 넘겨받은 사용자의 정보(신체정보 및 활동량, 목표, 권장섭취량) 와 일일섭취량을 기반으로 식단의 점수를 매겨주세요. ");
         return sb.toString();
     }
 
