@@ -6,7 +6,7 @@
           <button class="back-btn" @click="emit('backToDetail')"><</button>
         </div>
         <h2>
-          {{ date }} {{ mealType }}
+          📅{{ date }} {{ mealType }}
         </h2>
         <button class="close-btn" @click="close">X</button>
       </div>
@@ -67,7 +67,7 @@
         <div class="section-card pending">
           <DietPreviewList :dietList="newDietList" @remove="(i) => newDietList.splice(i, 1)" />
           <div class="register-button" v-if="newDietList.length > 0">
-            <button @click="handleRegisterDiet">등록 완료</button>
+            <button @click="handleRegisterDiet">등록 하기</button>
           </div>
         </div>
 
@@ -255,7 +255,7 @@ onMounted(fetchDietList)
   right: 0;
   width: 600px;
   height: 100%;
-  background: #f9fff4; /* 크림빛 연두 배경 */
+  background: #ffffff; /* 크림빛 연두 배경 */
   padding: 24px;
   overflow-y: auto;
   animation: slideIn 0.3s ease-out forwards;
@@ -263,6 +263,7 @@ onMounted(fetchDietList)
   display: flex;
   flex-direction: column;
   border-radius: 12px 0 0 12px;
+  font-weight: bold;
 }
 .header {
   display: flex;
@@ -284,11 +285,6 @@ onMounted(fetchDietList)
   color: #444;
   cursor: pointer;
   transition: transform 0.2s ease, color 0.2s;
-}
-.back-btn:hover,
-.close-btn:hover {
-  color: #ff9800; /* 포인트 주황 */
-  transform: scale(1.2);
 }
 .search-bar {
   display: flex;
@@ -312,10 +308,10 @@ onMounted(fetchDietList)
   color: white;
 }
 .search-bar button:first-of-type {
-  background-color: #57bb5c; /* 메인 연두 */
+  background-color: #4c8bf5; 
 }
 .manual-button {
-  background-color: #ff9800; /* 포인트 주황 */
+  background-color: #e76f51; 
 }
 .manual-form {
   
@@ -351,10 +347,10 @@ onMounted(fetchDietList)
   font-size: 14px;
 }
 .section-card.pending {
-  background-color: #d5f7bf; 
+  background-color: #d6d7da; 
 }
 .section-card.registered {
-  background-color: #f7e7c4; 
+  background-color: #c4e3f7; 
 }
 .autocomplete-list {
   position: absolute;
@@ -383,7 +379,7 @@ onMounted(fetchDietList)
   justify-content: center;
 }
 .register-button button {
-  background-color: #57bb5c;
+  background-color: #4c8bf5; 
   border: none;
   padding: 10px 20px;
   font-size: 14px;
@@ -391,6 +387,7 @@ onMounted(fetchDietList)
   color: white;
   cursor: pointer;
   margin-top: 12px;
+  font-weight: 100;
 }
 @keyframes slideIn {
   from {

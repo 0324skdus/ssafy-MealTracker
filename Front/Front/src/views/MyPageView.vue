@@ -27,6 +27,9 @@
           <p><strong>몸무게:</strong> {{ user.weight }}kg</p>
           <p><strong>목표:</strong> {{ convertSpecialNote(user.specialNote) }}</p>
           <p><strong>활동량:</strong> {{ convertActivityLevel(user.activityLevel) }}</p>
+          <div v-if="selectedTab === 'info'" class="edit-wrapper">
+            <button class="edit-button" @click="goToEditProfile">회원정보 수정</button>
+          </div>
         </div>
 <!-- 회원정보 탭 -->
         <div v-else-if="selectedTab === 'profile'" class="info-tab">
@@ -77,9 +80,6 @@
         </div>
       </div>
 
-      <div v-if="selectedTab === 'info'" class="edit-wrapper">
-        <button class="edit-button" @click="goToEditProfile">회원정보 수정</button>
-      </div>
     </div>
 
     <RightSidebar />
@@ -266,15 +266,18 @@ onMounted(fetchUserInfo)
 }
 
 .edit-button {
-  background-color: #86efac;
+  background-color:#ff9800;
   border: none;
   padding: 10px 16px;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
+  color: white;
+  font-size: 14px;
 }
 
 .edit-button:hover {
-  background-color: #4ade80;
+  background-color: #ffb74c;
+  color: #666;
 }
 
 .post-list {

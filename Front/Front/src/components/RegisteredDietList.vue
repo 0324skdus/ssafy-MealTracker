@@ -5,7 +5,7 @@
     <ul>
       <li v-for="(item, index) in dietList" :key="item.dietId">
         {{ item.foodName }} - ({{ item.kcal }}kcal)
-        <button @click="deleteDiet(item.dietId)">X</button>
+        <button @click="deleteDiet(item.dietId)">❌</button>
       </li>
     </ul>
   </div>
@@ -61,8 +61,6 @@ li {
 }
 button {
   padding: 4px 8px;
-  background-color: #ff9800;
-  color: white;
   border: none;
   border-radius: 4px;
 }

@@ -18,7 +18,7 @@
 
         <div class="post-actions">
           <div class="left-group">
-            <button class="like-button" @click="likePost">❤️ 좋아요 {{ post.likeCount }}</button>
+            <button class="like-button" @click="likePost">💛 좋아요 {{ post.likeCount }}</button>
           </div>
           <div class="right-group" v-if="isAuthor">
             <button class="edit-button" @click="goToEdit">수정</button>
@@ -340,7 +340,8 @@ onMounted(async () => {
 .like-button,
 .edit-button,
 .delete-button {
-  background-color: #86efac;
+  background-color: #4caf50;
+  color: white;
   border: none;
   border-radius: 6px;
   padding: 8px 16px;
@@ -398,7 +399,8 @@ onMounted(async () => {
   color: #888;
 }
 .comment-submit-btn {
-  background-color: #86efac;
+  background-color: #4caf50;
+  color: white;
   border: none;
   border-radius: 6px;
   padding: 6px 14px;

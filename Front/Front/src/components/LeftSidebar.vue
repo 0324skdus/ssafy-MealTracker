@@ -20,11 +20,16 @@ function logout() {
     </div>
     <ul>
       <li>
+        <router-link to="/main">
+        캘린더
+      </router-link>
+      </li>
+      <br>
+      <li>
         <router-link to="/mypage">
           마이페이지
         </router-link>
         </li><br>
-
         <li>
           <router-link to="/board">
           게시판

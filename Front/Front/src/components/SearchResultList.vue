@@ -11,7 +11,7 @@
           {{ food.foodName }} (100g) - {{ food.kcal }} kcal<br />
           탄: {{ food.carbo }} / 단: {{ food.protein }} / 지: {{ food.fat }}
         </div>
-        <button @click="() => emit('selectFood', food)">선택</button>
+        <button @click="() => emit('selectFood', food)">✅</button>
       </div>
 
       <!-- 페이지네이션 버튼 UI -->
@@ -70,17 +70,17 @@ watch(() => props.foodList, () => {
 }
 button {
   padding: 6px 10px;
-  background-color: #57bb5c;
-  color: white;
+  color: rgb(0, 0, 0);
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 20px;
 }
 .pagination {
   display: flex;
   justify-content: center;
   gap: 10px;
   margin-top: 15px;
+  align-items: center;
 }
 </style>

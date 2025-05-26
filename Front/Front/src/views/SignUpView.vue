@@ -247,7 +247,7 @@ async function submitSignup() {
   width: 100%;
   height: 2.5rem;
   border-radius: 0.375rem;
-  background-color: #d9f99d;
+  background-color: #c7ff60;
   padding-left: 1rem;
   font-size: 1rem;
   color: #374151;
@@ -325,13 +325,13 @@ async function submitSignup() {
 }
 
 .radio-box {
-  background-color: #d9f99d;
+  background-color: #c7ff60;
   padding: 0.5rem 1rem;
   border-radius: 0.375rem;
 }
 
 .activity-box {
-  background-color: #d9f99d;
+  background-color: #c7ff60;
   border-radius: 0.375rem;
   padding: 1rem;
   display: flex;
@@ -366,10 +366,10 @@ async function submitSignup() {
 .submit-button {
   width: 48%;
   height: 2.5rem;
-  background-color: #bef264;
+  background-color: #4caf50;
   border-radius: 0.375rem;
   box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-  color: #1f2937;
+  color: white;
   font-size: 1rem;
   cursor: pointer;
 }
@@ -385,11 +385,11 @@ async function submitSignup() {
 
 .check-button {
   width: 6rem;
-  background-color: #86efac;
+  background-color: #4caf50;
   border-radius: 0.375rem;
   border: none;
   font-size: 0.875rem;
-  color: #1f2937;
+  color: white;
   cursor: pointer;
 }
 </style>

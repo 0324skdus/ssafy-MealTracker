@@ -2,7 +2,7 @@
   <div class="backdrop" @click.self="emit('close')">
     <div class="panel">
       <div class="header">
-        <h2 class="date-title">{{ date }} 식단 상세</h2>
+        <h2 class="date-title">📅{{ date }} 식단 상세</h2>
         <button class="close-btn" @click="emit('close')">X</button>
       </div>
 
@@ -42,13 +42,13 @@
       </div>
 
       <div class="meal-section">
-        <p>아침</p>
+        <p data-type="아침">아침</p>
         <ul><li v-for="(item, idx) in breakfastList" :key="idx">{{ item.foodName }} - {{ item.kcal }} kcal</li></ul>
-        <p>점심</p>
+        <p data-type="점심">점심</p>
         <ul><li v-for="(item, idx) in lunchList" :key="idx">{{ item.foodName }} - {{ item.kcal }} kcal</li></ul>
-        <p>저녁</p>
+        <p data-type="저녁">저녁</p>
         <ul><li v-for="(item, idx) in dinnerList" :key="idx">{{ item.foodName }} - {{ item.kcal }} kcal</li></ul>
-        <p>간식</p>
+        <p data-type="간식">간식</p>
         <ul><li v-for="(item, idx) in snackList" :key="idx">{{ item.foodName }} - {{ item.kcal }} kcal</li></ul>
       </div>
 
