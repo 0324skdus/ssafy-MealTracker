@@ -1,18 +1,15 @@
 <template>
   <div class="backdrop" @click.self="emit('close')">
     <div class="panel">
-      <!-- 날짜 -->
       <div class="header">
         <h2 class="date-title">{{ date }} 식단 상세</h2>
         <button class="close-btn" @click="emit('close')">X</button>
       </div>
 
-      <!-- 진짜 점수 표시 -->
       <div class="score-section">
         <p><strong>오늘의 식단 점수:</strong> {{ props.score }}점</p>
       </div>
 
-      <!-- 식사 등록 버튼 -->
       <div class="meal-buttons">
         <button @click="register('아침')">아침</button>
         <button @click="register('점심')">점심</button>
@@ -20,7 +17,6 @@
         <button @click="register('간식')">간식</button>
       </div>
 
-      <!-- 영양성분 요약 -->
       <div class="nutrition-summary" v-if="nutritionTarget">
         <div class="nutrient kcal" :style="{ background: `linear-gradient(to right, #e76f51 ${percent.kcal}%, #eee ${percent.kcal}%)` }">
           총 칼로리: {{ total.kcal }} / {{ nutritionTarget.kcal }} kcal
@@ -45,42 +41,32 @@
         </div>
       </div>
 
-      <!-- 식단 상세 -->
       <div class="meal-section">
         <p>아침</p>
-        <ul>
-          <li v-for="(item, idx) in breakfastList" :key="idx">
-            {{ item.foodName }} - {{ item.kcal }} kcal
-          </li>
-        </ul>
-
+        <ul><li v-for="(item, idx) in breakfastList" :key="idx">{{ item.foodName }} - {{ item.kcal }} kcal</li></ul>
         <p>점심</p>
-        <ul>
-          <li v-for="(item, idx) in lunchList" :key="idx">
-            {{ item.foodName }} - {{ item.kcal }} kcal
-          </li>
-        </ul>
-
+        <ul><li v-for="(item, idx) in lunchList" :key="idx">{{ item.foodName }} - {{ item.kcal }} kcal</li></ul>
         <p>저녁</p>
-        <ul>
-          <li v-for="(item, idx) in dinnerList" :key="idx">
-            {{ item.foodName }} - {{ item.kcal }} kcal
-          </li>
-        </ul>
-
+        <ul><li v-for="(item, idx) in dinnerList" :key="idx">{{ item.foodName }} - {{ item.kcal }} kcal</li></ul>
         <p>간식</p>
-        <ul>
-          <li v-for="(item, idx) in snackList" :key="idx">
-            {{ item.foodName }} - {{ item.kcal }} kcal
-          </li>
-        </ul>
+        <ul><li v-for="(item, idx) in snackList" :key="idx">{{ item.foodName }} - {{ item.kcal }} kcal</li></ul>
       </div>
 
-      <!-- 공유 버튼 -->
       <div class="bottom-buttons">
         <button class="share-button" @click="shareToCommunity">공유하기</button>
+        <button class="share-button" @click="handleFeedbackClick">
+          {{ hasFeedback ? 'GPT 피드백 보기' : 'GPT 피드백 받기' }}
+        </button>
       </div>
     </div>
+
+    <FeedbackPopup
+      v-if="showFeedbackPopup"
+      :feedback="feedback"
+      :loading="loadingFeedback"
+      @close="showFeedbackPopup = false"
+      @regenerate="regenerateFeedback"
+    />
   </div>
 </template>
 
@@ -88,6 +74,7 @@
 import { ref, watch, onMounted, computed } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+import FeedbackPopup from '../components/FeedbackPopup.vue'
 
 const props = defineProps({
   date: String,
@@ -95,12 +82,16 @@ const props = defineProps({
   dietList: Array,
   score: Number
 })
-
 const emit = defineEmits(['close', 'openRegister'])
 const router = useRouter()
 
 const groupedDietList = ref({})
 const total = ref({ kcal: 0, carbo: 0, protein: 0, fat: 0, fiber: 0, sugar: 0, transfat: 0 })
+
+const feedback = ref('')
+const hasFeedback = ref(false)
+const loadingFeedback = ref(false)
+const showFeedbackPopup = ref(false)
 
 const breakfastList = computed(() => groupedDietList.value['아침'] || [])
 const lunchList = computed(() => groupedDietList.value['점심'] || [])
@@ -109,42 +100,17 @@ const snackList = computed(() => groupedDietList.value['간식'] || [])
 
 function register(mealType) {
   const mealData = groupedDietList.value[mealType] || []
-  emit('openRegister', {
-    date: props.date,
-    mealType,
-    existingDiet: mealData
-  })
-}
-
-async function fetchDietList() {
-  const userId = localStorage.getItem('userId')
-  const token = localStorage.getItem('accessToken')
-  if (!userId || !props.date || !token) return
-
-  try {
-    const res = await axios.get(`/api/diet/user/${userId}/date`, {
-      params: { date: props.date },
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    calculateGroupedAndTotal(res.data)
-  } catch (err) {
-    console.error('식단 조회 실패:', err)
-    calculateGroupedAndTotal([])
-  }
+  emit('openRegister', { date: props.date, mealType, existingDiet: mealData })
 }
 
 function calculateGroupedAndTotal(fetchedList) {
   const grouped = { 아침: [], 점심: [], 저녁: [], 간식: [] }
   const sum = { kcal: 0, carbo: 0, protein: 0, fat: 0, fiber: 0, sugar: 0, transfat: 0 }
-
   const mealMap = { breakfast: '아침', lunch: '점심', dinner: '저녁', snack: '간식' }
 
   for (const item of fetchedList) {
-    const translated = mealMap[item.mealType]
-    if (translated) grouped[translated].push(item)
-
+    const type = mealMap[item.mealType]
+    if (type) grouped[type].push(item)
     sum.kcal += Number(item.kcal) || 0
     sum.carbo += Number(item.carbo) || 0
     sum.protein += Number(item.protein) || 0
@@ -159,9 +125,7 @@ function calculateGroupedAndTotal(fetchedList) {
 }
 
 const percent = computed(() => {
-  if (!props.nutritionTarget) {
-    return { kcal: 0, carbo: 0, protein: 0, fat: 0, fiber: 0, sugar: 0, transfat: 0 }
-  }
+  if (!props.nutritionTarget) return total.value
   return {
     kcal: Math.min((total.value.kcal / props.nutritionTarget.kcal) * 100, 100),
     carbo: Math.min((total.value.carbo / props.nutritionTarget.carb) * 100, 100),
@@ -173,22 +137,63 @@ const percent = computed(() => {
   }
 })
 
+async function fetchDietList() {
+  const userId = localStorage.getItem('userId')
+  const token = localStorage.getItem('accessToken')
+  if (!userId || !props.date || !token) return
+
+  try {
+    const res = await axios.get(`/api/diet/user/${userId}/date`, {
+      params: { date: props.date },
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    calculateGroupedAndTotal(res.data)
+  } catch (err) {
+    console.error('식단 조회 실패:', err)
+    calculateGroupedAndTotal([])
+  }
+}
+
+function handleFeedbackClick() {
+  const key = `gpt_feedback_${props.date}`
+  const cached = localStorage.getItem(key)
+  if (cached) {
+    feedback.value = cached
+    hasFeedback.value = true
+    showFeedbackPopup.value = true
+  } else {
+    regenerateFeedback()
+  }
+}
+
+async function regenerateFeedback() {
+  const token = localStorage.getItem('accessToken')
+  if (!token || !props.date) return
+
+  loadingFeedback.value = true
+  feedback.value = ''
+  showFeedbackPopup.value = true
+
+  try {
+    const res = await axios.get(`/api/gpt/feedback?date=${props.date}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    feedback.value = res.data
+    localStorage.setItem(`gpt_feedback_${props.date}`, res.data)
+    hasFeedback.value = true
+  } catch (err) {
+    feedback.value = 'GPT 피드백을 불러오는 데 실패했습니다.'
+  } finally {
+    loadingFeedback.value = false
+  }
+}
+
 async function shareToCommunity() {
   const token = localStorage.getItem('accessToken')
-  if (!token) {
-    alert("로그인이 필요합니다.")
-    return
-  }
+  if (!token) return alert("로그인이 필요합니다.")
 
   const title = prompt("공유할 게시글 제목을 입력해주세요:")
-
-  if (title === null) {
-  return
-  }
-  if (title.trim() === "") {
-    alert("제목을 입력해주세요.")
-    return
-  }
+  if (!title || title.trim() === '') return alert("제목을 입력해주세요.")
 
   const formatMealList = (name, list) =>
     list.length ? `🍽️ [${name}]\n` + list.map(i => `- ${i.foodName} (${i.kcal} kcal)`).join('\n') + '\n\n' : ''
@@ -201,41 +206,46 @@ async function shareToCommunity() {
     formatMealList("저녁", dinnerList.value) +
     formatMealList("간식", snackList.value) +
     `📊 [영양소 섭취 요약]\n` +
-    `- 칼로리: ${total.value.kcal.toFixed(1)} / ${props.nutritionTarget.kcal.toFixed(0)} kcal\n` +
-    `- 탄수화물: ${total.value.carbo.toFixed(1)} / ${props.nutritionTarget.carb.toFixed(0)}g\n` +
-    `- 단백질: ${total.value.protein.toFixed(1)} / ${props.nutritionTarget.protein.toFixed(0)}g\n` +
-    `- 지방: ${total.value.fat.toFixed(1)} / ${props.nutritionTarget.fat.toFixed(0)}g\n` +
-    `- 식이섬유: ${total.value.fiber.toFixed(1)} / ${props.nutritionTarget.fiber.toFixed(0)}g\n` +
-    `- 당류: ${total.value.sugar.toFixed(1)} / ${props.nutritionTarget.sugar.toFixed(0)}g\n` +
-    `- 트랜스지방: ${total.value.transfat.toFixed(1)} / ${props.nutritionTarget.transfat.toFixed(0)}g`
+    `- 칼로리: ${total.value.kcal.toFixed(1)} / ${props.nutritionTarget.kcal} kcal\n` +
+    `- 탄수화물: ${total.value.carbo.toFixed(1)} / ${props.nutritionTarget.carb}g\n` +
+    `- 단백질: ${total.value.protein.toFixed(1)} / ${props.nutritionTarget.protein}g\n` +
+    `- 지방: ${total.value.fat.toFixed(1)} / ${props.nutritionTarget.fat}g\n` +
+    `- 식이섬유: ${total.value.fiber.toFixed(1)} / ${props.nutritionTarget.fiber}g\n` +
+    `- 당류: ${total.value.sugar.toFixed(1)} / ${props.nutritionTarget.sugar}g\n` +
+    `- 트랜스지방: ${total.value.transfat.toFixed(1)} / ${props.nutritionTarget.transfat}g`
 
   try {
-    const res = await axios.post('/api/community', {
+    await axios.post('/api/community', {
       title,
       content,
       communityType: "식단 게시판"
     }, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+      headers: { Authorization: `Bearer ${token}` }
     })
 
     alert("등록이 완료되었습니다.")
     if (confirm("해당 게시글로 이동하시겠습니까?")) {
-      const latestRes = await axios.get('/api/community?sort=최신글', {
+      const latest = await axios.get('/api/community?sort=최신글', {
         headers: { Authorization: `Bearer ${token}` }
       })
-      const newId = latestRes.data[0].id
-      router.push(`/community/${newId}`)
+      router.push(`/community/${latest.data[0].id}`)
     }
   } catch (err) {
-    console.error("공유 실패:", err)
+    console.error(err)
     alert("게시글 공유에 실패했습니다.")
   }
 }
 
+onMounted(() => {
+  const cached = localStorage.getItem(`gpt_feedback_${props.date}`)
+  if (cached) {
+    feedback.value = cached
+    hasFeedback.value = true
+  }
+  fetchDietList()
+})
+
 watch(() => props.date, fetchDietList, { immediate: true })
-onMounted(fetchDietList)
 </script>
 
 <style scoped>
@@ -306,12 +316,12 @@ onMounted(fetchDietList)
   font-weight: bold;
   color: white;
 }
-.nutrient.kcal    { background-color: #e76f51; }
-.nutrient.carb    { background-color: #f9c74f; }
+.nutrient.kcal { background-color: #e76f51; }
+.nutrient.carb { background-color: #f9c74f; }
 .nutrient.protein { background-color: #f9844a; }
-.nutrient.fat     { background-color: #90be6d; }
-.nutrient.fiber   { background-color: #43aa8b; }
-.nutrient.sugar   { background-color: #577590; }
+.nutrient.fat { background-color: #90be6d; }
+.nutrient.fiber { background-color: #43aa8b; }
+.nutrient.sugar { background-color: #577590; }
 .nutrient.transfat { background-color: #d62828; }
 
 .score-section {
@@ -320,17 +330,15 @@ onMounted(fetchDietList)
   font-weight: bold;
   color: #333;
 }
-
 .meal-section {
   margin-top: 30px;
 }
-
 .bottom-buttons {
   margin-top: auto;
   display: flex;
   justify-content: flex-end;
+  gap: 10px;
 }
-
 .share-button {
   margin-top: 20px;
   padding: 10px 20px;
@@ -344,7 +352,6 @@ onMounted(fetchDietList)
 .share-button:hover {
   background-color: #2e6ff2;
 }
-
 @keyframes slideIn {
   from { transform: translateX(100%); }
   to { transform: translateX(0); }
