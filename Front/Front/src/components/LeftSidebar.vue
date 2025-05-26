@@ -14,24 +14,22 @@ function logout() {
 <template>
   <aside class="left-sidebar">
     <div class="logo-box">
-      <router-link to="/main">
         <img src="/logo.png" alt="Meal Tracker Logo" class="logo" />
-      </router-link>
     </div>
     <ul>
       <li>
-        <router-link to="/main">
+        <router-link to="/main" active-class="active">
         캘린더
       </router-link>
       </li>
       <br>
       <li>
-        <router-link to="/mypage">
+        <router-link to="/mypage" active-class="active">
           마이페이지
         </router-link>
         </li><br>
         <li>
-          <router-link to="/board">
+          <router-link to="/board" active-class="active">
           게시판
         </router-link>
         </li><br>
@@ -63,6 +61,14 @@ li:hover {
   background-color: #b1f584;
   border-radius: 10px;
   transition: background-color 0.3s;
+}
+.router-link-exact-active {
+  background-color: #b1f584;
+   border: none;
+  padding: 10px;
+  width: 100%;
+  border-radius: 10px;
+  display: block; 
 }
 .logo-box {
   margin-bottom: 16px;

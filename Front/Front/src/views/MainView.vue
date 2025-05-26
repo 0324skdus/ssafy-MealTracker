@@ -259,7 +259,7 @@ const calendarOptions = ref({
   font-weight: bold;
   margin-bottom: 16px;
   position: relative;
-  color: rgb(20, 122, 0);
+  color: #323a33;
 }
 
 .nav-btn {
