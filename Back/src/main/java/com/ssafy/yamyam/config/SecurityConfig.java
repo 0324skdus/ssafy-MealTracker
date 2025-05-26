@@ -38,6 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/user").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/user").authenticated() // ← 이 줄 반드시 필요
+						.requestMatchers(HttpMethod.DELETE, "/api/user/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/user/check-id").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/user/exists/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()

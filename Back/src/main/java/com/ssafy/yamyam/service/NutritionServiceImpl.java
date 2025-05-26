@@ -32,7 +32,9 @@ public class NutritionServiceImpl implements NutritionService {
 
         // 1. BMR 계산 (Harris-Benedict)
         double bmr;
-        if ("M".equals(user.getGender())) {
+        if (user.getCustomBmr() != null) {
+            bmr = user.getCustomBmr();  // 사용자가 직접 입력한 BMR
+        } else if ("M".equals(user.getGender())) {
             bmr = 66.47 + (13.75 * user.getWeight()) + (5.003 * user.getHeight()) - (6.755 * user.getAge());
         } else {
             bmr = 655.1 + (9.563 * user.getWeight()) + (1.850 * user.getHeight()) - (4.676 * user.getAge());
@@ -117,13 +119,14 @@ public class NutritionServiceImpl implements NutritionService {
         double transfat = totalKcal * 0.01 / 9;
 
         return new DailyNutrition(
-                Math.round(totalKcal),
-                Math.round(carb),
-                Math.round(protein),
-                Math.round(fat),
+                (double) Math.round(totalKcal),
+                (double) Math.round(carb),
+                (double) Math.round(protein),
+                (double) Math.round(fat),
                 fiber,
                 sugar,
-                Math.round(transfat)
+                (double) Math.round(transfat),
+                (double) Math.round(bmr)
         );
     }
 
@@ -131,7 +134,7 @@ public class NutritionServiceImpl implements NutritionService {
     public DailyNutrition getAverageNutrition(String userId, LocalDate start, LocalDate end) {
         List<Diet> diets = dietDao.selectDietByUserAndPeriod(userId, start, end);
         if (diets.isEmpty()) {
-            return new DailyNutrition(0, 0, 0, 0, 0, 0, 0);
+            return new DailyNutrition(0, 0, 0, 0, 0, 0, 0, 0);
         }
 
         Map<LocalDate, List<Diet>> groupedByDate = new HashMap<>();
@@ -169,13 +172,14 @@ public class NutritionServiceImpl implements NutritionService {
         }
 
         return new DailyNutrition(
-                Math.round(totalKcal / dayCount),
-                Math.round(totalCarb / dayCount),
-                Math.round(totalProtein / dayCount),
-                Math.round(totalFat / dayCount),
-                Math.round(totalFiber / dayCount),
-                Math.round(totalSugar / dayCount),
-                Math.round(totalTransfat / dayCount)
+                (double) Math.round(totalKcal / dayCount),
+                (double) Math.round(totalCarb / dayCount),
+                (double) Math.round(totalProtein / dayCount),
+                (double) Math.round(totalFat / dayCount),
+                (double) Math.round(totalFiber / dayCount),
+                (double) Math.round(totalSugar / dayCount),
+                (double) Math.round(totalTransfat / dayCount),
+                0 // 평균 BMR은 없음
         );
     }
 

@@ -3,6 +3,7 @@ package com.ssafy.yamyam.dto;
 import java.time.LocalDateTime;
 
 public class User {
+	private Double customBmr;
 	private String userId;
 	private String email;
 	private String password;
@@ -18,8 +19,7 @@ public class User {
 	public User() {
 	}
 
-	public User(String userId, String email, String password, String name, String gender,
-				double height, double weight, int age, String specialNote, String activityLevel, LocalDateTime createdAt) {
+	public User(String userId, String email, String password, String name, String gender, double height, double weight, int age, String specialNote, String activityLevel, LocalDateTime createdAt, Double customBmr) {
 		this.userId = userId;
 		this.email = email;
 		this.password = password;
@@ -31,12 +31,12 @@ public class User {
 		this.specialNote = specialNote;
 		this.activityLevel = activityLevel;
 		this.createdAt = createdAt;
+		this.customBmr = customBmr;
 	}
 
 	public String getUserId() {
 		return userId;
 	}
-
 	public void setUserId(String userId) {
 		this.userId = userId;
 	}
@@ -44,7 +44,6 @@ public class User {
 	public String getEmail() {
 		return email;
 	}
-
 	public void setEmail(String email) {
 		this.email = email;
 	}
@@ -52,7 +51,6 @@ public class User {
 	public String getPassword() {
 		return password;
 	}
-
 	public void setPassword(String password) {
 		this.password = password;
 	}
@@ -60,7 +58,6 @@ public class User {
 	public String getName() {
 		return name;
 	}
-
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -68,7 +65,6 @@ public class User {
 	public String getGender() {
 		return gender;
 	}
-
 	public void setGender(String gender) {
 		this.gender = gender;
 	}
@@ -76,7 +72,6 @@ public class User {
 	public double getHeight() {
 		return height;
 	}
-
 	public void setHeight(double height) {
 		this.height = height;
 	}
@@ -84,7 +79,6 @@ public class User {
 	public double getWeight() {
 		return weight;
 	}
-
 	public void setWeight(double weight) {
 		this.weight = weight;
 	}
@@ -92,7 +86,6 @@ public class User {
 	public int getAge() {
 		return age;
 	}
-
 	public void setAge(int age) {
 		this.age = age;
 	}
@@ -100,7 +93,6 @@ public class User {
 	public String getSpecialNote() {
 		return specialNote;
 	}
-
 	public void setSpecialNote(String specialNote) {
 		this.specialNote = specialNote;
 	}
@@ -108,7 +100,6 @@ public class User {
 	public String getActivityLevel() {
 		return activityLevel;
 	}
-
 	public void setActivityLevel(String activityLevel) {
 		this.activityLevel = activityLevel;
 	}
@@ -116,9 +107,15 @@ public class User {
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
 	}
-
 	public void setCreatedAt(LocalDateTime createdAt) {
 		this.createdAt = createdAt;
+	}
+
+	public Double getCustomBmr() {
+		return customBmr;
+	}
+	public void setCustomBmr(Double customBmr) {
+		this.customBmr = customBmr;
 	}
 
 	@Override
@@ -133,6 +130,7 @@ public class User {
 				", age=" + age +
 				", specialNote='" + specialNote + '\'' +
 				", activityLevel='" + activityLevel + '\'' +
+				", customBmr=" + customBmr +
 				'}';
 	}
 }
