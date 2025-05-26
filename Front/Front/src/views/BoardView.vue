@@ -161,7 +161,7 @@ function formatDate(dateString) {
   font-size: 16px;
 }
 .board-tabs button.active {
-  background-color: #65a30d;
+  background-color: #4caf50;
   color: white;
 }
 .board-area {
@@ -209,7 +209,7 @@ function formatDate(dateString) {
   cursor: pointer;
 }
 .pagination button.active {
-  background-color: #65a30d;
+  background-color: #4caf50;
   color: white;
 }
 .action-bar {
@@ -249,7 +249,7 @@ function formatDate(dateString) {
   padding: 10px 20px;
   border: none;
   border-radius: 9999px;
-  background-color: #65a30d;
+  background-color: #4caf50;
   color: white;
   font-size: 16px;
   cursor: pointer;

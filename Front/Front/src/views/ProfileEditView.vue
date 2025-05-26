@@ -236,7 +236,7 @@ async function submitUpdate() {
 .submit-button {
   width: 48%;
   height: 2.5rem;
-  background-color: #bef264;
+  background-color: #4caf50;
   border-radius: 0.375rem;
   box-shadow: 0 1px 2px rgba(0,0,0,0.1);
   color: #1f2937;

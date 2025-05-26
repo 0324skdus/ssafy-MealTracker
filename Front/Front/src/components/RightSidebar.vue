@@ -1,15 +1,17 @@
 <template>
   <aside class="right-sidebar">
-    <div class="info-box">
-      <h3>인기글</h3>
+    <br>
+    <div class="card">
+      <h3>🔥 인기글 🔥</h3>
       <ul>
         <li v-for="post in popularPosts" :key="post.id">
           <router-link :to="`/community/${post.id}`">{{ post.title }}</router-link>
         </li>
       </ul>
     </div>
-    <div class="info-box">
-      <h3>최신글</h3>
+    <br>
+    <div class="card">
+      <h3>🌱 최신글 🌱</h3>
       <ul>
         <li v-for="post in recentPosts" :key="post.id">
           <router-link :to="`/community/${post.id}`">{{ post.title }}</router-link>
@@ -18,6 +20,7 @@
     </div>
   </aside>
 </template>
+
 
 <script setup>
 import { ref, onMounted } from 'vue'
@@ -56,27 +59,54 @@ onMounted(fetchPosts)
 
 <style scoped>
 .right-sidebar {
-  width: 250px;
-  background-color: #c7eeb0;
-  padding: 20px;
+  width: 240px;
+  padding: 16px;
+  background-color: #fff;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  min-height: 100vh;
 }
 
-.info-box h3 {
-  margin-bottom: 10px;
+.card {
+  background-color: #e8ece6;
+  padding: 14px 16px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  height: 260px;
+}
+
+.card h3 {
+  font-size: 16px;
   font-weight: bold;
+  margin-bottom: 10px;
+  color: #333;
+  text-align: center;
 }
 
-.info-box ul {
+.card ul {
   list-style: none;
   padding: 0;
-  font-size: 14px;
+  margin: 0;
 }
 
-.info-box li {
-  margin-bottom: 6px;
+.card ul li {
+  font-size: 14px;
+  color: #444;
+  padding: 6px 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.2s;
+}
+
+.card ul li:hover {
+  color: #2e6ff2;
+  text-decoration: underline;
+}
+.card ul li + li {
+  border-top: 1px dotted #9fa19e;
+  margin-top: 4px;
+  padding-top: 6px;
 }
 </style>

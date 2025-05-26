@@ -3,10 +3,11 @@
     <div class="panel">
       <div class="header">
         <div class="left-buttons">
-          <button class="back-btn" @click="emit('backToDetail')">〈</button>
+          <button class="back-btn" @click="emit('backToDetail')"><</button>
         </div>
-        <h2>식단 등록</h2>
-        <p>{{ date }} - {{ mealType }}</p>
+        <h2>
+          📅{{ date }} {{ mealType }}
+        </h2>
         <button class="close-btn" @click="close">X</button>
       </div>
 
@@ -54,10 +55,11 @@
 
   <button class="manual-add-button" @click="handleAddManualFood">추가</button>
 </div>
+<br>
 
         <!-- 검색 결과 -->
         <SearchResultList :foodList="foodList" @selectFood="handleSelectFood" />
-
+<br>
         <!-- 선택된 식품 정보 -->
         <SelectedFoodInfo v-if="selectedFood" :food="selectedFood" @addDiet="handleAddDiet" />
 
@@ -65,7 +67,7 @@
         <div class="section-card pending">
           <DietPreviewList :dietList="newDietList" @remove="(i) => newDietList.splice(i, 1)" />
           <div class="register-button" v-if="newDietList.length > 0">
-            <button @click="handleRegisterDiet">등록 완료</button>
+            <button @click="handleRegisterDiet">등록 하기</button>
           </div>
         </div>
 
@@ -244,7 +246,7 @@ onMounted(fetchDietList)
 .backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.4);
   z-index: 999;
 }
 .panel {
@@ -253,99 +255,139 @@ onMounted(fetchDietList)
   right: 0;
   width: 600px;
   height: 100%;
-  background: #fff;
-  padding: 20px;
+  background: #ffffff; /* 크림빛 연두 배경 */
+  padding: 24px;
   overflow-y: auto;
   animation: slideIn 0.3s ease-out forwards;
-  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.2);
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
+  border-radius: 12px 0 0 12px;
+  font-weight: bold;
 }
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 16px;
 }
+.header h2 {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+}
+.back-btn,
 .close-btn {
   background: none;
   border: none;
   font-size: 20px;
+  font-weight: 700;
+  color: #444;
   cursor: pointer;
-}
-.register-button {
-  text-align: center;
-  margin-top: 20px;
+  transition: transform 0.2s ease, color 0.2s;
 }
 .search-bar {
-  margin-bottom: 16px;
   display: flex;
   gap: 8px;
+  margin-bottom: 16px;
   position: relative;
 }
+.search-bar input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #b0bec5;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.search-bar button {
+  padding: 8px 12px;
+  font-size: 13px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  color: white;
+}
+.search-bar button:first-of-type {
+  background-color: #4c8bf5; 
+}
 .manual-button {
-  background-color: #2196f3;
+  background-color: #e76f51; 
 }
 .manual-form {
+  
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-bottom: 16px;
+  gap: 8px;
 }
-
 .manual-form label {
-  font-size: 14px;
-  font-weight: 500;
-  margin-top: 4px;
+  font-weight: 600;
+  font-size: 13px;
+  color: #555;
+}
+.manual-form input {
+  border: 1px solid #ccc;
+  padding: 8px;
+  border-radius: 6px;
+  
 }
 .manual-add-button {
-  grid-column: span 2;
-  background-color: #ff9800;
+  background-color: #ff9800; /* 포인트 주황 */
+  color: white;
+  margin-top: 20px;
+  border-radius: 8px;
 }
 .section-card {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 12px 16px;
+  border-radius: 10px;
+  padding: 14px 18px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  font-size: 14px;
 }
 .section-card.pending {
-  background-color: #fff8e1;
+  background-color: #d6d7da; 
 }
 .section-card.registered {
-  background-color: #e3f2fd;
+  background-color: #c4e3f7; 
 }
 .autocomplete-list {
   position: absolute;
-  top: 40px;
+  top: 44px;
   left: 0;
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
   width: 100%;
-  max-height: 200px;
+  max-height: 180px;
   overflow-y: auto;
   z-index: 10;
+  font-size: 13px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 .autocomplete-list li {
-  padding: 8px;
+  padding: 10px;
   cursor: pointer;
+  transition: background 0.2s;
 }
 .autocomplete-list li:hover {
-  background-color: #eee;
+  background: #f1f8e9;
 }
-input {
-  flex: 1;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+.register-button {
+  display: flex;
+  justify-content: center;
 }
-button {
-  padding: 8px 12px;
-  background-color: #4caf50;
-  color: white;
+.register-button button {
+  background-color: #4c8bf5; 
   border: none;
-  border-radius: 4px;
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 8px;
+  color: white;
   cursor: pointer;
+  margin-top: 12px;
+  font-weight: 100;
 }
 @keyframes slideIn {
   from {
@@ -356,3 +398,5 @@ button {
   }
 }
 </style>
+
+

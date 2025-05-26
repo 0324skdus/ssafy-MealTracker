@@ -116,7 +116,7 @@ async function login() {
 .input-box {
   width: 90%;
   height: 2.75rem;
-  background-color: #d9f99d;
+  background-color: #c7ff60;
   border-radius: 0.375rem;
   padding-left: 1rem;
   color: #374151;
@@ -126,10 +126,10 @@ async function login() {
 .login-button {
   width: 90%;
   height: 2.75rem;
-  background-color: #bef264;
+  background-color: #4caf50;
+  color : white;
   border-radius: 0.375rem;
   box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-  color: #1f2937;
   font-size: 1rem;
   cursor: pointer;
 }
@@ -143,7 +143,7 @@ async function login() {
 }
 
 .link-button {
-  color: #65a30d;
+  color: #747474;
   font-size: 0.875rem;
   text-decoration: none;
   background: none;

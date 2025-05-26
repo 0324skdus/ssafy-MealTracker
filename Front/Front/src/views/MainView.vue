@@ -245,7 +245,7 @@ const calendarOptions = ref({
 .calendar-area {
   flex-grow: 1;
   padding: 30px;
-  background-color: #fff;
+  background-color: #ffffff;
   min-width: 0;
 }
 
@@ -259,6 +259,7 @@ const calendarOptions = ref({
   font-weight: bold;
   margin-bottom: 16px;
   position: relative;
+  color: rgb(20, 122, 0);
 }
 
 .nav-btn {

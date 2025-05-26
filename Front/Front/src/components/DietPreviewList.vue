@@ -5,7 +5,7 @@
     <ul>
       <li v-for="(item, index) in dietList" :key="index">
         {{ item.foodName }} - ({{ item.kcal }}kcal)
-        <button @click="removeLocal(index)">삭제</button>
+        <button @click="removeLocal(index)">❌</button>
       </li>
     </ul>
   </div>
@@ -34,8 +34,6 @@ const removeLocal = (index) => {
   align-items: center;
 }
 button {
-  background-color: #f44336;
-  color: white;
   border: none;
   border-radius: 4px;
   padding: 4px 8px;

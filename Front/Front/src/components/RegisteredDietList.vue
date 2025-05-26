@@ -1,11 +1,11 @@
 <template>
+  <h4>현재 식단</h4>
   <div class="diet-preview-list" v-if="dietList.length > 0">
   <!-- 기존에 등록한 식단을 보여주는 등록페이지의 섹션입니다 -->
-    <h4>현재 식단</h4>
     <ul>
       <li v-for="(item, index) in dietList" :key="item.dietId">
         {{ item.foodName }} - ({{ item.kcal }}kcal)
-        <button @click="deleteDiet(item.dietId)">삭제</button>
+        <button @click="deleteDiet(item.dietId)">❌</button>
       </li>
     </ul>
   </div>
@@ -61,8 +61,6 @@ li {
 }
 button {
   padding: 4px 8px;
-  background-color: #f44336;
-  color: white;
   border: none;
   border-radius: 4px;
 }
