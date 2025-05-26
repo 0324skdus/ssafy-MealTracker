@@ -71,13 +71,13 @@
                   </div>
                 </template>
                 <template v-else>
-                  <template v-if="!comment.secret || isMyComment(comment)">
-                    <div>{{ comment.content }}</div>
-                  </template>
-                  <template v-else>
-                    <div>🔒 비밀댓글입니다.</div>
-                  </template>
-                </template>
+                   <template v-if="!comment.secret || canViewSecretComment(comment)">
+      <div>{{ comment.content }}</div>
+    </template>
+    <template v-else>
+      <div>🔒 비밀댓글입니다.</div>
+    </template>
+  </template>
               </div>
 
               <div class="comment-actions" v-if="isMyComment(comment)">
@@ -260,6 +260,13 @@ const deletePost = async () => {
 
 const isMyComment = (comment) => {
   return (comment.userId || '').toLowerCase() === loggedInUserId.value
+}
+
+const canViewSecretComment = (comment) => {
+  const commentAuthor = (comment.userId || '').toLowerCase()
+  const postAuthor = (post.value?.userId || '').toLowerCase()
+  const currentUser = loggedInUserId.value
+  return commentAuthor === currentUser || postAuthor === currentUser
 }
 
 const formatDate = (str) => str?.slice(0, 10)
