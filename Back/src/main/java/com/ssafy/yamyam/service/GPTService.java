@@ -1,4 +1,7 @@
 package com.ssafy.yamyam.service;
 
-public class GPTService {
+import java.time.LocalDate;
+
+public interface GPTService {
+    String getFeedback(String userId, LocalDate date);
 }

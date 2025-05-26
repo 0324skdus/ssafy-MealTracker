@@ -42,6 +42,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/user/exists/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/nutrition/**").authenticated()
+						.requestMatchers(HttpMethod.GET, "/api/gpt/feedback").authenticated()
 						.requestMatchers(HttpMethod.PUT, "/api/user/profile/update").authenticated()
 						.requestMatchers("/api/community").authenticated()
                         .requestMatchers("/api/community/**").authenticated()
