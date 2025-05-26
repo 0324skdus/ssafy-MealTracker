@@ -10,7 +10,7 @@
 
         <!-- 알림 벨 아이콘 -->
         <div class="notification-bell" @click="toggleNotificationPanel">
-          <img src="/bell.png" class="bell-icon" />
+          🔔
           <span v-if="unreadCount > 0" class="noti-dot">{{ unreadCount }}</span>
           <Notification 
             v-if="showNotificationDropdown" 
@@ -277,10 +277,6 @@ const calendarOptions = ref({
   cursor: pointer;
 }
 
-.bell-icon {
-  width: 55px;
-  height: 55px;
-}
 
 .noti-dot {
   position: absolute;
