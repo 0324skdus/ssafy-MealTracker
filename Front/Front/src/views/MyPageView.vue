@@ -1,91 +1,3 @@
-<template>
-  <div class="main-layout">
-    <LeftSidebar />
-
-    <div class="mypage-container">
-      <h1 class="title">마이페이지</h1>
-      <p class="summary">{{ userName }}님, {{ daysSinceJoined }}일 동안 Meal Tracker를 이용 중입니다.</p>
-
-      <!-- 탭 버튼 -->
-      <div class="tab-buttons">
-        <button
-          v-for="tab in tabs"
-          :key="tab.key"
-          :class="{ active: selectedTab === tab.key }"
-          @click="selectedTab = tab.key"
-        >
-          {{ tab.label }}
-        </button>
-      </div>
-
-      <!-- 탭 내용 -->
-      <div class="tab-content">
-        <div v-if="selectedTab === 'info'" class="info-tab">
-          <p><strong>성별:</strong> {{ user.gender }}</p>
-          <p><strong>나이:</strong> {{ user.age }}세</p>
-          <p><strong>키:</strong> {{ user.height }}cm</p>
-          <p><strong>몸무게:</strong> {{ user.weight }}kg</p>
-          <p><strong>목표:</strong> {{ convertSpecialNote(user.specialNote) }}</p>
-          <p><strong>활동량:</strong> {{ convertActivityLevel(user.activityLevel) }}</p>
-        </div>
-<!-- 회원정보 탭 -->
-        <div v-else-if="selectedTab === 'profile'" class="info-tab">
-          <p><strong>아이디:</strong> {{ user.userId }}</p>
-          <p><strong>이름:</strong> {{ user.name }}</p>
-          <p><strong>이메일:</strong> {{ user.email }}</p>
-          <div class="edit-wrapper">
-            <button class="edit-button" @click="goToEditUserInfo">회원정보 수정</button>
-          </div>
-        </div>
-
-        
-
-        <div v-else-if="selectedTab === 'written'" class="post-list">
-          <div v-if="myPosts.length === 0">작성한 글이 없습니다.</div>
-          <ul v-else>
-            <li v-for="post in myPosts" :key="post.id" class="post-item">
-              <div class="post-title" @click="goToPost(post.id)">
-                {{ post.title }}
-              </div>
-              <div class="post-meta">작성일: {{ post.createdAt }} | 좋아요: {{ post.likeCount }}</div>
-            </li>
-          </ul>
-        </div>
-
-        <div v-else-if="selectedTab === 'liked'" class="post-list">
-          <div v-if="myLikedPosts.length === 0">좋아요 누른 글이 없습니다.</div>
-          <ul v-else>
-            <li v-for="post in myLikedPosts" :key="post.id" class="post-item">
-              <div class="post-title" @click="goToPost(post.id)">
-                {{ post.title }}
-              </div>
-              <div class="post-meta">작성일: {{ post.createdAt }} | 좋아요: {{ post.likeCount }}</div>
-            </li>
-          </ul>
-        </div>
-
-        <div v-else-if="selectedTab === 'comments'" class="post-list">
-          <div v-if="myComments.length === 0">작성한 댓글이 없습니다.</div>
-          <ul v-else>
-            <li v-for="comment in myComments" :key="comment.id" class="post-item">
-              <div class="post-title" @click="goToPost(comment.communityId)">
-                {{ comment.content }}
-              </div>
-              <div class="post-meta">작성일: {{ comment.createdAt }}</div>
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      <div v-if="selectedTab === 'info'" class="edit-wrapper">
-        <button class="edit-button" @click="goToEditProfile">회원정보 수정</button>
-      </div>
-    </div>
-
-    <RightSidebar />
-  </div>
-</template>
-
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -261,8 +173,11 @@ const handleDelete = async () => {
           <p><strong>목표:</strong> {{ convertSpecialNote(user.specialNote) }}</p>
           <p><strong>활동량:</strong> {{ convertActivityLevel(user.activityLevel) }}</p>
           <p><strong>기초대사량:</strong> {{ bmrText }}</p>
+          <div v-if="selectedTab === 'info'" class="edit-wrapper">
+            <button class="edit-button" @click="goToEditProfile">회원정보 수정</button>
+          </div>
         </div>
-
+        
         <div v-else-if="selectedTab === 'profile'" class="info-tab">
           <p><strong>아이디:</strong> {{ user.userId }}</p>
           <p><strong>이름:</strong> {{ user.name }}</p>
@@ -310,9 +225,6 @@ const handleDelete = async () => {
         </div>
       </div>
 
-      <div v-if="selectedTab === 'info'" class="edit-wrapper">
-        <button class="edit-button" @click="goToEditProfile">회원정보 수정</button>
-      </div>
     </div>
     <RightSidebar />
   </div>
@@ -364,22 +276,29 @@ const handleDelete = async () => {
 }
 .edit-wrapper {
   margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
 }
-
-.edit-button {
-  background-color: #86efac;
-  border: none;
+.edit-button,
+.delete-button {
   padding: 10px 16px;
   border-radius: 8px;
   cursor: pointer;
+  min-width: 130px;
+  font-size: 14px;
 }
-
+.edit-button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+}
 .edit-button:hover {
-  background-color: #ffb74c;
-  color: #666;
+  background-color: #4ade80;
+  color: #444;
 }
 .delete-button {
-  background-color: #f87171;
+  background-color: #ff9800;
   border: none;
   color: white;
 }
