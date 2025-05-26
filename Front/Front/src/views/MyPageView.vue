@@ -34,8 +34,10 @@
           <p><strong>이름:</strong> {{ user.name }}</p>
           <p><strong>이메일:</strong> {{ user.email }}</p>
           <div class="edit-wrapper">
-            <button class="edit-button" @click="goToEditUserInfo">회원정보 수정</button>
-          </div>
+  <button class="edit-button" @click="goToEditUserInfo">회원정보 수정</button>
+  <button class="delete-button" @click="handleDelete">회원 탈퇴</button>
+</div>
+
         </div>
 
         
@@ -98,6 +100,7 @@ const router = useRouter()
 const tabs = [
   { key: 'info', label: '내 신체정보' },
   { key: 'profile', label: '회원정보' },
+  { key: 'stat', label: '내 식단 통계' },
   { key: 'written', label: '내가 쓴 글' },
   { key: 'liked', label: '좋아요 누른 글' },
   { key: 'comments', label: '내가 쓴 댓글' }
@@ -183,9 +186,32 @@ watch(selectedTab, (newTab) => {
 const goToEditProfile = () => {
   router.push('/profile-edit')
 }
+
+const handleDelete = async () => {
+  const confirmed = window.confirm('정말 탈퇴하시겠습니까?\n탈퇴 시 모든 정보가 삭제됩니다.')
+  if (!confirmed) return
+
+  const token = localStorage.getItem('accessToken')
+  const userId = localStorage.getItem('userId')
+
+  try {
+    await axios.delete(`/api/user/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+
+    alert('회원 탈퇴가 완료되었습니다.')
+    localStorage.clear()
+    router.push('/')
+  } catch (err) {
+    alert('회원 탈퇴 실패: ' + (err.response?.data || err.message))
+  }
+}
+
 const goToEditUserInfo = () => {
   router.push('/userInfo-edit')
 }
+
+
 
 const goToPost = (postId) => {
   router.push(`/community/${postId}`)
@@ -263,19 +289,39 @@ onMounted(fetchUserInfo)
 
 .edit-wrapper {
   margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
+}
+
+.edit-button,
+.delete-button {
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  min-width: 130px;
+  font-size: 14px;
 }
 
 .edit-button {
   background-color: #86efac;
   border: none;
-  padding: 10px 16px;
-  border-radius: 6px;
-  cursor: pointer;
 }
 
 .edit-button:hover {
   background-color: #4ade80;
 }
+
+.delete-button {
+  background-color: #f87171;
+  border: none;
+  color: white;
+}
+
+.delete-button:hover {
+  background-color: #ef4444;
+}
+
 
 .post-list {
   display: flex;
