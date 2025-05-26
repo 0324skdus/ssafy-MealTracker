@@ -1,6 +1,6 @@
 <template>
   <div class="statistics-panel">
-    <!-- 상단 버튼 -->
+    <!-- 상단: 기간 선택 버튼 -->
     <div class="controls">
       <div class="period-buttons">
         <button
@@ -12,38 +12,34 @@
           {{ option.label }}
         </button>
       </div>
-      <div class="view-buttons">
-        <button :class="{ active: viewMode === 'average' }" @click="viewMode = 'average'">평균치 보기</button>
-        <button :class="{ active: viewMode === 'graph' }" @click="viewMode = 'graph'">그래프 보기</button>
-      </div>
     </div>
 
-    <!-- 평균치 보기 -->
-    <div v-if="viewMode === 'average'" class="average-view">
-      <div class="nutrient" v-for="(value, key) in nutrition" :key="key">
-        <span class="label">{{ nutrientLabels[key] }}:</span>
-        <div class="bar-wrapper">
-          <div
-            class="bar"
-            :style="{ width: getBarWidth(key, value) + '%' }"
-          ></div>
-          <span class="value">{{ value.toFixed(1) }}</span>
+    <!-- 본문: 그래프 + 평균치 동시 노출 -->
+    <div class="stat-body">
+      <!-- 그래프 영역 -->
+      <div class="chart-half">
+        <Line :data="chartData" :options="chartOptions" :height="220" />
+      </div>
+
+      <!-- 평균치 막대그래프 영역 -->
+      <div class="average-half">
+        <div class="nutrient" v-for="(value, key) in nutrition" :key="key">
+          <span class="label">{{ nutrientLabels[key] }}:</span>
+          <div class="bar-wrapper">
+            <div class="bar" :style="{ width: getBarWidth(key, value) + '%' }" />
+            <span class="value">{{ value.toFixed(1) }}</span>
+          </div>
+        </div>
+        <div class="score">
+          평균 점수: <strong>{{ averageScore.toFixed(1) }}</strong>점
         </div>
       </div>
-      <div class="score">
-        평균 점수: <strong>{{ averageScore.toFixed(1) }}</strong>점
-      </div>
-    </div>
-
-    <!-- 그래프 보기 -->
-    <div v-else class="graph-view">
-      <Line :data="chartData" :options="chartOptions" />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 import { Line } from 'vue-chartjs'
 import {
@@ -71,7 +67,6 @@ const userId = localStorage.getItem('userId')
 const token = localStorage.getItem('accessToken')
 
 const selectedPeriod = ref('1W')
-const viewMode = ref('graph')
 
 const periodOptions = [
   { value: '1W', label: '1주일' },
@@ -100,9 +95,9 @@ const nutrientLabels = {
   transfat: '트랜스지방 (g)'
 }
 
-const fetchAverageData = async () => {
+const fetchAllData = async () => {
   try {
-    const [nutritionRes, scoreRes, targetRes] = await Promise.all([
+    const [nutritionRes, scoreRes, targetRes, historyRes] = await Promise.all([
       axios.get(`/api/nutrition/average`, {
         params: { userId, period: selectedPeriod.value },
         headers: { Authorization: `Bearer ${token}` }
@@ -114,33 +109,24 @@ const fetchAverageData = async () => {
       axios.get(`/api/nutrition/target`, {
         params: { userId },
         headers: { Authorization: `Bearer ${token}` }
+      }),
+      axios.get(`/api/score/${userId}/history`, {
+        params: { period: selectedPeriod.value },
+        headers: { Authorization: `Bearer ${token}` }
       })
     ])
     nutrition.value = nutritionRes.data
     averageScore.value = scoreRes.data
     targetNutrition.value = targetRes.data
+    scoreHistory.value = historyRes.data
   } catch (err) {
-    console.error('평균치 조회 실패:', err)
-  }
-}
-
-const fetchScoreHistory = async () => {
-  try {
-    const res = await axios.get(`/api/score/${userId}/history`, {
-      params: { period: selectedPeriod.value },
-      headers: { Authorization: `Bearer ${token}` }
-    })
-    scoreHistory.value = res.data
-  } catch (err) {
-    console.error('점수 이력 조회 실패:', err)
-    scoreHistory.value = []
+    console.error('데이터 조회 실패:', err)
   }
 }
 
 const changePeriod = (period) => {
   selectedPeriod.value = period
-  if (viewMode.value === 'average') fetchAverageData()
-  else fetchScoreHistory()
+  fetchAllData()
 }
 
 const getBarWidth = (key, value) => {
@@ -175,35 +161,22 @@ const chartOptions = {
   }
 }
 
-onMounted(() => {
-  if (viewMode.value === 'graph') {
-    fetchScoreHistory()
-  } else {
-    fetchAverageData()
-  }
-})
-
-watch(viewMode, (mode) => {
-  if (mode === 'graph') fetchScoreHistory()
-  else fetchAverageData()
-})
+onMounted(fetchAllData)
 </script>
 
 <style scoped>
 .statistics-panel {
-  background-color: #f9f9f9;
-  padding: 24px;
+  background-color: #ffffff;   /* ← 회색 제거 */
+  padding: 16px;               /* ← 여백 줄이기 */
   border-radius: 8px;
 }
-
 .controls {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
+  justify-content: flex-start;
+  margin: 50px 0 20px;  /* ← 위쪽 여백 추가 */
 }
 
-.period-buttons button,
-.view-buttons button {
+.period-buttons button {
   margin-right: 10px;
   padding: 6px 12px;
   border: none;
@@ -217,10 +190,23 @@ button.active {
   color: white;
 }
 
-.average-view {
+/* 본문 가로배치 */
+.stat-body {
+  display: flex;
+  gap: 24px;
+  align-items: stretch; /* ← 높이 맞추기 핵심 */
+}
+
+.chart-half,
+.average-half {
+  flex: 1;
+}
+
+/* 평균 막대그래프 스타일 */
+.average-half {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  justify-content: space-between; /* 항목이 전체 영역 안에서 분산되도록 */
 }
 
 .nutrient {
