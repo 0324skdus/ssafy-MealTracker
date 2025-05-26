@@ -179,14 +179,7 @@ async function submitUpdate() {
   border: none;
 }
 
-.no-spin::-webkit-inner-spin-button,
-.no-spin::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-.no-spin {
-  -moz-appearance: textfield;
-}
+
 
 .row-box {
   display: flex;
