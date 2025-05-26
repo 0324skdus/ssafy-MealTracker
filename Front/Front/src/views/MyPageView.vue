@@ -10,7 +10,6 @@ const router = useRouter()
 const tabs = [
   { key: 'info', label: '내 신체정보' },
   { key: 'profile', label: '회원정보' },
-  { key: 'stat', label: '내 식단 통계' },
   { key: 'written', label: '내가 쓴 글' },
   { key: 'liked', label: '좋아요 누른 글' },
   { key: 'comments', label: '내가 쓴 댓글' }
