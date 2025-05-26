@@ -3,6 +3,7 @@ package com.ssafy.yamyam.service;
 import com.ssafy.yamyam.dao.DietDao;
 import com.ssafy.yamyam.dto.DailyNutrition;
 import com.ssafy.yamyam.dto.Diet;
+import com.ssafy.yamyam.dto.User;
 import com.ssafy.yamyam.util.OpenAIUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -71,8 +72,19 @@ public class GPTServiceImpl implements GPTService {
 
     private String buildPrompt(String userId, LocalDate date, DailyNutrition sum,
                                DailyNutrition target, List<Diet> meals) {
+
+        // 사용자 정보 가져오기
+        User user = nutritionService.getUserInfo(userId);  // 반드시 NutritionServiceImpl 에 이런 메서드 있어야 함
+        String goal = user.getSpecialNote();                // 체중감량 / 유지 / 근육량 증가
+        String activityLevel = user.getActivityLevel();     // 예: "활동 적음", "보통", "많음"
+
         StringBuilder sb = new StringBuilder();
-        sb.append(userId).append(" 사용자의 ").append(date).append(" 식단은 다음과 같습니다:\n");
+        sb.append("다음은 ").append(userId)
+                .append(" 사용자의 ").append(date).append(" 식단 기록입니다. ")
+                .append("사용자는 현재 '").append(goal).append("'을 목표로 하고 있으며, 활동량은 '")
+                .append(activityLevel).append("' 수준입니다.\n");
+
+        sb.append("\n[식단 내역]\n");
         for (Diet d : meals) {
             sb.append("- ").append(d.getFoodName()).append(": ")
                     .append(d.getKcal()).append("kcal, ")
@@ -81,7 +93,7 @@ public class GPTServiceImpl implements GPTService {
                     .append(d.getFat()).append("g 지방\n");
         }
 
-        sb.append("\n[실제 섭취량]\n")
+        sb.append("\n[총 섭취량]\n")
                 .append("칼로리: ").append(sum.getKcal()).append("kcal\n")
                 .append("탄수화물: ").append(sum.getCarb()).append("g\n")
                 .append("단백질: ").append(sum.getProtein()).append("g\n")
@@ -90,7 +102,7 @@ public class GPTServiceImpl implements GPTService {
                 .append("당류: ").append(sum.getSugar()).append("g\n")
                 .append("트랜스지방: ").append(sum.getTransfat()).append("g\n");
 
-        sb.append("\n[권장 섭취량]\n")
+        sb.append("\n[권장 섭취량 (해당 사용자 기준)]\n")
                 .append("칼로리: ").append(target.getKcal()).append("kcal\n")
                 .append("탄수화물: ").append(target.getCarb()).append("g\n")
                 .append("단백질: ").append(target.getProtein()).append("g\n")
@@ -99,8 +111,17 @@ public class GPTServiceImpl implements GPTService {
                 .append("당류: ").append(target.getSugar()).append("g\n")
                 .append("트랜스지방: ").append(target.getTransfat()).append("g\n");
 
-        sb.append("\n위 내용을 바탕으로 이 식단이 건강한지, 어떤 개선이 필요한지 전문가 관점에서 상세 피드백을 작성해주세요. ");
-
+        sb.append("\n위 데이터를 바탕으로 다음 사항을 반영하여 전문가 스타일로 피드백을 해주세요:\n")
+                .append("1. 체중감량 / 근육량 증가 등 사용자의 목표에 적합한지 평가해주세요.\n")
+                .append("2. 영양성분의 과잉 또는 부족 여부를 분석해주세요.\n")
+                .append("3. 과잉/부족한 항목에 대해 구체적으로 어떤 음식을 줄이거나 추가하면 좋을지 알려주세요.\n")
+                .append("4. 부족한 영양소를 보충할 수 있는 식품 예시를 제시하고, 그 식품의 쿠팡 구매 링크도 함께 제시해주세요. (단, 실제 링크는 예시 형식으로라도 보여주세요)\n")
+                .append("5. ‘트레이너’나 ‘영양사’처럼 친절하고 설득력 있는 말투로 작성해주세요. 단순한 수치 나열이 아닌 실질적 조언이 되도록 해주세요.\n")
+                .append("6. 내가 먹은 음식 중 바꾸면 좋은 음식이 있다면 어떤 걸 대체해서 바꿔보면 좋을지 구체적으로 제안해주세요.\n")
+                .append("7. 쿠팡 링크는 반드시 'https://www.coupang.com/...' 형태의 전체 URL로 출력해주세요. 'coupang.com' 식의 도메인만 주지 마세요.\n" +
+                        "8. 특정 카테고리 링크(예: /categories/xxxxx)는 사용하지 마세요.  \n" +
+                        "항상 https://www.coupang.com/np/search?q=식품명 형식의 검색 링크만 추천해주세요.");
         return sb.toString();
     }
+
 }

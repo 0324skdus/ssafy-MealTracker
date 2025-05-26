@@ -26,9 +26,39 @@ const props = defineProps({
 })
 const emit = defineEmits(['close', 'regenerate'])
 
-const formattedFeedback = computed(() =>
-  props.feedback?.replace(/\n/g, '<br />')
-)
+function autoLinkFeedback(feedbackText) {
+  if (!feedbackText) return ''
+
+  let result = feedbackText.replace(/\n/g, '<br />')
+
+  // 추천 식품 추출 패턴 (예: "추천드립니다: 닭가슴살, 바나나, ...")
+  const foodPattern = /(?:추천(?:드립니다|합니다|해요)?|드시는 것을 추천|드셔보세요|추가하시면 좋습니다)[^\n]*?([가-힣a-zA-Z0-9\s,·•ㆍ\/]+)[\.\n]/gi
+
+  const matches = [...feedbackText.matchAll(foodPattern)]
+
+  for (const match of matches) {
+    const foods = match[1]
+      .split(/,|·|•|ㆍ|\/|or|그리고|또는/)
+      .map(s => s.trim())
+      .filter(s => s.length >= 2 && s.length <= 20 && /^[가-힣a-zA-Z0-9\s]+$/.test(s))
+
+    for (const food of foods) {
+      const url = `https://www.coupang.com/np/search?q=${encodeURIComponent(food)}`
+      const linked = `<a href="${url}" target="_blank">${food}</a>`
+      const plainPattern = new RegExp(food.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g')
+      result = result.replace(plainPattern, linked)
+    }
+  }
+
+  // 일반적인 URL도 자동 링크 처리
+  result = result.replace(/https?:\/\/[^\s<>()]+/g, (url) => {
+    return `<a href="${url}" target="_blank">${url}</a>`
+  })
+
+  return result
+}
+
+const formattedFeedback = computed(() => autoLinkFeedback(props.feedback))
 </script>
 
 <style scoped>
@@ -64,6 +94,11 @@ const formattedFeedback = computed(() =>
   white-space: normal;
   word-break: break-word;
   margin-bottom: 24px;
+}
+
+.popup-content a {
+  color: #1a0dab;
+  text-decoration: underline;
 }
 
 .popup-footer {

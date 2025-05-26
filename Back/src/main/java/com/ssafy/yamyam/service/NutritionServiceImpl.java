@@ -178,4 +178,13 @@ public class NutritionServiceImpl implements NutritionService {
                 Math.round(totalTransfat / dayCount)
         );
     }
+
+    @Override
+    public User getUserInfo(String userId) {
+        User user = userDao.selectById(userId);
+        if (user == null) {
+            throw new IllegalArgumentException("해당 유저 정보를 찾을 수 없습니다: " + userId);
+        }
+        return user;
+    }
 }
