@@ -71,7 +71,7 @@ const userId = localStorage.getItem('userId')
 const token = localStorage.getItem('accessToken')
 
 const selectedPeriod = ref('1W')
-const viewMode = ref('average')
+const viewMode = ref('graph')
 
 const periodOptions = [
   { value: '1W', label: '1주일' },
@@ -176,7 +176,11 @@ const chartOptions = {
 }
 
 onMounted(() => {
-  fetchAverageData()
+  if (viewMode.value === 'graph') {
+    fetchScoreHistory()
+  } else {
+    fetchAverageData()
+  }
 })
 
 watch(viewMode, (mode) => {

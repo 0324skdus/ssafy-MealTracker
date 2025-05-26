@@ -38,9 +38,7 @@
           </div>
         </div>
 
-        <div v-else-if="selectedTab === 'stat'">
-          <StatisticsPanel />
-        </div>
+        
 
         <div v-else-if="selectedTab === 'written'" class="post-list">
           <div v-if="myPosts.length === 0">작성한 글이 없습니다.</div>
@@ -94,14 +92,12 @@ import { useRouter } from 'vue-router'
 import axios from 'axios'
 import LeftSidebar from '@/components/LeftSidebar.vue'
 import RightSidebar from '@/components/RightSidebar.vue'
-import StatisticsPanel from '@/components/StatisticsPanel.vue'
 
 const router = useRouter()
 
 const tabs = [
   { key: 'info', label: '내 신체정보' },
   { key: 'profile', label: '회원정보' },
-  { key: 'stat', label: '내 식단 통계' },
   { key: 'written', label: '내가 쓴 글' },
   { key: 'liked', label: '좋아요 누른 글' },
   { key: 'comments', label: '내가 쓴 댓글' }

@@ -21,6 +21,9 @@
       </div>
 
       <FullCalendar ref="calendarRef" :options="calendarOptions" />
+
+      <!-- 통계 패널 (버튼은 내부 StatisticsPanel.vue에 존재) -->
+      <StatisticsPanel />
     </main>
 
     <RightSidebar />
@@ -63,6 +66,7 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import DietDetailPanel from '@/components/DietDetailPanel.vue'
 import DietRegisterPanel from '@/components/DietRegisterPanel.vue'
 import Notification from '@/components/Notification.vue'
+import StatisticsPanel from '@/components/StatisticsPanel.vue'
 
 const selectedDate = ref(null)
 const showDetailPanel = ref(false)
@@ -81,10 +85,8 @@ function toggleNotificationPanel() {
 async function fetchUnreadCount() {
   const token = localStorage.getItem('accessToken')
   try {
-    const res = await axios.get('http://localhost:8080/api/notification/unread-count', {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+    const res = await axios.get('/api/notification/unread-count', {
+      headers: { Authorization: `Bearer ${token}` }
     })
     unreadCount.value = res.data
   } catch (e) {
@@ -101,7 +103,7 @@ async function openDetail(date) {
   const token = localStorage.getItem('accessToken')
 
   try {
-    const res = await axios.get('http://localhost:8080/api/nutrition/target', {
+    const res = await axios.get('/api/nutrition/target', {
       params: { userId },
       headers: { Authorization: `Bearer ${token}` }
     })
@@ -157,7 +159,7 @@ const fetchMonthlyData = async () => {
     const startDate = calendarApi.view.currentStart.toISOString().split('T')[0]
     const endDate = calendarApi.view.currentEnd.toISOString().split('T')[0]
 
-    const res = await axios.get('http://localhost:8080/api/diet/summary/monthly', {
+    const res = await axios.get('/api/diet/summary/monthly', {
       params: { userId, startDate, endDate },
       headers: { Authorization: `Bearer ${token}` }
     })
@@ -334,6 +336,7 @@ const calendarOptions = ref({
 .main-layout > * {
   min-width: 180px;
 }
+
 .panel-backdrop {
   position: fixed;
   top: 0;
