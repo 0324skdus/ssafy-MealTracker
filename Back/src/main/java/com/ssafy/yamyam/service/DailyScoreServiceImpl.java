@@ -119,17 +119,53 @@ public class DailyScoreServiceImpl implements DailyScoreService {
         int saturatedFatScore = reverseScoreByRatio(actualSaturatedFat, targetSaturatedFat);
         int transFatScore = reverseScoreByRatio(actualTransFat, targetKcal * 0.01 / 9);
 
+        String goal = user.getSpecialNote();  // "체중감량", "체중유지", "근육량증가"
+
+        double weightKcal, weightCarb, weightProtein, weightFat, weightFiber, weightSaturatedFat, weightTransFat;
+
+        switch (goal) {
+            case "체중감량":
+                weightKcal = 0.20;
+                weightCarb = 0.20;
+                weightProtein = 0.25;
+                weightFat = 0.10;
+                weightFiber = 0.10;
+                weightSaturatedFat = 0.10;
+                weightTransFat = 0.05;
+                break;
+            case "근육량 증가":
+                weightKcal = 0.10;
+                weightCarb = 0.15;
+                weightProtein = 0.35;
+                weightFat = 0.15;
+                weightFiber = 0.10;
+                weightSaturatedFat = 0.10;
+                weightTransFat = 0.05;
+                break;
+            case "체중유지":
+            default:
+                weightKcal = 0.15;
+                weightCarb = 0.20;
+                weightProtein = 0.25;
+                weightFat = 0.15;
+                weightFiber = 0.10;
+                weightSaturatedFat = 0.10;
+                weightTransFat = 0.05;
+                break;
+        }
+
         double finalScore =
-                kcalScore * 0.15 +
-                        carbScore * 0.20 +
-                        proteinScore * 0.25 +
-                        fatScore * 0.15 +
-                        fiberScore * 0.10 +
-                        saturatedFatScore * 0.10 +
-                        transFatScore * 0.05;
+                kcalScore * weightKcal +
+                        carbScore * weightCarb +
+                        proteinScore * weightProtein +
+                        fatScore * weightFat +
+                        fiberScore * weightFiber +
+                        saturatedFatScore * weightSaturatedFat +
+                        transFatScore * weightTransFat;
 
         return Math.round(finalScore);
     }
+
 
     private int scoreByRatio(double actual, double target) {
         if (target == 0) return 100;
