@@ -56,17 +56,15 @@ public class GPTServiceImpl implements GPTService {
             transfat += d.getTransfat();
         }
 
-        int count = meals.size() == 0 ? 1 : meals.size();
-
         return new DailyNutrition(
-                kcal / count,
-                carb / count,
-                protein / count,
-                fat / count,
-                fiber / count,
-                sugar / count,
-                transfat / count,
-                0  // bmr은 GPT에서 안 쓰므로 0으로 대체
+                kcal,
+                carb,
+                protein,
+                fat,
+                fiber,
+                sugar,
+                transfat,
+                0
         );
     }
 
@@ -119,10 +117,13 @@ public class GPTServiceImpl implements GPTService {
                 .append("4. 부족한 영양소를 보충할 수 있는 식품 예시를 제시하고, 그 식품의 쿠팡 구매 링크도 함께 제시해주세요. (단, 실제 링크는 예시 형식으로라도 보여주세요)\n")
                 .append("5. ‘트레이너’나 ‘영양사’처럼 친절하고 설득력 있는 말투로 작성해주세요. 단순한 수치 나열이 아닌 실질적 조언이 되도록 해주세요.\n")
                 .append("6. 내가 먹은 음식 중 바꾸면 좋은 음식이 있다면 어떤 걸 대체해서 바꿔보면 좋을지 구체적으로 제안해주세요.\n")
-                .append("7. 쿠팡 링크는 반드시 'https://www.coupang.com/...' 형태의 전체 URL로 출력해주세요. 'coupang.com' 식의 도메인만 주지 마세요.\n" +
-                        "8. 특정 카테고리 링크(예: /categories/xxxxx)는 사용하지 마세요.  \n" +
-                        "항상 https://www.coupang.com/np/search?q=식품명 형식의 검색 링크만 추천해주세요\n" +
-                        "그리고 넘겨받은 사용자의 정보(신체정보 및 활동량, 목표, 권장섭취량) 와 일일섭취량을 기반으로 식단의 점수를 매겨주세요. ");
+                .append("7. 쿠팡 링크는 반드시 'https://www.coupang.com/...' 형태의 전체 URL로 출력해주세요. 'coupang.com' 식의 도메인만 주지 마세요.\n")
+                .append("8. 특정 카테고리 링크(예: /categories/xxxxx)는 사용하지 마세요. 항상 https://www.coupang.com/np/search?q=식품명 형식의 검색 링크만 추천해주세요.\n")
+                .append("10. 다음과 같은 추가 항목도 꼭 포함해주세요:\n")
+                .append("  - 영양 불균형 여부 (예: 과다/부족 영양소, 칼로리 초과/미달, 식이섬유 부족 등)\n")
+                .append("  - 개선을 위한 팁 (예: 균형 잡힌 식단 구성, 건강한 조리법, 식사 시간 조절, 간식 선택 가이드, 외식 메뉴 팁 등)\n")
+                .append("  - 대체 식품 제안 (예: 영양가 높은 대체 식품, 알레르기 대체품, 저칼로리/저지방 옵션, 식물성 단백질 등)\n");
+
         return sb.toString();
     }
 

@@ -55,7 +55,7 @@
       <div class="bottom-buttons">
         <button class="share-button" @click="shareToCommunity">공유하기</button>
         <button class="share-button" @click="handleFeedbackClick">
-          {{ hasFeedback ? 'GPT 피드백 보기' : 'GPT 피드백 받기' }}
+          {{ hasFeedback ? '피드백 보기' : '피드백 받기' }}
         </button>
       </div>
     </div>
@@ -182,7 +182,7 @@ async function regenerateFeedback() {
     localStorage.setItem(`gpt_feedback_${props.date}`, res.data)
     hasFeedback.value = true
   } catch (err) {
-    feedback.value = 'GPT 피드백을 불러오는 데 실패했습니다.'
+    feedback.value = '피드백을 불러오는 데 실패했습니다.'
   } finally {
     loadingFeedback.value = false
   }

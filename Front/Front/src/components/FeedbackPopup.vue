@@ -1,7 +1,7 @@
 <template>
   <div class="popup-backdrop" @click.self="emit('close')">
     <div class="popup-panel">
-      <h3 class="popup-title">GPT 식단 피드백</h3>
+      <h3 class="popup-title">식단 피드백</h3>
 
       <div class="popup-content">
         <p v-if="loading">피드백 생성 중입니다...</p>
@@ -10,7 +10,7 @@
       </div>
 
       <div class="popup-footer">
-        <button class="refresh-btn" @click="emit('regenerate')">다시 피드백 받기</button>
+        <button class="refresh-btn" @click="emit('regenerate')">피드백 업데이트</button>
         <button class="close-btn" @click="emit('close')">닫기</button>
       </div>
     </div>
