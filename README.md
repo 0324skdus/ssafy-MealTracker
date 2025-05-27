@@ -1,12 +1,11 @@
-# MealTracker_KIMNAYEON_LEEJONGHYEON
+# MealTracker_KIMNAYEON_LEEJONGHUN
 1. 프로젝트 소개
-   - 개발 기간: 
+   - 개발 기간: 2025.04.26 ~ 2025.05.26
    - 프로젝트 내용: 식단기록및 피드백 웹애플리케이션
    - 기술 스택: SpringBoot, MyBatis, Vue
-   - 개발 인원: 김나연(팀장),이종현(팀원) 2인
+   - 개발 인원: 2명
 
 2. 주요 기능
-
 
 | 기능 번호 | 기능 명 | 설명 |
 | ------ | ------ | ------ |
@@ -20,11 +19,11 @@
 | 8         | 게시판 - 추천 기능               | 좋아요 버튼. 추천 수 카운트                             |
 
 3. 서비스 설계
-   - 와이어프레임 목업*
+   - 목업
 ![Untitled](/uploads/3565a27c7c12be6c8018b5a42cf23ae2/Untitled.png)
-   - 데이터 베이스 모델링 (ERD) *
+   - 데이터 베이스 모델링 (ERD) 
 ![ERD-냠냠코치](/uploads/1e807d7bcca22ce9aa328fab9fd3d090/ERD-냠냠코치.png)
-   - URL 명세서(or REST API 명세) *  
+   - URL 명세서(or REST API 명세) 
    - Vue 컴포넌트 구조
 
 ```C:\MEALTRACKER\FRONT\FRONT\SRC  
@@ -62,9 +61,9 @@
         SignUpView.vue : 회원가입페이지
         UserInfoEditView.vue : 회원정보 수정 페이지
         WriteView.vue : 게시글 작성 화면 
+```
 
-
-  - 팀원 및 업무분담
+   - 팀원 및 업무분담
     김나연: 메인페이지 캘린더 ui구현, 추천기능 구현  
     이종현: 게시판기능 구현, gpt api를 활용한 식단 코칭 기능구현
 4. 후기
