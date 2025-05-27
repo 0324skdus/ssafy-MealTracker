@@ -14,8 +14,10 @@ function logout() {
 <template>
   <aside class="left-sidebar">
     <div class="logo-box">
-        <img src="/logo.png" alt="Meal Tracker Logo" class="logo" />
-    </div>
+  <router-link to="/main" class="logo-link" exact-active-class="">
+    <img src="/logo.png" alt="Meal Tracker Logo" class="logo" />
+  </router-link>
+</div>
     <ul>
       <li>
         <router-link to="/main" active-class="active">
