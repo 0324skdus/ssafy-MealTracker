@@ -23,7 +23,7 @@
 
       <!-- 평균치 막대그래프 영역 -->
       <div class="average-half">
-        <div class="nutrient" v-for="(value, key) in nutrition" :key="key">
+        <div class="nutrient" v-for="(value, key) in visibleNutrition" :key="key">
           <span class="label">{{ nutrientLabels[key] }}:</span>
           <div class="bar-wrapper">
             <div class="bar" :style="{ width: getBarWidth(key, value) + '%' }" />
@@ -94,6 +94,13 @@ const nutrientLabels = {
   sugar: '당류 (g)',
   transfat: '트랜스지방 (g)'
 }
+
+// 🔍 nutrientLabels에 정의된 key만 필터링
+const visibleNutrition = computed(() => {
+  return Object.fromEntries(
+    Object.entries(nutrition.value).filter(([key]) => key in nutrientLabels)
+  )
+})
 
 const fetchAllData = async () => {
   try {
@@ -166,16 +173,15 @@ onMounted(fetchAllData)
 
 <style scoped>
 .statistics-panel {
-  background-color: #ffffff;   /* ← 회색 제거 */
-  padding: 16px;               /* ← 여백 줄이기 */
+  background-color: #ffffff;
+  padding: 16px;
   border-radius: 8px;
 }
 .controls {
   display: flex;
   justify-content: flex-start;
-  margin: 50px 0 20px;  /* ← 위쪽 여백 추가 */
+  margin: 50px 0 20px;
 }
-
 .period-buttons button {
   margin-right: 10px;
   padding: 6px 12px;
@@ -184,55 +190,44 @@ onMounted(fetchAllData)
   background-color: #ddd;
   cursor: pointer;
 }
-
 button.active {
   background-color: #4caf50;
   color: white;
 }
-
-/* 본문 가로배치 */
 .stat-body {
   display: flex;
   gap: 24px;
-  align-items: stretch; /* ← 높이 맞추기 핵심 */
+  align-items: stretch;
 }
-
 .chart-half,
 .average-half {
   flex: 1;
 }
-
-/* 평균 막대그래프 스타일 */
 .average-half {
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* 항목이 전체 영역 안에서 분산되도록 */
+  justify-content: space-between;
 }
-
 .nutrient {
   display: flex;
   flex-direction: column;
 }
-
 .label {
   font-weight: bold;
   margin-bottom: 4px;
 }
-
 .bar-wrapper {
   background-color: #eee;
   border-radius: 4px;
   position: relative;
   height: 24px;
 }
-
 .bar {
   background-color: #4caf50;
   height: 100%;
   border-radius: 4px;
   transition: width 0.3s ease;
 }
-
 .value {
   position: absolute;
   top: 0;
@@ -240,7 +235,6 @@ button.active {
   font-size: 14px;
   line-height: 24px;
 }
-
 .score {
   margin-top: 20px;
   font-size: 18px;
