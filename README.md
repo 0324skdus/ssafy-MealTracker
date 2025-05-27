@@ -22,7 +22,7 @@
    - 목업
 ![Untitled](/uploads/3565a27c7c12be6c8018b5a42cf23ae2/Untitled.png)
    - 데이터 베이스 모델링 (ERD) 
-![ERD-냠냠코치](/uploads/1e807d7bcca22ce9aa328fab9fd3d090/ERD-냠냠코치.png)
+![MT_ERD](/uploads/67cf8570e291588b6a4adda44eb7b83a/MT_ERD.png)
    - URL 명세서(or REST API 명세) 
 [MealTracker_api.pdf](/uploads/4e56eeabfa6f302ca063881d2590ff7f/MealTracker_api.pdf)
    - Vue 컴포넌트 구조
