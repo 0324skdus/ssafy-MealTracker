@@ -78,11 +78,11 @@
 
 3. 서비스 설계
    - 목업
-![Untitled](/uploads/3565a27c7c12be6c8018b5a42cf23ae2/Untitled.png)
+![Untitled](Untitled.png)
    - 데이터 베이스 모델링 (ERD) 
-![MT_ERD](/uploads/67cf8570e291588b6a4adda44eb7b83a/MT_ERD.png)
+![MT_ERD](MT_ERD.png)
    - URL 명세서(or REST API 명세) 
-[MealTracker_api.pdf](/uploads/4e56eeabfa6f302ca063881d2590ff7f/MealTracker_api.pdf)
+[MealTracker_api.pdf](MealTracker_api.pdf)
    - Vue 컴포넌트 구조
 
 ```
